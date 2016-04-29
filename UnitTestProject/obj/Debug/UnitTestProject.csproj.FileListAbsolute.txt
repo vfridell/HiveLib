@@ -1,0 +1,7 @@
+C:\Workroot\Projects\HiveLib\UnitTestProject\obj\Debug\UnitTestProject.csprojResolveAssemblyReference.cache
+C:\Workroot\Projects\HiveLib\UnitTestProject\bin\Debug\UnitTestProject.dll
+C:\Workroot\Projects\HiveLib\UnitTestProject\bin\Debug\UnitTestProject.pdb
+C:\Workroot\Projects\HiveLib\UnitTestProject\bin\Debug\HiveLib.dll
+C:\Workroot\Projects\HiveLib\UnitTestProject\bin\Debug\HiveLib.pdb
+C:\Workroot\Projects\HiveLib\UnitTestProject\obj\Debug\UnitTestProject.dll
+C:\Workroot\Projects\HiveLib\UnitTestProject\obj\Debug\UnitTestProject.pdb

@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 
 namespace HiveLib.Models.Pieces
 {
-    class Piece
+    class Spider : Piece
     {
-        public enum PieceColor {White, Black};
-        public int number { get; set; }
-        public PieceColor color { get; set; }
     }
 }

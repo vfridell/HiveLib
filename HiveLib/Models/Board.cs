@@ -17,7 +17,42 @@ namespace HiveLib.Models
         internal readonly List<Piece> unplayedPieces = new List<Piece>();
         internal readonly Piece [,] boardArray = new Piece[rows,columns];
 
-        public Board() { }
+        public Board() 
+        {
+            unplayedPieces.Add(new Bee { color = Piece.PieceColor.White, number = 1 });
+            unplayedPieces.Add(new Beetle { color = Piece.PieceColor.White, number = 1 });
+            unplayedPieces.Add(new Beetle { color = Piece.PieceColor.White, number = 2 });
+            unplayedPieces.Add(new Spider { color = Piece.PieceColor.White, number = 1 });
+            unplayedPieces.Add(new Spider { color = Piece.PieceColor.White, number = 2 });
+            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.White, number = 1 });
+            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.White, number = 2 });
+            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.White, number = 3 });
+            unplayedPieces.Add(new Ant { color = Piece.PieceColor.White, number = 1 });
+            unplayedPieces.Add(new Ant { color = Piece.PieceColor.White, number = 2 });
+            unplayedPieces.Add(new Ant { color = Piece.PieceColor.White, number = 3 });
+
+            unplayedPieces.Add(new Bee { color = Piece.PieceColor.Black, number = 1 });
+            unplayedPieces.Add(new Beetle { color = Piece.PieceColor.Black, number = 1 });
+            unplayedPieces.Add(new Beetle { color = Piece.PieceColor.Black, number = 2 });
+            unplayedPieces.Add(new Spider { color = Piece.PieceColor.Black, number = 1 });
+            unplayedPieces.Add(new Spider { color = Piece.PieceColor.Black, number = 2 });
+            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.Black, number = 1 });
+            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.Black, number = 2 });
+            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.Black, number = 3 });
+            unplayedPieces.Add(new Ant { color = Piece.PieceColor.Black, number = 1 });
+            unplayedPieces.Add(new Ant { color = Piece.PieceColor.Black, number = 2 });
+            unplayedPieces.Add(new Ant { color = Piece.PieceColor.Black, number = 3 });
+        }
+
+        public void PlaceFirstPiece(Piece piece)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void PlaceSecondPiece(Piece piece)
+        {
+            throw new NotImplementedException();
+        }
 
         public void PlacePiece(Point point, Piece piece)
         {
