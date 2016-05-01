@@ -9,7 +9,17 @@ namespace HiveLib.Models.Pieces
     class Piece
     {
         public enum PieceColor {White, Black};
-        public int number { get; set; }
-        public PieceColor color { get; set; }
+
+        internal Piece(PieceColor color, int number)
+        {
+            _number = number;
+            _color = color;
+        }
+
+        private readonly int _number;
+        internal virtual int number { get { return _number; } }
+
+        private readonly PieceColor _color;
+        internal virtual PieceColor color { get { return _color; } }
     }
 }

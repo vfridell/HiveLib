@@ -1,5 +1,0 @@
-C:\Workroot\Projects\HiveLib\HiveLib\obj\Debug\HiveLib.csprojResolveAssemblyReference.cache
-C:\Workroot\Projects\HiveLib\HiveLib\bin\Debug\HiveLib.dll
-C:\Workroot\Projects\HiveLib\HiveLib\bin\Debug\HiveLib.pdb
-C:\Workroot\Projects\HiveLib\HiveLib\obj\Debug\HiveLib.dll
-C:\Workroot\Projects\HiveLib\HiveLib\obj\Debug\HiveLib.pdb

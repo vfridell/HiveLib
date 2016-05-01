@@ -42,12 +42,15 @@
   <ItemGroup>
     <Compile Include="Models\Board.cs" />
     <Compile Include="Models\HumanReadableMove.cs" />
+    <Compile Include="Models\Move.cs" />
+    <Compile Include="Models\Neighborhood.cs" />
     <Compile Include="Models\Pieces\Ant.cs" />
     <Compile Include="Models\Pieces\Bee.cs" />
     <Compile Include="Models\Pieces\Beetle.cs" />
     <Compile Include="Models\Pieces\Hopper.cs" />
     <Compile Include="Models\Pieces\Piece.cs" />
     <Compile Include="Models\Pieces\Spider.cs" />
+    <Compile Include="Models\Pieces\Stack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\HiveService.cs" />
   </ItemGroup>

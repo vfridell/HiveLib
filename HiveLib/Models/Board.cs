@@ -11,67 +11,75 @@ namespace HiveLib.Models
 
     class Board
     {
-        public static readonly int rows = 50;
         public static readonly int columns = 50;
+        public static readonly int rows = 50;
         
         internal readonly List<Piece> unplayedPieces = new List<Piece>();
-        internal readonly Piece [,] boardArray = new Piece[rows,columns];
+        internal readonly Piece [,] boardArray = new Piece[columns, rows];
 
-        public Board() 
+        internal Board() 
         {
-            unplayedPieces.Add(new Bee { color = Piece.PieceColor.White, number = 1 });
-            unplayedPieces.Add(new Beetle { color = Piece.PieceColor.White, number = 1 });
-            unplayedPieces.Add(new Beetle { color = Piece.PieceColor.White, number = 2 });
-            unplayedPieces.Add(new Spider { color = Piece.PieceColor.White, number = 1 });
-            unplayedPieces.Add(new Spider { color = Piece.PieceColor.White, number = 2 });
-            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.White, number = 1 });
-            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.White, number = 2 });
-            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.White, number = 3 });
-            unplayedPieces.Add(new Ant { color = Piece.PieceColor.White, number = 1 });
-            unplayedPieces.Add(new Ant { color = Piece.PieceColor.White, number = 2 });
-            unplayedPieces.Add(new Ant { color = Piece.PieceColor.White, number = 3 });
+            unplayedPieces.Add(new Bee(Piece.PieceColor.White, 1));
+            unplayedPieces.Add(new Beetle(Piece.PieceColor.White, 1));
+            unplayedPieces.Add(new Beetle(Piece.PieceColor.White, 2 ));
+            unplayedPieces.Add(new Spider(Piece.PieceColor.White, 1));
+            unplayedPieces.Add(new Spider(Piece.PieceColor.White, 2));
+            unplayedPieces.Add(new Hopper(Piece.PieceColor.White, 1));
+            unplayedPieces.Add(new Hopper(Piece.PieceColor.White, 2));
+            unplayedPieces.Add(new Hopper(Piece.PieceColor.White, 3));
+            unplayedPieces.Add(new Ant(Piece.PieceColor.White, 1));
+            unplayedPieces.Add(new Ant(Piece.PieceColor.White, 2));
+            unplayedPieces.Add(new Ant(Piece.PieceColor.White, 3));
 
-            unplayedPieces.Add(new Bee { color = Piece.PieceColor.Black, number = 1 });
-            unplayedPieces.Add(new Beetle { color = Piece.PieceColor.Black, number = 1 });
-            unplayedPieces.Add(new Beetle { color = Piece.PieceColor.Black, number = 2 });
-            unplayedPieces.Add(new Spider { color = Piece.PieceColor.Black, number = 1 });
-            unplayedPieces.Add(new Spider { color = Piece.PieceColor.Black, number = 2 });
-            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.Black, number = 1 });
-            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.Black, number = 2 });
-            unplayedPieces.Add(new Hopper { color = Piece.PieceColor.Black, number = 3 });
-            unplayedPieces.Add(new Ant { color = Piece.PieceColor.Black, number = 1 });
-            unplayedPieces.Add(new Ant { color = Piece.PieceColor.Black, number = 2 });
-            unplayedPieces.Add(new Ant { color = Piece.PieceColor.Black, number = 3 });
+            unplayedPieces.Add(new Bee(Piece.PieceColor.Black, 1));
+            unplayedPieces.Add(new Beetle(Piece.PieceColor.Black, 1));
+            unplayedPieces.Add(new Beetle(Piece.PieceColor.Black, 2));
+            unplayedPieces.Add(new Spider(Piece.PieceColor.Black, 1));
+            unplayedPieces.Add(new Spider(Piece.PieceColor.Black, 2));
+            unplayedPieces.Add(new Hopper(Piece.PieceColor.Black, 1));
+            unplayedPieces.Add(new Hopper(Piece.PieceColor.Black, 2));
+            unplayedPieces.Add(new Hopper(Piece.PieceColor.Black, 3));
+            unplayedPieces.Add(new Ant(Piece.PieceColor.Black, 1));
+            unplayedPieces.Add(new Ant(Piece.PieceColor.Black, 2));
+            unplayedPieces.Add(new Ant(Piece.PieceColor.Black, 3));
         }
 
-        public void PlaceFirstPiece(Piece piece)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void PlaceSecondPiece(Piece piece)
+        internal void PlaceFirstPiece(Piece piece)
         {
             throw new NotImplementedException();
         }
 
-        public void PlacePiece(Point point, Piece piece)
+        internal void PlaceSecondPiece(Piece piece)
         {
             throw new NotImplementedException();
         }
 
-        public void MovePiece(Point point, Piece piece)
+        internal void MakeMove(Move move)
         {
             throw new NotImplementedException();
         }
 
-        private static void ConvertForArrayLookup(Point p)
+        internal Piece GetPieceByCoordinate(int column, int row)
         {
-            throw new NotImplementedException();
+            return boardArray[column, row];
         }
 
-        private static void ConvertForCoordinateCalc(Point p)
+        internal Neighborhood GetNeighborhood(int column, int row)
         {
-            throw new NotImplementedException();
+            Neighborhood neighborhood = new Neighborhood();
+            neighborhood.center = boardArray[column, row];
+            
+            // Axial coordinates
+            // ref: http://www.redblobgames.com/grids/hexagons/
+            neighborhood.topleft = boardArray[column, row - 1];
+            neighborhood.topright = boardArray[column + 1, row - 1];
+            neighborhood.right = boardArray[column + 1, row];
+            neighborhood.bottomright = boardArray[column, row + 1];
+            neighborhood.bottomleft = boardArray[column - 1, row + 1];
+            neighborhood.left = boardArray[column - 1, row];
+
+            return neighborhood;
         }
+
     }
 }
