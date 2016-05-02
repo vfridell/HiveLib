@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,9 +16,13 @@ namespace HiveLib.Models
         internal readonly List<Piece> unplayedPieces = new List<Piece>();
         internal readonly Piece [,] boardArray = new Piece[columns, rows];
 
+        internal bool whiteToPlay = true;
+        internal bool whiteQueenPlaced { get; set; }
+        internal bool blackQueenPlaced { get; set; }
+
         internal Board() 
         {
-            unplayedPieces.Add(new Bee(Piece.PieceColor.White, 1));
+            unplayedPieces.Add(new QueenBee(Piece.PieceColor.White, 1));
             unplayedPieces.Add(new Beetle(Piece.PieceColor.White, 1));
             unplayedPieces.Add(new Beetle(Piece.PieceColor.White, 2 ));
             unplayedPieces.Add(new Spider(Piece.PieceColor.White, 1));
@@ -31,7 +34,7 @@ namespace HiveLib.Models
             unplayedPieces.Add(new Ant(Piece.PieceColor.White, 2));
             unplayedPieces.Add(new Ant(Piece.PieceColor.White, 3));
 
-            unplayedPieces.Add(new Bee(Piece.PieceColor.Black, 1));
+            unplayedPieces.Add(new QueenBee(Piece.PieceColor.Black, 1));
             unplayedPieces.Add(new Beetle(Piece.PieceColor.Black, 1));
             unplayedPieces.Add(new Beetle(Piece.PieceColor.Black, 2));
             unplayedPieces.Add(new Spider(Piece.PieceColor.Black, 1));

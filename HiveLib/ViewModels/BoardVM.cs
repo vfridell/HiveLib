@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HiveLib.Models.Pieces
+namespace HiveLib.ViewModels
 {
-    class Bee : Piece
+    class BoardVM
     {
-        internal Bee(PieceColor color, int number) : base(color, number) { }
     }
 }
