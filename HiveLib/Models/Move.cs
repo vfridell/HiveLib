@@ -168,18 +168,5 @@ namespace HiveLib.Models
             }
             return piece;
         }
-
-        public static bool IsValidNotationString(string notation)
-        {
-            try
-            {
-                Move move = GetMove(notation);
-                return move.NotationValid();
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
     }
 }

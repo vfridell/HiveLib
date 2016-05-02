@@ -8,11 +8,21 @@ using HiveLib.ViewModels;
 
 namespace HiveLib.Services
 {
-    class HiveService
+    public class HiveService
     {
-        IOrderedEnumerable<Move> GetAllAvailableMoves(BoardVM board)
+        public static bool IsValidNotationString(string notation)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Move move = Move.GetMove(notation);
+                return move.NotationValid();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
+
+
     }
 }

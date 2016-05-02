@@ -14,6 +14,7 @@ namespace HiveLib.Models
         public static readonly int rows = 50;
         
         internal readonly List<Piece> unplayedPieces = new List<Piece>();
+        internal readonly Dictionary<Piece, Hex> playedPieces = new Dictionary<Piece, Hex>();
         internal readonly Piece [,] boardArray = new Piece[columns, rows];
 
         internal bool whiteToPlay = true;
@@ -62,26 +63,18 @@ namespace HiveLib.Models
             throw new NotImplementedException();
         }
 
-        internal Piece GetPieceByCoordinate(int column, int row)
+        internal Piece GetPiece(Hex hex)
         {
-            return boardArray[column, row];
+            return boardArray[hex.column, hex.row];
         }
 
-        internal Neighborhood GetNeighborhood(int column, int row)
+        internal Hex GetHex(Piece piece)
         {
-            Neighborhood neighborhood = new Neighborhood();
-            neighborhood.center = boardArray[column, row];
-            
-            // Axial coordinates
-            // ref: http://www.redblobgames.com/grids/hexagons/
-            neighborhood.topleft = boardArray[column, row - 1];
-            neighborhood.topright = boardArray[column + 1, row - 1];
-            neighborhood.right = boardArray[column + 1, row];
-            neighborhood.bottomright = boardArray[column, row + 1];
-            neighborhood.bottomleft = boardArray[column - 1, row + 1];
-            neighborhood.left = boardArray[column - 1, row];
-
-            return neighborhood;
+            Hex hex;
+            if (!playedPieces.TryGetValue(piece, out hex))
+                return null;
+            else
+                return hex;
         }
 
     }

@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="AI\JohnnyHive.cs" />
     <Compile Include="Models\Board.cs" />
+    <Compile Include="Models\Hex.cs" />
     <Compile Include="Models\HumanReadableMove.cs" />
     <Compile Include="Models\Move.cs" />
     <Compile Include="Models\Neighborhood.cs" />

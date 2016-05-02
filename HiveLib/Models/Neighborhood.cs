@@ -7,45 +7,22 @@ using HiveLib.Models.Pieces;
 
 namespace HiveLib.Models
 {
+    // Axial coordinates
+    // ref: http://www.redblobgames.com/grids/hexagons/
     class Neighborhood
     {
         public enum Position { center, topleft, topright, right, bottomright, bottomleft, left };
+        public static readonly Hex[] neighborDirections = { new Hex(0,0), new Hex(0,-1), new Hex(1,-1), new Hex(1,0), new Hex(0,1), new Hex(-1,1), new Hex(-1,0), };
 
-        internal Piece[] neighborhoodArray = new Piece[7];
-
-        internal Piece center 
-        { 
-            get { return neighborhoodArray[(int)Position.center]; }
-            set { neighborhoodArray[(int)Position.center] = value; } 
-        }
-        internal Piece topleft 
-        { 
-            get { return neighborhoodArray[(int)Position.topleft]; }
-            set { neighborhoodArray[(int)Position.topleft] = value; } 
-        }
-        internal Piece topright 
-        { 
-            get { return neighborhoodArray[(int)Position.topright]; }
-            set { neighborhoodArray[(int)Position.topright] = value; } 
-        }
-        internal Piece right 
-        { 
-            get { return neighborhoodArray[(int)Position.right]; }
-            set { neighborhoodArray[(int)Position.right] = value; } 
-        }
-        internal Piece bottomright 
+        public static Hex GetDirectionHex(Position position)
         {
-            get { return neighborhoodArray[(int)Position.bottomright]; }
-            set { neighborhoodArray[(int)Position.bottomright] = value; } 
+            return neighborDirections[(int)position];
         }
-        internal Piece bottomleft 
-        { 
-            get { return neighborhoodArray[(int)Position.bottomleft]; }
-            set { neighborhoodArray[(int)Position.bottomleft] = value; } 
-        }
-        internal Piece left { 
-            get { return neighborhoodArray[(int)Position.left]; }
-            set { neighborhoodArray[(int)Position.left] = value; } 
+
+        public static Hex GetNeighborHex(Hex hex, Position position)
+        {
+            Hex dir = GetDirectionHex(position);
+            return new Hex(hex.column + dir.column, hex.row + dir.row);
         }
     }
 }
