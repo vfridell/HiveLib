@@ -14,8 +14,8 @@ namespace HiveLib.Services
         {
             try
             {
-                Move move = Move.GetMove(notation);
-                return move.NotationValid();
+                Move move;
+                return NotationParser.TryParseNotation(notation, out move);
             }
             catch (Exception)
             {

@@ -54,6 +54,7 @@ namespace HiveLib.Tests
 
             Assert.IsTrue(bs.Equals(bs2));
             Assert.IsFalse(bs3.Equals(bs2));
+            Assert.IsFalse(bs2.Equals(beetle3));
         }
 
         [TestMethod]
