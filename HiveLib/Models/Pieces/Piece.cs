@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HiveLib.Models.Pieces
+﻿namespace HiveLib.Models.Pieces
 {
     class Piece
     {
         public enum PieceColor {White, Black};
 
-        internal Piece(PieceColor color, int number)
+        public Piece(PieceColor color, int number)
         {
             _number = number;
             _color = color;
@@ -21,5 +15,25 @@ namespace HiveLib.Models.Pieces
 
         private readonly PieceColor _color;
         internal virtual PieceColor color { get { return _color; } }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (this.GetType() != obj.GetType()) return false;
+            return Equals((Piece)obj);
+        }
+
+        public virtual bool Equals(Piece obj)
+        {
+            if (obj == null) return false;
+            if (this.GetType() != obj.GetType()) return false;
+            return this._color.Equals(obj._color) && this._number.Equals(obj._number);
+        }
+
+        public override int GetHashCode()
+        {
+            // this probably sucks
+            return _number + (int)_color;
+        }
     }
 }
