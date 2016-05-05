@@ -14,8 +14,9 @@ namespace HiveLib.Models
         internal Piece pieceToMove { get; set; }
         internal Piece referencePiece { get; set; }
         internal Neighborhood.Position targetPosition { get; set; }
+        internal Hex hex;
 
-        private Move() { }
+        private Move() { hex = Board.invalidHex; }
 
         internal void Execute(Board board)
         {
@@ -44,5 +45,12 @@ namespace HiveLib.Models
             return move;
         }
 
+        internal static Move GetMove(Piece pieceToMove, Hex hex)
+        {
+            Move move = new Move();
+            move.pieceToMove = pieceToMove;
+            move.hex = hex;
+            return move;
+        }
     }
 }

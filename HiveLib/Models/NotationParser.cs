@@ -7,7 +7,7 @@ namespace HiveLib.Models
 {
     class NotationParser
     {
-        private static Regex _notationStringRegex = new Regex(@"([bw]([BS][12]|[GA][123]|Q)) (([-\\/]?)([bw]([BS][12]|[GA][123]|Q))([-\\/]?))");
+        private static Regex _notationStringRegex = new Regex(@"([bw]([BS][12]|[GA][123]|Q)) (([-\\/]?)([bw]([BS][12]|[GA][123]|Q))([-\\/]?)|\.)");
 
         internal static bool TryParseNotation(string notation, out Move move)
         {
@@ -25,8 +25,15 @@ namespace HiveLib.Models
             if (!NotationValid(pieceToMoveNotation, targetLocation, referencePieceNotation, targetpositionLeft, targetpositionRight)) return false;
 
             Piece pieceToMove = GetPieceByNotation(pieceToMoveNotation);
-            Piece referencePiece = GetPieceByNotation(referencePieceNotation);
             Neighborhood.Position targetPosition;
+            if (targetLocation == ".")
+            {
+                // the first move is always to this hex
+                move = Move.GetMove(pieceToMove, new Hex(24, 24));
+                return true;
+            }
+
+            Piece referencePiece = GetPieceByNotation(referencePieceNotation);
 
             if (!string.IsNullOrEmpty(targetpositionLeft))
             {
@@ -69,6 +76,12 @@ namespace HiveLib.Models
                 !string.IsNullOrEmpty(targetpositionRight))
             {
                 return false;
+            }
+
+            // an initial move has no target
+            if(targetLocation == ".")
+            {
+                return true;
             }
 
             // cannot be missing a position indicator on a non-beetle move

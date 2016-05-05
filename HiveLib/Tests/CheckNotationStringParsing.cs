@@ -46,7 +46,11 @@ namespace HiveLib.Tests
             // do not need a postion for beetle move
             Assert.IsTrue(HiveService.IsValidNotationString(@"bB1 bS1"));
         }
-
+        [TestMethod]
+        public void CheckValidNotationString8()
+        {
+            Assert.IsTrue(HiveService.IsValidNotationString(@"wA1 ."));
+        }
         
         [TestMethod]
         public void CheckBadNotationString1()
