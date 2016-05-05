@@ -18,8 +18,8 @@ namespace HiveLib.Models
         private Piece [,] boardArray = new Piece[columns, rows];
 
         internal bool whiteToPlay = true;
-        internal bool whiteQueenPlaced { get; set; }
-        internal bool blackQueenPlaced { get; set; }
+        internal bool whiteQueenPlaced = false;
+        internal bool blackQueenPlaced = false;
 
         private Board() { }
 
@@ -37,7 +37,7 @@ namespace HiveLib.Models
         /// Make a move.  Validates the move or fails.
         /// </summary>
         /// <param name="move"></param>
-        internal void MakeMove(Move move)
+        internal bool TryMakeMove(Move move)
         {
             throw new NotImplementedException();
         }
@@ -63,13 +63,13 @@ namespace HiveLib.Models
             throw new NotImplementedException();
         }
 
-        internal bool TryGetPiece(Hex hex, out Piece piece)
+        internal bool TryGetPieceAtHex(Hex hex, out Piece piece)
         {
             piece = boardArray[hex.column, hex.row];
             return (null == piece);
         }
 
-        internal bool TryGetHex(Piece piece, out Hex hex)
+        internal bool TryGetHexOfPlayedPiece(Piece piece, out Hex hex)
         {
             // look for it non-stacked
             if (playedPieces.TryGetValue(piece, out hex))
@@ -92,6 +92,11 @@ namespace HiveLib.Models
                     return false;
                 }
             }
+        }
+
+        internal bool PiecePlayed(Piece piece)
+        {
+            return !unplayedPieces.Contains(piece);
         }
 
         internal Board Clone()

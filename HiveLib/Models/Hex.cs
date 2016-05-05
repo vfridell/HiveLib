@@ -1,20 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HiveLib.Models
+﻿namespace HiveLib.Models
 {
-    class Hex
+    struct Hex
     {
-        internal Hex(int column, int row)
+        public Hex(int column, int row)
         {
             this.column = column;
             this.row = row;
         }
 
-        internal int column { get; set; }
-        internal int row { get; set; }
+        public readonly int column;
+        public readonly int row;
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (this.GetType() != obj.GetType()) return false;
+            return this.column == ((Hex)obj).column &&
+                   this.row == ((Hex)obj).row;
+        }
+
+        public override int GetHashCode()
+        {
+            return column ^ row;
+        }
+
     }
 }

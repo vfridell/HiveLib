@@ -151,50 +151,72 @@ namespace HiveLib.Tests
             Assert.IsTrue(move.targetPosition == Neighborhood.Position.bottomleft);
         }
 
-        //[TestMethod]
-        //public void CheckProperPiecesReturned2()
-        //{
-        //    Move move;
-        //    Assert.IsTrue(Move.TryGetMove(@"wB2 -bQ", out move));
+        [TestMethod]
+        public void CheckProperPiecesReturned4()
+        {
+            Move move;
+            Assert.IsTrue(Move.TryGetMove(@"wB2 -bQ", out move));
 
-        //    Assert.IsInstanceOfType(move.pieceToMove, typeof(Beetle));
-        //    Assert.IsTrue(move.pieceToMove.number == 2);
-        //    Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.White);
+            Assert.IsInstanceOfType(move.pieceToMove, typeof(Beetle));
+            Assert.IsTrue(move.pieceToMove.number == 2);
+            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.White);
 
-        //    Assert.IsInstanceOfType(move.referencePiece, typeof(QueenBee));
-        //    Assert.IsTrue(move.referencePiece.number == 1);
-        //    Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.Black);
+            Assert.IsInstanceOfType(move.referencePiece, typeof(QueenBee));
+            Assert.IsTrue(move.referencePiece.number == 1);
+            Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.Black);
 
-        //    Assert.IsTrue(move.targetPosition == Neighborhood.Position.left);
-        //}
+            Assert.IsTrue(move.targetPosition == Neighborhood.Position.left);
+        }
 
-        //[TestMethod]
-        //public void CheckProperPiecesReturned2()
-        //{
-        //    Move move;
-        //    Assert.IsTrue(Move.TryGetMove(@"wS2 /bA3", out move));
+        [TestMethod]
+        public void CheckProperPiecesReturned5()
+        {
+            Move move;
+            Assert.IsTrue(Move.TryGetMove(@"wS2 /bA3", out move));
 
-        //    Assert.IsInstanceOfType(move.pieceToMove, typeof(Spider));
-        //    Assert.IsTrue(move.pieceToMove.number == 2);
-        //    Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.White);
+            Assert.IsInstanceOfType(move.pieceToMove, typeof(Spider));
+            Assert.IsTrue(move.pieceToMove.number == 2);
+            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.White);
 
-        //    Assert.IsInstanceOfType(move.referencePiece, typeof(Ant));
-        //    Assert.IsTrue(move.referencePiece.number == 3);
-        //    Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.Black);
+            Assert.IsInstanceOfType(move.referencePiece, typeof(Ant));
+            Assert.IsTrue(move.referencePiece.number == 3);
+            Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.Black);
 
-        //    Assert.IsTrue(move.targetPosition == Neighborhood.Position.topleft);
-        //}
+            Assert.IsTrue(move.targetPosition == Neighborhood.Position.topleft);
+        }
 
-        //[TestMethod]
-        //public void CheckValidNotationString6()
-        //{
-        //    Assert.IsTrue(HiveService.IsValidNotationString(@"bB1 bS1/"));
-        //}
-        //[TestMethod]
-        //public void CheckValidNotationString7()
-        //{
-        //    // do not need a postion for beetle move
-        //    Assert.IsTrue(HiveService.IsValidNotationString(@"bB1 bS1"));
-        //}
+        [TestMethod]
+        public void CheckProperPiecesReturned6()
+        {
+            Move move;
+            Assert.IsTrue(Move.TryGetMove(@"bB1 bS1/", out move));
+
+            Assert.IsInstanceOfType(move.pieceToMove, typeof(Beetle));
+            Assert.IsTrue(move.pieceToMove.number == 1);
+            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.Black);
+
+            Assert.IsInstanceOfType(move.referencePiece, typeof(Spider));
+            Assert.IsTrue(move.referencePiece.number == 1);
+            Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.Black);
+
+            Assert.IsTrue(move.targetPosition == Neighborhood.Position.topright);
+        }
+
+        [TestMethod]
+        public void CheckProperPiecesReturned7()
+        {
+            Move move;
+            Assert.IsTrue(Move.TryGetMove(@"bB1 bS1", out move));
+
+            Assert.IsInstanceOfType(move.pieceToMove, typeof(Beetle));
+            Assert.IsTrue(move.pieceToMove.number == 1);
+            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.Black);
+
+            Assert.IsInstanceOfType(move.referencePiece, typeof(Spider));
+            Assert.IsTrue(move.referencePiece.number == 1);
+            Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.Black);
+
+            Assert.IsTrue(move.targetPosition == Neighborhood.Position.center);
+        }
     }
 }
