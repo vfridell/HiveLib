@@ -1,6 +1,6 @@
 ﻿namespace HiveLib.Models.Pieces
 {
-    class Piece
+    abstract class Piece
     {
         public enum PieceColor {White, Black};
 
@@ -15,6 +15,8 @@
 
         private readonly PieceColor _color;
         internal virtual PieceColor color { get { return _color; } }
+
+        public abstract string GetPieceNotation();
 
         public override bool Equals(object obj)
         {

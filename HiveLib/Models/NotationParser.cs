@@ -146,5 +146,70 @@ namespace HiveLib.Models
             }
             return piece;
         }
+
+        /// <summary>
+        /// Produces valid notation, but does not validate the move for the given board.
+        /// </summary>
+        /// <param name="move"></param>
+        /// <param name="board"></param>
+        /// <returns></returns>
+        internal static string GetNotationForMove(Move move, Board board)
+        {
+            string referencePieceNotation;
+            string targetPieceNotation = GetNotationForPiece(move.pieceToMove);
+            if (move.referencePiece != null)
+            {
+                referencePieceNotation = GetNotationForPiece(move.referencePiece);
+                referencePieceNotation = string.Format(Neighborhood.neighborDirectionNotationTemplates[(int)move.targetPosition], referencePieceNotation);
+            }
+            else if(!move.hex.Equals(Board.invalidHex))
+            {
+                Piece refPiece = null;
+                if(board.TryGetPieceAtHex(move.hex, out refPiece))
+                {
+                    // assume this is a beetle moving on top of another piece
+                    referencePieceNotation = GetNotationForPiece(refPiece);
+                }
+                else
+                {
+                    Hex refHex = Board.invalidHex;
+                    Neighborhood.Position refPosition;
+                    bool found = false;
+                    int i = 0;  // zero is center.  we dont care about center
+                    while(!found && i < Neighborhood.neighborDirections.Length)
+                    {
+                        i++;
+                        refHex = Neighborhood.neighborDirections[i] + move.hex;
+                        refPosition = Neighborhood.GetOpposite((Neighborhood.Position)i);
+                        found = board.TryGetPieceAtHex(refHex, out refPiece);
+                    }
+                    // must be a first move
+                    if (!found)
+                    {
+                        referencePieceNotation = ".";
+                    }
+                    else
+                    {
+                        // TODO here!
+                        throw new NotImplementedException();
+                        //referencePieceNotation = "";
+                    }
+                }
+            }
+            else
+            {
+                // must be a first move
+               referencePieceNotation = ".";
+            }
+            return targetPieceNotation + " " + referencePieceNotation;
+        }
+
+        private static string GetNotationForPiece(Piece piece)
+        {
+            return (piece.color == HiveLib.Models.Pieces.Piece.PieceColor.White ? "w" : "b") +
+                                             piece.GetPieceNotation() +
+                                             piece.number.ToString();
+        }
+
     }
 }

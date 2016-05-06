@@ -3,5 +3,9 @@
     class Spider : Piece
     {
         internal Spider(PieceColor color, int number) : base(color, number) { }
+        public override string GetPieceNotation()
+        {
+            return "S";
+        }
     }
 }

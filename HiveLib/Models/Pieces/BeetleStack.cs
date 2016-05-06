@@ -103,5 +103,10 @@ namespace HiveLib.Models.Pieces
             }
             return true;
         }
+
+        public override string GetPieceNotation()
+        {
+            throw new Exception("BeetleStacks do not have notation");
+        }
     }
 }

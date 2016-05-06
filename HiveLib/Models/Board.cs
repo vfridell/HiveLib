@@ -33,7 +33,7 @@ namespace HiveLib.Models
             _moves.Clear();
             foreach (KeyValuePair<Hex, Hivailability> kvp in _hivailableHexes)
             {
-                if (kvp.Value.BlackCanPlace)
+                if (kvp.Value.BlackCanPlace && !whiteToPlay)
                 {
                     Beetle beetle = _unplayedPieces.OfType<Beetle>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
                     Ant ant = _unplayedPieces.OfType<Ant>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
@@ -46,7 +46,7 @@ namespace HiveLib.Models
                     if (null != queenBee) _moves.Add(Move.GetMove(queenBee, kvp.Key));
                     if (null != hopper) _moves.Add(Move.GetMove(hopper, kvp.Key));
                 }
-                if (kvp.Value.WhiteCanPlace)
+                if (kvp.Value.WhiteCanPlace && whiteToPlay)
                 {
                     Beetle beetle = _unplayedPieces.OfType<Beetle>().Where(p => p.color == PieceColor.White).FirstOrDefault();
                     Ant ant = _unplayedPieces.OfType<Ant>().Where(p => p.color == PieceColor.White).FirstOrDefault();
@@ -157,6 +157,13 @@ namespace HiveLib.Models
                     _hivailableHexes.Remove(adjacentHex);
                     _hivailableHexes.Add(adjacentHex, Hivailability.GetHivailability(this, adjacentHex, false, forceBlackCanPlace));
                 }
+            }
+            if (piece is QueenBee)
+            {
+                if (piece.color == PieceColor.White)
+                    whiteQueenPlaced = true;
+                else
+                    blackQueenPlaced = true;
             }
         }
 
