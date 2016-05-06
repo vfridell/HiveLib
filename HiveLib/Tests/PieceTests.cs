@@ -14,10 +14,14 @@ namespace HiveLib.Tests
         {
             Ant ant = new Ant(Piece.PieceColor.Black, 1);
             Ant ant2 = new Ant(Piece.PieceColor.Black, 1);
+            Ant ant3 = new Ant(Piece.PieceColor.Black, 2);
+            Ant ant4 = new Ant(Piece.PieceColor.White, 1);
             Beetle beetle = new Beetle(Piece.PieceColor.Black, 1);
 
             Assert.IsTrue(ant.Equals(ant2));
             Assert.IsFalse(ant.Equals(beetle));
+            Assert.IsFalse(ant.Equals(ant3));
+            Assert.IsFalse(ant.Equals(ant4));
         }
 
         [TestMethod]

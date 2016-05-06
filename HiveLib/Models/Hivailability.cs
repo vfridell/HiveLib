@@ -18,6 +18,12 @@ namespace HiveLib.Models
         public bool[] IsBlockedArray { get { return _isBlocked; } }
         public NeighborStatus[] NeighborStatusArray { get { return _neighborStatus; } }
 
+        internal bool CanPlace(Piece.PieceColor pieceColor)
+        {
+            if (pieceColor == Piece.PieceColor.Black) return _blackCanPlace;
+            else return _whiteCanPlace;
+        }
+
         internal static Hivailability GetHivailability(Board board, Hex hex, bool forceWhitePlacement = false, bool forceBlackPlacement = false)
         {
             Hivailability hivailability = new Hivailability();

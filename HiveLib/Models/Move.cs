@@ -52,5 +52,28 @@ namespace HiveLib.Models
             move.hex = hex;
             return move;
         }
+
+        public virtual bool Equals(Move obj)
+        {
+            if (obj == null) return false;
+            if (this.GetType() != obj.GetType()) return false;
+            return this.pieceToMove.Equals(obj.pieceToMove) && this.hex.Equals(obj.hex);
+        }
+
+        public static bool operator == (Move move1, Move move2)
+        {
+            return move1.Equals(move2);
+        }
+
+        public static bool operator !=(Move move1, Move move2)
+        {
+            return !move1.Equals(move2);
+        }
+
+        public override int GetHashCode()
+        {
+            // this probably sucks
+            return (this.hex.column ^ this.hex.row) + this.pieceToMove.GetHashCode();
+        }
     }
 }

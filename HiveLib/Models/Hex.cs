@@ -11,25 +11,19 @@
         public readonly int column;
         public readonly int row;
 
-        //public override bool Equals(object obj)
-        //{
-        //    if (obj == null) return false;
-        //    if (this.GetType() != obj.GetType()) return false;
-        //    return this.column == ((Hex)obj).column &&
-        //           this.row == ((Hex)obj).row;
-        //}
+        public static bool operator != (Hex hex1, Hex hex2)
+        {
+            return hex1.column != hex2.column || hex1.row != hex2.row;
+        }
 
-        //public override bool Equals(Hex obj)
-        //{
-        //    if (this.GetType() != obj.GetType()) return false;
-        //    return this.column == ((Hex)obj).column &&
-        //           this.row == ((Hex)obj).row;
-        //}
+        public static bool operator ==(Hex hex1, Hex hex2)
+        {
+            return hex1.column == hex2.column && hex1.row == hex2.row;
+        }
 
-        //public override int GetHashCode()
-        //{
-        //    return column ^ row;
-        //}
-
+        public static Hex operator +(Hex hex1, Hex hex2)
+        {
+            return new Hex(hex1.column + hex2.column, hex1.row + hex2.row);
+        }
     }
 }

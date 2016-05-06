@@ -17,7 +17,7 @@ namespace HiveLib.Tests
             Assert.IsFalse(board.whiteQueenPlaced);
             Assert.IsFalse(board.blackQueenPlaced);
             Assert.IsTrue(board.whiteToPlay);
-            IList<Move> placementMoves = board.GetPlacementMoves();
+            IList<Move> placementMoves = board.GetMoves();
             Assert.AreEqual(placementMoves.Count, 5);
         }
 
@@ -25,7 +25,16 @@ namespace HiveLib.Tests
         public void CheckFirstMove()
         {
             Board board = Board.GetNewBoard();
-
+            IList<Move> placementMoves = board.GetMoves();
+            Assert.IsTrue(board.TryMakeMove(placementMoves[0]));
         }
+
+        //[TestMethod]
+        //public void CheckSecondMove()
+        //{
+        //    Board board = Board.GetNewBoard();
+        //    IList<Move> placementMoves = board.GetMoves();
+        //    Assert.IsTrue(board.TryMakeMove(placementMoves[0]));
+        //}
     }
 }

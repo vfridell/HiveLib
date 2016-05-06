@@ -18,30 +18,33 @@ namespace HiveLib.Models
         private HashSet<Piece> _unplayedPieces = new HashSet<Piece>();
         private Dictionary<Piece, Hex> _playedPieces = new Dictionary<Piece, Hex>();
         private Piece [,] _boardPieceArray = new Piece[columns, rows];
+        private List<Move> _moves = new List<Move>();
+        private bool _movesDirty = true;
 
         internal bool whiteToPlay = true;
         internal bool whiteQueenPlaced = false;
         internal bool blackQueenPlaced = false;
+        internal int turnNumber = 0;
 
         private Board() { }
 
-        internal IList<Move> GetPlacementMoves()
+        private void GeneratePlacementMoves()
         {
-            List<Move> moves = new List<Move>();
-            foreach(KeyValuePair<Hex, Hivailability> kvp in _hivailableHexes)
+            _moves.Clear();
+            foreach (KeyValuePair<Hex, Hivailability> kvp in _hivailableHexes)
             {
-                if(kvp.Value.BlackCanPlace) 
+                if (kvp.Value.BlackCanPlace)
                 {
                     Beetle beetle = _unplayedPieces.OfType<Beetle>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
                     Ant ant = _unplayedPieces.OfType<Ant>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
                     Spider spider = _unplayedPieces.OfType<Spider>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
                     QueenBee queenBee = _unplayedPieces.OfType<QueenBee>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
                     Hopper hopper = _unplayedPieces.OfType<Hopper>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
-                    if (null != beetle) moves.Add(Move.GetMove(beetle, kvp.Key));
-                    if (null != ant) moves.Add(Move.GetMove(ant, kvp.Key));
-                    if (null != spider) moves.Add(Move.GetMove(spider, kvp.Key));
-                    if (null != queenBee) moves.Add(Move.GetMove(queenBee, kvp.Key));
-                    if (null != hopper) moves.Add(Move.GetMove(hopper, kvp.Key));
+                    if (null != beetle) _moves.Add(Move.GetMove(beetle, kvp.Key));
+                    if (null != ant) _moves.Add(Move.GetMove(ant, kvp.Key));
+                    if (null != spider) _moves.Add(Move.GetMove(spider, kvp.Key));
+                    if (null != queenBee) _moves.Add(Move.GetMove(queenBee, kvp.Key));
+                    if (null != hopper) _moves.Add(Move.GetMove(hopper, kvp.Key));
                 }
                 if (kvp.Value.WhiteCanPlace)
                 {
@@ -50,24 +53,29 @@ namespace HiveLib.Models
                     Spider spider = _unplayedPieces.OfType<Spider>().Where(p => p.color == PieceColor.White).FirstOrDefault();
                     QueenBee queenBee = _unplayedPieces.OfType<QueenBee>().Where(p => p.color == PieceColor.White).FirstOrDefault();
                     Hopper hopper = _unplayedPieces.OfType<Hopper>().Where(p => p.color == PieceColor.White).FirstOrDefault();
-                    if (null != beetle) moves.Add(Move.GetMove(beetle, kvp.Key));
-                    if (null != ant) moves.Add(Move.GetMove(ant, kvp.Key));
-                    if (null != spider) moves.Add(Move.GetMove(spider, kvp.Key));
-                    if (null != queenBee) moves.Add(Move.GetMove(queenBee, kvp.Key));
-                    if (null != hopper) moves.Add(Move.GetMove(hopper, kvp.Key));
+                    if (null != beetle) _moves.Add(Move.GetMove(beetle, kvp.Key));
+                    if (null != ant) _moves.Add(Move.GetMove(ant, kvp.Key));
+                    if (null != spider) _moves.Add(Move.GetMove(spider, kvp.Key));
+                    if (null != queenBee) _moves.Add(Move.GetMove(queenBee, kvp.Key));
+                    if (null != hopper) _moves.Add(Move.GetMove(hopper, kvp.Key));
                 }
             }
-            return moves;
         }
 
-        internal void PlaceFirstPiece(Piece piece)
+        private void GenerateMovementMoves()
         {
             throw new NotImplementedException();
         }
 
-        internal void PlaceSecondPiece(Piece piece)
+        internal IList<Move> GetMoves()
         {
-            throw new NotImplementedException();
+            if (_movesDirty)
+            {
+                GeneratePlacementMoves();
+                //GenerateMovementMoves();
+                _movesDirty = false;
+            }
+            return _moves;
         }
 
         /// <summary>
@@ -76,36 +84,80 @@ namespace HiveLib.Models
         /// <param name="move"></param>
         internal bool TryMakeMove(Move move)
         {
-            Hex targetPieceHex;
-            Hex referencePieceHex = move.hex;
+            if (move.pieceToMove.color == PieceColor.White && !whiteToPlay) return false;
+            if (move.pieceToMove.color == PieceColor.Black && whiteToPlay) return false;
+
+            bool placement = true;
+            Hex pieceToMoveHex;
+            if (_unplayedPieces.FirstOrDefault(p => p.Equals(move.pieceToMove)) == null)
+            {
+                // the target piece is already played on the board
+                placement = false;
+                if (!TryGetHexOfPlayedPiece(move.pieceToMove, out pieceToMoveHex)) return false;
+            }
+
             if(move.hex.Equals(invalidHex))
             {
-                if(_unplayedPieces.FirstOrDefault(p => p.Equals(move.pieceToMove)) != null)
-                {
-                    // unplayed do nothing
-                }
-                else
-                {
-                    // played
-                    if (!TryGetHexOfPlayedPiece(move.pieceToMove, out targetPieceHex)) return false;
-                }
-
+                Hex referencePieceHex;
                 if (!TryGetHexOfPlayedPiece(move.referencePiece, out referencePieceHex)) return false;
                 move.hex = Neighborhood.GetNeighborHex(referencePieceHex, move.targetPosition);
             }
 
-            throw new NotImplementedException();
+            if (placement)
+            {
+                if (!GetMoves().Contains(move)) return false;
+                Hivailability hivailability;
+                if(!_hivailableHexes.TryGetValue(move.hex, out hivailability)) return false;
+                if(!hivailability.CanPlace(move.pieceToMove.color)) return false;
+                PlacePiece(move.pieceToMove, move.hex);
+                IncrementTurn();
+                return true;
+            }
+            else
+            {
+                // movement
+                throw new NotImplementedException();
+            }
+        }
+
+        private void IncrementTurn()
+        {
+            whiteToPlay = !whiteToPlay;
+            turnNumber++;
+            // what else?
         }
 
         /// <summary>
-        /// For arbitrary setting up board.
-        /// Doesn't validate board
+        /// Place a piece (as apposed to moving one)
+        /// Assumes all validation is already done, or that you don't care about validity.
         /// </summary>
         /// <param name="piece"></param>
         /// <param name="hex"></param>
-        internal void SetPiece(Piece piece, Hex hex)
+        internal void PlacePiece(Piece piece, Hex hex)
         {
-            throw new NotImplementedException();
+            // if this is the first placement on the board
+            bool forceBlackCanPlace = (_playedPieces.Count == 0);
+
+            _movesDirty = true;
+            _hivailableHexes.Remove(hex);
+            _unplayedPieces.Remove(piece);
+            _playedPieces.Add(piece, hex);
+            _boardPieceArray[hex.column, hex.row] = piece;
+
+            foreach (Hex directionHex in Neighborhood.neighborDirections)
+            {
+                // don't do the center
+                if(directionHex.Equals(hex)) continue;
+
+                Piece adjacentPiece;
+                Hex adjacentHex = hex + directionHex;
+                if (!TryGetPieceAtHex(adjacentHex, out adjacentPiece))
+                {
+                    // empty space, add/update hivailability
+                    _hivailableHexes.Remove(adjacentHex);
+                    _hivailableHexes.Add(adjacentHex, Hivailability.GetHivailability(this, adjacentHex, false, forceBlackCanPlace));
+                }
+            }
         }
 
         /// <summary>
