@@ -236,5 +236,20 @@ namespace HiveLib.Tests
             Assert.IsNull(move.referencePiece);
             Assert.IsTrue(move.hex != Board.invalidHex);
         }
+
+        
+        //[TestMethod]
+        //public void CheckNotationForMove1()
+        //{
+        //    Move move = Move.GetMove(new Piece(Piece.PieceColor.Black, 1), new Hex(;
+        //    Assert.IsTrue(Move.TryGetMove(@"wA1 .", out move));
+
+        //    Assert.IsInstanceOfType(move.pieceToMove, typeof(Ant));
+        //    Assert.IsTrue(move.pieceToMove.number == 1);
+        //    Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.White);
+
+        //    Assert.IsNull(move.referencePiece);
+        //    Assert.IsTrue(move.hex != Board.invalidHex);
+        //}
     }
 }

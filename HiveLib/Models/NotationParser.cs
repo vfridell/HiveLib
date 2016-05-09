@@ -173,7 +173,7 @@ namespace HiveLib.Models
                 else
                 {
                     Hex refHex = Board.invalidHex;
-                    Neighborhood.Position refPosition;
+                    Neighborhood.Position refPosition = Neighborhood.Position.center;
                     bool found = false;
                     int i = 0;  // zero is center.  we dont care about center
                     while(!found && i < Neighborhood.neighborDirections.Length)
@@ -190,9 +190,9 @@ namespace HiveLib.Models
                     }
                     else
                     {
-                        // TODO here!
-                        throw new NotImplementedException();
-                        //referencePieceNotation = "";
+
+                        referencePieceNotation = GetNotationForPiece(refPiece);
+                        referencePieceNotation = string.Format(Neighborhood.neighborDirectionNotationTemplates[(int)refPosition], referencePieceNotation);
                     }
                 }
             }
