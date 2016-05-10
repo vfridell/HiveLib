@@ -190,7 +190,6 @@ namespace HiveLib.Models
                     }
                     else
                     {
-
                         referencePieceNotation = GetNotationForPiece(refPiece);
                         referencePieceNotation = string.Format(Neighborhood.neighborDirectionNotationTemplates[(int)refPosition], referencePieceNotation);
                     }

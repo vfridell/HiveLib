@@ -1,4 +1,6 @@
-﻿namespace HiveLib.Models.Pieces
+﻿using System.Collections.Generic;
+
+namespace HiveLib.Models.Pieces
 {
     class QueenBee : Piece
     {
@@ -7,5 +9,21 @@
         {
             return "Q";
         }
+
+        //public static IList<Move> GetMoves(Hex start, Board board, List<Hex> visited)
+        //{
+        //    List<Move> returnList = new List<Move>();
+        //    Hivailability hivailableCenter = Hivailability.GetHivailability(board, start);
+        //    hivailableCenter.
+        //    foreach (Hex deltaHex in Neighborhood.neighborDirections)
+        //    {
+
+        //        Hex nHex = deltaHex + start;
+        //        if (nHex.Equals(start)) continue;
+        //        Hivailability hivailable;
+        //        if(!hivailableHexes.TryGetValue(nHex, out hivailable)) continue;
+
+        //    }
+        //}
     }
 }

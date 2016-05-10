@@ -30,7 +30,6 @@ namespace HiveLib.Models
 
         private void GeneratePlacementMoves()
         {
-            _moves.Clear();
             foreach (KeyValuePair<Hex, Hivailability> kvp in _hivailableHexes)
             {
                 if (kvp.Value.BlackCanPlace && !whiteToPlay)
@@ -71,6 +70,7 @@ namespace HiveLib.Models
         {
             if (_movesDirty)
             {
+                _moves.Clear();
                 GeneratePlacementMoves();
                 //GenerateMovementMoves();
                 _movesDirty = false;
@@ -128,7 +128,7 @@ namespace HiveLib.Models
         }
 
         /// <summary>
-        /// Place a piece (as apposed to moving one)
+        /// Place a piece (as opposed to moving one)
         /// Assumes all validation is already done, or that you don't care about validity.
         /// </summary>
         /// <param name="piece"></param>

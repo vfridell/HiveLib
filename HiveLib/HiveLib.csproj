@@ -57,6 +57,7 @@
     <Compile Include="Models\Pieces\BeetleStack.cs" />
     <Compile Include="Tests\BoardTests.cs" />
     <Compile Include="Tests\CheckNotationStringParsing.cs" />
+    <Compile Include="Tests\MoveToNotationTests.cs" />
     <Compile Include="Tests\PieceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AI\IHiveAI.cs" />
