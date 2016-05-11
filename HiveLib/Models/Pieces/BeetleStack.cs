@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HiveLib.Models.Pieces
@@ -107,6 +108,11 @@ namespace HiveLib.Models.Pieces
         public override string GetPieceNotation()
         {
             throw new Exception("BeetleStacks do not have notation");
+        }
+
+        internal override IList<Move> GetMoves(Hex start, Board board)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Linq;
 using HiveLib.Models.Pieces;
 using Position = HiveLib.Models.Neighborhood.Position;
+using System.Collections.Generic;
 
 namespace HiveLib.Models
 {
@@ -22,6 +23,28 @@ namespace HiveLib.Models
         {
             if (pieceColor == Piece.PieceColor.Black) return _blackCanPlace;
             else return _whiteCanPlace;
+        }
+
+        internal IList<Hex> EmptyNeighborHexes(Hex center)
+        {
+            List<Hex> emptyNeighbors = new List<Hex>();
+            for (int i = 1; i < 7; i++)
+            {
+                Hex neighborHex = Neighborhood.GetNeighborHex(center, (Position)i);
+                if (_neighborStatus[i] == NeighborStatus.Empty) emptyNeighbors.Add(neighborHex);
+            }
+            return emptyNeighbors;
+        }
+
+        internal IList<Hex> NonEmptyNeighborHexes(Hex center)
+        {
+            List<Hex> neighbors = new List<Hex>();
+            for (int i = 1; i < 7; i++)
+            {
+                Hex neighborHex = Neighborhood.GetNeighborHex(center, (Position)i);
+                if (_neighborStatus[i] != NeighborStatus.Empty) neighbors.Add(neighborHex);
+            }
+            return neighbors;
         }
 
         internal static Hivailability GetHivailability(Board board, Hex hex, bool forceWhitePlacement = false, bool forceBlackPlacement = false)

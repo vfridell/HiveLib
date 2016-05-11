@@ -57,6 +57,8 @@
     <Compile Include="Models\Pieces\BeetleStack.cs" />
     <Compile Include="Tests\BoardTests.cs" />
     <Compile Include="Tests\CheckNotationStringParsing.cs" />
+    <Compile Include="Tests\MovementTests2.cs" />
+    <Compile Include="Tests\MovementTests.cs" />
     <Compile Include="Tests\MoveToNotationTests.cs" />
     <Compile Include="Tests\PieceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

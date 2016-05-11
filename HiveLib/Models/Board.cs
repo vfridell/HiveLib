@@ -19,6 +19,7 @@ namespace HiveLib.Models
         private Dictionary<Piece, Hex> _playedPieces = new Dictionary<Piece, Hex>();
         private Piece [,] _boardPieceArray = new Piece[columns, rows];
         private List<Move> _moves = new List<Move>();
+        private HashSet<Piece> _immovablePieces = null;
         private bool _movesDirty = true;
 
         internal bool whiteToPlay = true;
@@ -212,6 +213,24 @@ namespace HiveLib.Models
         {
             return !_unplayedPieces.Contains(piece);
         }
+
+        //internal bool MovingPieceBreaksOneHiveRule(Piece piece)
+        //{
+        //    if (null != _immovablePieces)
+        //    {
+        //        return _immovablePieces.Contains(piece);
+        //    }
+        //    else
+        //    {
+        //        if (_playedPieces.Count == 0) return false;
+        //        Hex start = _playedPieces.Values.First();
+        //        Hivailability hivailability = Hivailability.GetHivailability(this, start);
+        //        if(hivailability.isBridgeLocation)
+        //        {
+        //            // check the 
+        //        }
+        //    }
+        //}
 
         internal Board Clone()
         {
