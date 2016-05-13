@@ -84,6 +84,7 @@
     <Compile Include="ViewModels\PieceVM.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Helpers\" />
     <Folder Include="Strategies\" />
   </ItemGroup>
   <ItemGroup>

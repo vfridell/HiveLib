@@ -22,11 +22,11 @@ namespace HiveLib.Models
         private Piece [,] _boardPieceArray = new Piece[columns, rows];
         private List<Move> _moves = new List<Move>();
         private UndirectedGraph<Piece, UndirectedEdge<Piece>> _adjacencyGraph = new UndirectedGraph<Piece, UndirectedEdge<Piece>>();
-        //private AdjacencyGraph<Piece, UndirectedEdge<Piece>> _adjacencyGraph = new AdjacencyGraph<Piece, UndirectedEdge<Piece>>();
-        private Dictionary<Piece, int[]> _dfsTraversalTimestamps = new Dictionary<Piece, int[]>();
         private Dictionary<Piece, int> discoverTimes = new Dictionary<Piece, int>();
         private Dictionary<Piece, int> finishTimes = new Dictionary<Piece, int>();
         private Dictionary<Piece, int> lowDiscoverTimes = new Dictionary<Piece, int>();
+        private Dictionary<Piece, int> _dfsChildren = new Dictionary<Piece, int>();
+        private IDictionary<Piece, UndirectedEdge<Piece>> vertexPredecessors = new Dictionary<Piece, UndirectedEdge<Piece>>();
         private HashSet<Piece> _articulationPoints = new HashSet<Piece>();
         private int _time = 1;
 
@@ -101,20 +101,13 @@ namespace HiveLib.Models
             _dfsChildren[e.Source] += 1;
         }
 
-        private Dictionary<Piece, int> _dfsChildren = new Dictionary<Piece, int>();
-        private List<UndirectedEdge<Piece>> _backEdges = new List<UndirectedEdge<Piece>>();
-        private IDictionary<Piece, UndirectedEdge<Piece>> vertexPredecessors = new Dictionary<Piece, UndirectedEdge<Piece>>();
         private void dfs_BackEdge(object sender, UndirectedEdgeEventArgs<Piece, UndirectedEdge<Piece>> e)
         {
-            _backEdges.Add(e.Edge);
             lowDiscoverTimes[e.Source] = discoverTimes[e.Target];
         }
 
         void dfs_FinishVertex(Piece vertex)
         {
-            _time++;
-            _dfsTraversalTimestamps[vertex][1] = _time;
-
             if (vertexPredecessors.ContainsKey(vertex))
             {
                 // not the root
@@ -135,16 +128,11 @@ namespace HiveLib.Models
                     _articulationPoints.Add(vertex);
                 }
             }
-
-
         }
 
         void dfs_DiscoverVertex(Piece vertex)
         {
-            _time++;
             _dfsChildren[vertex] = 0;
-            int [] timestamps = {_time, -1};
-            _dfsTraversalTimestamps.Add(vertex, timestamps);
             lowDiscoverTimes[vertex] = _time;
         }
 
