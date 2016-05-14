@@ -22,17 +22,9 @@ namespace HiveLib.Models
         private Piece [,] _boardPieceArray = new Piece[columns, rows];
         private List<Move> _moves = new List<Move>();
         private UndirectedGraph<Piece, UndirectedEdge<Piece>> _adjacencyGraph = new UndirectedGraph<Piece, UndirectedEdge<Piece>>();
-        private Dictionary<Piece, int> discoverTimes = new Dictionary<Piece, int>();
-        private Dictionary<Piece, int> finishTimes = new Dictionary<Piece, int>();
-        private Dictionary<Piece, int> lowDiscoverTimes = new Dictionary<Piece, int>();
-        private Dictionary<Piece, int> _dfsChildren = new Dictionary<Piece, int>();
-        private IDictionary<Piece, UndirectedEdge<Piece>> vertexPredecessors = new Dictionary<Piece, UndirectedEdge<Piece>>();
         private HashSet<Piece> _articulationPoints = new HashSet<Piece>();
-        private int _time = 1;
 
-        //private HashSet<Piece> _immovablePieces = null;
         private bool _movesDirty = true;
-
         internal bool whiteToPlay = true;
         internal bool whiteQueenPlaced = false;
         internal bool blackQueenPlaced = false;
@@ -73,67 +65,24 @@ namespace HiveLib.Models
             }
         }
 
-        internal void RunDFS()
+        /// <summary>
+        /// An articulation point is a hex with a piece whose removal
+        /// causes a violation of the one-hive rule.
+        /// </summary>
+        private void FindArticulationPoints()
         {
-            _time = 0;
             _adjacencyGraph.RemoveEdgeIf(e => e.Source == e.Target);
             var dfs = new UndirectedDepthFirstSearchAlgorithm<Piece, UndirectedEdge<Piece>>(_adjacencyGraph);
-            var timeStamper = new QuickGraph.Algorithms.Observers.VertexTimeStamperObserver<Piece, UndirectedEdge<Piece>>(discoverTimes, finishTimes);
-            var predecessors = new QuickGraph.Algorithms.Observers.UndirectedVertexPredecessorRecorderObserver<Piece, UndirectedEdge<Piece>>(vertexPredecessors);
-            timeStamper.Attach(dfs); 
-            predecessors.Attach(dfs);
-            dfs.DiscoverVertex += dfs_DiscoverVertex;
-            dfs.FinishVertex += dfs_FinishVertex;
-            dfs.BackEdge += dfs_BackEdge;
-            dfs.TreeEdge += dfs_TreeEdge;
+            var articulationPointObserver = new HiveLib.Helpers.UndirectedArticulationPointObserver<Piece, UndirectedEdge<Piece>>(_articulationPoints);
 
-            if (_playedPieces.Count > 0)
+            using (articulationPointObserver.Attach(dfs))
             {
-                Piece root = _playedPieces.Keys.First();
-                dfs.Compute(root);
-            }
-
-        }
-
-        void dfs_TreeEdge(object sender, UndirectedEdgeEventArgs<Piece, UndirectedEdge<Piece>> e)
-        {
-            // count children of nodes in predessor tree
-            _dfsChildren[e.Source] += 1;
-        }
-
-        private void dfs_BackEdge(object sender, UndirectedEdgeEventArgs<Piece, UndirectedEdge<Piece>> e)
-        {
-            lowDiscoverTimes[e.Source] = discoverTimes[e.Target];
-        }
-
-        void dfs_FinishVertex(Piece vertex)
-        {
-            if (vertexPredecessors.ContainsKey(vertex))
-            {
-                // not the root
-                Piece parent = vertexPredecessors[vertex].Target;
-                lowDiscoverTimes[parent] = Math.Min(lowDiscoverTimes[vertex], discoverTimes[parent]);
-                // is my parent an articulation point?
-                if(discoverTimes[parent] <= lowDiscoverTimes[vertex])
+                if (_playedPieces.Count > 0)
                 {
-                    _articulationPoints.Add(parent);
+                    Piece root = _playedPieces.Keys.First();
+                    dfs.Compute(root);
                 }
             }
-            else
-            {
-                // this is the root of the DFS 
-                if(_dfsChildren[vertex] > 1)
-                {
-                    // more than one child in the predessor tree means articulation point
-                    _articulationPoints.Add(vertex);
-                }
-            }
-        }
-
-        void dfs_DiscoverVertex(Piece vertex)
-        {
-            _dfsChildren[vertex] = 0;
-            lowDiscoverTimes[vertex] = _time;
         }
 
         private void GenerateMovementMoves()
@@ -190,8 +139,13 @@ namespace HiveLib.Models
             }
             else
             {
-                // movement
+                // check that movement doesn't violate the one-hive rule
+                if (_articulationPoints.Contains(move.pieceToMove)) return false;
+                
                 throw new NotImplementedException();
+                
+                IncrementTurn();
+                return true;
             }
         }
 
@@ -236,9 +190,9 @@ namespace HiveLib.Models
                 {
                     // contains a piece.  Update the adjacency graph
                     _adjacencyGraph.AddVerticesAndEdge(new UndirectedEdge<Piece>(piece, adjacentPiece));
-                    //_adjacencyGraph.AddEdge(new UndirectedEdge<Piece>(piece, adjacentPiece));
                 }
             }
+            FindArticulationPoints();
             if (piece is QueenBee)
             {
                 if (piece.color == PieceColor.White)
@@ -246,16 +200,6 @@ namespace HiveLib.Models
                 else
                     blackQueenPlaced = true;
             }
-        }
-
-        /// <summary>
-        /// For arbitrary clearing a hex.
-        /// Doesn't validate board
-        /// </summary>
-        /// <param name="hex"></param>
-        internal void ClearHex(Hex hex)
-        {
-            throw new NotImplementedException();
         }
 
         internal bool TryGetPieceAtHex(Hex hex, out Piece piece)
@@ -294,24 +238,6 @@ namespace HiveLib.Models
             return !_unplayedPieces.Contains(piece);
         }
 
-        //internal bool MovingPieceBreaksOneHiveRule(Piece piece)
-        //{
-        //    if (null != _immovablePieces)
-        //    {
-        //        return _immovablePieces.Contains(piece);
-        //    }
-        //    else
-        //    {
-        //        if (_playedPieces.Count == 0) return false;
-        //        Hex start = _playedPieces.Values.First();
-        //        Hivailability hivailability = Hivailability.GetHivailability(this, start);
-        //        if(hivailability.isBridgeLocation)
-        //        {
-        //            // check the 
-        //        }
-        //    }
-        //}
-
         internal Board Clone()
         {
             Board board = new Board();
@@ -322,6 +248,7 @@ namespace HiveLib.Models
             {
                 board._hivailableHexes.Add(kvp.Key, kvp.Value);
             }
+            foreach (Piece piece in this._articulationPoints) board._articulationPoints.Add(piece);
             foreach (Piece piece in this._unplayedPieces) board._unplayedPieces.Add(piece);
             foreach (KeyValuePair<Piece, Hex> kvp in this._playedPieces)
             {

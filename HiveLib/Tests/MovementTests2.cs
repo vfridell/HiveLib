@@ -65,10 +65,10 @@ namespace HiveLib.Tests
             Assert.IsTrue(_board.blackQueenPlaced);
         }
 
-        [TestMethod]
-        public void CheckDFS()
-        {
-            _board.RunDFS();
-        }
+        //[TestMethod]
+        //public void CheckDFS()
+        //{
+        //    _board.RunDFS();
+        //}
     }
 }
