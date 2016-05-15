@@ -23,12 +23,13 @@ namespace HiveLib.Models
         private List<Move> _moves = new List<Move>();
         private UndirectedGraph<Piece, UndirectedEdge<Piece>> _adjacencyGraph = new UndirectedGraph<Piece, UndirectedEdge<Piece>>();
         private HashSet<Piece> _articulationPoints = new HashSet<Piece>();
-
         private bool _movesDirty = true;
+
         internal bool whiteToPlay = true;
         internal bool whiteQueenPlaced = false;
         internal bool blackQueenPlaced = false;
         internal int turnNumber = 0;
+        internal HashSet<Piece> articulationPoints { get { return _articulationPoints; } }
 
         private Board() { }
 
@@ -71,6 +72,7 @@ namespace HiveLib.Models
         /// </summary>
         private void FindArticulationPoints()
         {
+            _articulationPoints.Clear();
             _adjacencyGraph.RemoveEdgeIf(e => e.Source == e.Target);
             var dfs = new UndirectedDepthFirstSearchAlgorithm<Piece, UndirectedEdge<Piece>>(_adjacencyGraph);
             var articulationPointObserver = new HiveLib.Helpers.UndirectedArticulationPointObserver<Piece, UndirectedEdge<Piece>>(_articulationPoints);
@@ -87,7 +89,10 @@ namespace HiveLib.Models
 
         private void GenerateMovementMoves()
         {
-            throw new NotImplementedException();
+            foreach (var kvp in _playedPieces)
+            {
+                _moves.AddRange(kvp.Key.GetMoves(kvp.Value, this));
+            }
         }
 
         internal IList<Move> GetMoves()
@@ -96,7 +101,7 @@ namespace HiveLib.Models
             {
                 _moves.Clear();
                 GeneratePlacementMoves();
-                //GenerateMovementMoves();
+                GenerateMovementMoves();
                 _movesDirty = false;
             }
             return _moves;
@@ -112,8 +117,8 @@ namespace HiveLib.Models
             if (move.pieceToMove.color == PieceColor.Black && whiteToPlay) return false;
 
             bool placement = true;
-            Hex pieceToMoveHex;
-            if (_unplayedPieces.FirstOrDefault(p => p.Equals(move.pieceToMove)) == null)
+            Hex pieceToMoveHex = Board.invalidHex;
+            if (!_unplayedPieces.Contains(move.pieceToMove))
             {
                 // the target piece is already played on the board
                 placement = false;
@@ -127,26 +132,23 @@ namespace HiveLib.Models
                 move.hex = Neighborhood.GetNeighborHex(referencePieceHex, move.targetPosition);
             }
 
+            if (!GetMoves().Contains(move)) return false;
+
             if (placement)
             {
-                if (!GetMoves().Contains(move)) return false;
                 Hivailability hivailability;
                 if(!_hivailableHexes.TryGetValue(move.hex, out hivailability)) return false;
                 if(!hivailability.CanPlace(move.pieceToMove.color)) return false;
                 PlacePiece(move.pieceToMove, move.hex);
-                IncrementTurn();
-                return true;
             }
             else
             {
                 // check that movement doesn't violate the one-hive rule
                 if (_articulationPoints.Contains(move.pieceToMove)) return false;
-                
-                throw new NotImplementedException();
-                
-                IncrementTurn();
-                return true;
+                MovePiece(move.pieceToMove, pieceToMoveHex, move.hex);
             }
+            IncrementTurn();
+            return true;
         }
 
         private void IncrementTurn()
@@ -154,6 +156,19 @@ namespace HiveLib.Models
             whiteToPlay = !whiteToPlay;
             turnNumber++;
             // what else?
+        }
+
+        internal void MovePiece(Piece piece, Hex from, Hex to)
+        {
+            _movesDirty = true;
+            _boardPieceArray[from.column, from.row] = null;
+            _boardPieceArray[to.column, to.row] = null;
+            _playedPieces.Remove(piece);
+            _playedPieces.Add(piece, to);
+
+            RefreshHivailability(piece, from, false);
+            RefreshHivailability(piece, to, false);
+            FindArticulationPoints();
         }
 
         /// <summary>
@@ -173,10 +188,44 @@ namespace HiveLib.Models
             _playedPieces.Add(piece, hex);
             _boardPieceArray[hex.column, hex.row] = piece;
 
+            //// update the data about the board
+            //foreach (Hex directionHex in Neighborhood.neighborDirections)
+            //{
+            //    // don't do the center
+            //    if(directionHex.Equals(hex)) continue;
+
+            //    Piece adjacentPiece;
+            //    Hex adjacentHex = hex + directionHex;
+            //    if (!TryGetPieceAtHex(adjacentHex, out adjacentPiece))
+            //    {
+            //        // empty space, add/update hivailability
+            //        _hivailableHexes.Remove(adjacentHex);
+            //        _hivailableHexes.Add(adjacentHex, Hivailability.GetHivailability(this, adjacentHex, false, forceBlackCanPlace));
+            //    }
+            //    else
+            //    {
+            //        // contains a piece.  Update the adjacency graph
+            //        _adjacencyGraph.AddVerticesAndEdge(new UndirectedEdge<Piece>(piece, adjacentPiece));
+            //    }
+            //}
+            RefreshHivailability(piece, hex, forceBlackCanPlace);
+            FindArticulationPoints();
+
+            if (piece is QueenBee)
+            {
+                if (piece.color == PieceColor.White)
+                    whiteQueenPlaced = true;
+                else
+                    blackQueenPlaced = true;
+            }
+        }
+
+        private void RefreshHivailability(Piece piece, Hex hex, bool forceBlackCanPlace)
+        {
             foreach (Hex directionHex in Neighborhood.neighborDirections)
             {
                 // don't do the center
-                if(directionHex.Equals(hex)) continue;
+                if (directionHex.Equals(hex)) continue;
 
                 Piece adjacentPiece;
                 Hex adjacentHex = hex + directionHex;
@@ -191,14 +240,6 @@ namespace HiveLib.Models
                     // contains a piece.  Update the adjacency graph
                     _adjacencyGraph.AddVerticesAndEdge(new UndirectedEdge<Piece>(piece, adjacentPiece));
                 }
-            }
-            FindArticulationPoints();
-            if (piece is QueenBee)
-            {
-                if (piece.color == PieceColor.White)
-                    whiteQueenPlaced = true;
-                else
-                    blackQueenPlaced = true;
             }
         }
 

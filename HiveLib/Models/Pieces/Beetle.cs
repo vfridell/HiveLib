@@ -13,7 +13,23 @@ namespace HiveLib.Models.Pieces
 
         internal override IList<Move> GetMoves(Hex start, Board board)
         {
-            throw new System.NotImplementedException();
+            Dictionary<int, List<Move>> moveDictionary = base.GetMoves(start, board, 1);
+            List<Move> validMoves;
+            if (!moveDictionary.TryGetValue(1, out validMoves)) validMoves = new List<Move>();
+
+            GetClimbingMoves(start, board, validMoves);
+
+            return validMoves;
+        }
+
+        internal void GetClimbingMoves(Hex start, Board board, List<Move> validMoves)
+        {
+            // TODO check climbing gates
+            var hivailability = Hivailability.GetHivailability(board, start);
+            foreach (Hex hex in hivailability.EmptyNeighborHexes(start).Union(hivailability.NonEmptyNeighborHexes(start)))
+            {
+                validMoves.Add(Move.GetMove(this, hex));
+            }
         }
     }
 }

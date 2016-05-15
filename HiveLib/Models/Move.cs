@@ -18,11 +18,6 @@ namespace HiveLib.Models
 
         private Move() { hex = Board.invalidHex; }
 
-        internal void Execute(Board board)
-        {
-            throw new NotImplementedException();
-        }
-
         internal static bool TryGetMove(string notation, out Move move)
         {
             if (NotationParser.TryParseNotation(notation, out move))
@@ -33,6 +28,20 @@ namespace HiveLib.Models
             else
             {
                 return false;
+            }
+        }
+
+        internal static Move GetMove(string notation)
+        {
+            Move move;
+            if (NotationParser.TryParseNotation(notation, out move))
+            {
+                move.notation = notation;
+                return move;
+            }
+            else
+            {
+                throw new Exception("Bad move notation");
             }
         }
 
@@ -53,21 +62,17 @@ namespace HiveLib.Models
             return move;
         }
 
-        public virtual bool Equals(Move obj)
+        public override bool Equals(object obj)
         {
             if (obj == null) return false;
             if (this.GetType() != obj.GetType()) return false;
+            return Equals((Move)obj);
+        }
+
+        public virtual bool Equals(Move obj)
+        {
+            if (obj == null) return false;
             return this.pieceToMove.Equals(obj.pieceToMove) && this.hex.Equals(obj.hex);
-        }
-
-        public static bool operator == (Move move1, Move move2)
-        {
-            return move1.Equals(move2);
-        }
-
-        public static bool operator !=(Move move1, Move move2)
-        {
-            return !move1.Equals(move2);
         }
 
         public override int GetHashCode()

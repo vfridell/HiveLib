@@ -47,6 +47,17 @@ namespace HiveLib.Models
             return neighbors;
         }
 
+        internal IList<Hex> BlockedNeighborHexes(Hex center)
+        {
+            List<Hex> blockedNeighbors = new List<Hex>();
+            for (int i = 1; i < 7; i++)
+            {
+                Hex neighborHex = Neighborhood.GetNeighborHex(center, (Position)i);
+                if (_isBlocked[i]) blockedNeighbors.Add(neighborHex);
+            }
+            return blockedNeighbors;
+        }
+
         internal static Hivailability GetHivailability(Board board, Hex hex, bool forceWhitePlacement = false, bool forceBlackPlacement = false)
         {
             Hivailability hivailability = new Hivailability();

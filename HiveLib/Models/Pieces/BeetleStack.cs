@@ -112,7 +112,10 @@ namespace HiveLib.Models.Pieces
 
         internal override IList<Move> GetMoves(Hex start, Board board)
         {
-            throw new NotImplementedException();
+            Beetle beetle = (Beetle)top;
+            var validMoves = new List<Move>();
+            beetle.GetClimbingMoves(start, board, validMoves);
+            return validMoves;
         }
     }
 }

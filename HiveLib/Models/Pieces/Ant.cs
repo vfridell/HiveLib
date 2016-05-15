@@ -13,7 +13,13 @@ namespace HiveLib.Models.Pieces
 
         internal override IList<Move> GetMoves(Hex start, Board board)
         {
-            throw new System.NotImplementedException();
+            Dictionary<int, List<Move>> moveDictionary = base.GetMoves(start, board, int.MaxValue);
+            List<Move> validMoves = new List<Move>();
+            foreach (var kvp in moveDictionary)
+            {
+                validMoves.AddRange(kvp.Value);
+            }
+            return validMoves;
         }
     }
 }

@@ -23,10 +23,34 @@ namespace HiveLib.Models.Pieces
 
         internal abstract IList<Move> GetMoves(Hex start, Board board);
 
+        internal Dictionary<int, List<Move>> GetMoves(Hex start, Board board, int stopAtDepth)
+        {
+            var moveDictionary = new Dictionary<int, List<Move>>();
+            if (!board.articulationPoints.Contains(this))
+            {
+                var visited = new List<Hex>();
+                var results = new Dictionary<int, HashSet<Hex>>();
+                GetSlideMovesRecursive(start, board, stopAtDepth, 1, visited, results);
+
+                List<Move> validMoves = new List<Move>();
+                foreach (var kvp in results)
+                {
+                    validMoves.Clear();
+                    foreach (Hex hex in kvp.Value)
+                    {
+                        validMoves.Add(Move.GetMove(this, hex));
+                    }
+                    moveDictionary[kvp.Key] = new List<Move>(validMoves);
+                }
+            }
+            return moveDictionary;
+        }
+
         protected void GetSlideMovesRecursive(Hex current, Board board, int stopAtDepth, int depth, IList<Hex> visited, Dictionary<int, HashSet<Hex>> results)
         {
             List<Move> returnList = new List<Move>();
             Hivailability hivailableCenter = Hivailability.GetHivailability(board, current);
+            IList<Hex> blockedNeighbors = hivailableCenter.BlockedNeighborHexes(current);
             IList<Hex> emptyNeighbors = hivailableCenter.EmptyNeighborHexes(current);
             IList<Hex> nonEmptyNeighbors = hivailableCenter.NonEmptyNeighborHexes(current);
             IList<Hex> emptyNeighborNeighbors = new List<Hex>();
@@ -35,7 +59,7 @@ namespace HiveLib.Models.Pieces
                 Hivailability hivailableNeighbor = Hivailability.GetHivailability(board, hex);
                 emptyNeighborNeighbors = hivailableNeighbor.EmptyNeighborHexes(hex).Concat(emptyNeighborNeighbors).ToList();
             }
-            HashSet<Hex> validMovementHexes = new HashSet<Hex>(emptyNeighborNeighbors.Intersect(emptyNeighbors));
+            HashSet<Hex> validMovementHexes = new HashSet<Hex>((emptyNeighborNeighbors.Intersect(emptyNeighbors)).Except(blockedNeighbors));
 
             visited.Add(current);
             
