@@ -15,8 +15,19 @@ namespace HiveLib.Models.Pieces
         {
             this.bottom = bottom;
             this.secondLevel = secondLevel;
-            _pieces[0] = bottom;
-            _pieces[1] = secondLevel;
+            _topLevel = 1;
+        }
+
+        internal BeetleStack(Beetle newPiece, BeetleStack originalStack)
+            : base(originalStack.color, originalStack.number)
+        {
+            _topLevel = originalStack._topLevel + 1;
+            this.bottom = originalStack.bottom;
+            this.secondLevel = originalStack.secondLevel;
+            this.thirdLevel = originalStack.thirdLevel;
+            this.fourthLevel = originalStack.fourthLevel;
+            this.fifthLevel = originalStack.fifthLevel;
+            _pieces[_topLevel] = newPiece;
         }
 
         private int _topLevel = 1;
@@ -28,6 +39,8 @@ namespace HiveLib.Models.Pieces
         internal Beetle fourthLevel { get { return (Beetle)_pieces[3]; } set { _pieces[3] = value; } }
         internal Beetle fifthLevel { get { return (Beetle)_pieces[4]; } set { _pieces[4] = value; } }
 
+        internal override int height { get { return _topLevel; } }
+
         /// <summary>
         /// the top of the stack.  Pull from whatever level is the top of the stack
         /// </summary>
@@ -37,22 +50,6 @@ namespace HiveLib.Models.Pieces
             {
                 return _pieces[_topLevel];
             } 
-        }
-
-        internal void Push(Piece piece)
-        {
-            if ((_topLevel + 1) > 4) throw new OverflowException("You cannot have a stack taller than 5 pieces");
-
-            _topLevel++;
-            _pieces[_topLevel] = piece;
-        }
-
-        internal Piece Pop()
-        {
-            if ((_topLevel - 1) < 1) throw new Exception("You cannot have a stack with fewer than 2 pieces");
-            Piece returnValue = _pieces[_topLevel];
-            _topLevel--;
-            return returnValue;
         }
 
         internal bool Contains(Piece piece)
@@ -81,33 +78,22 @@ namespace HiveLib.Models.Pieces
             }
         }
 
-        internal BeetleStack Clone()
-        {
-            BeetleStack bs = new BeetleStack(this.bottom, this.secondLevel);
-            for (int i = 0; i <= this._topLevel; i++)
-            {
-                bs._pieces[i] = this._pieces[i];
-            }
-            bs._topLevel = this._topLevel;
-            return bs;
-        }
-
         public override bool Equals(Piece obj)
         {
             if (obj == null) return false;
-            if (this.GetType() != obj.GetType()) return false;
-            if(this._topLevel != ((BeetleStack)obj)._topLevel) return false;
-
-            for (int i = 0; i < _topLevel; i++)
-            {
-                if(!this._pieces[i].Equals(((BeetleStack)obj)._pieces[i])) return false;
-            }
+            if (!(obj is BeetleStack)) return false;
+            BeetleStack other = (BeetleStack)obj;
+            if (!(this.fifthLevel == other.fifthLevel)) return false;
+            if (!(this.fourthLevel == other.fourthLevel)) return false;
+            if (!(this.thirdLevel == other.thirdLevel)) return false;
+            if (!(this.secondLevel == other.secondLevel)) return false;
+            if (!(this.bottom == other.bottom)) return false;
             return true;
         }
 
         public override string GetPieceNotation()
         {
-            throw new Exception("BeetleStacks do not have notation");
+            return top.GetPieceNotation();
         }
 
         internal override IList<Move> GetMoves(Hex start, Board board)
@@ -115,6 +101,14 @@ namespace HiveLib.Models.Pieces
             Beetle beetle = (Beetle)top;
             var validMoves = new List<Move>();
             beetle.GetClimbingMoves(start, board, validMoves);
+
+            // empty spaces around are valid moves for a beetle stack
+            var hivailability = Hivailability.GetHivailability(board, start);
+            foreach (Hex hex in hivailability.EmptyNeighborHexes(start))
+            {
+                validMoves.Add(Move.GetMove(this.top, hex));
+            }
+
             return validMoves;
         }
     }

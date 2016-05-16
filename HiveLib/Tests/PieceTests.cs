@@ -32,8 +32,7 @@ namespace HiveLib.Tests
             Beetle beetle2 = new Beetle(Piece.PieceColor.Black, 2);
             Beetle beetle3 = new Beetle(Piece.PieceColor.White, 1);
             Beetle beetle4 = new Beetle(Piece.PieceColor.White, 2);
-            BeetleStack bs = new BeetleStack(ant, beetle);
-            bs.Push(beetle3);
+            BeetleStack bs = new BeetleStack(beetle3, new BeetleStack(ant, beetle));
 
             Assert.IsTrue(bs.Contains(beetle3));
             Assert.IsTrue(bs.Contains(ant));
@@ -48,11 +47,9 @@ namespace HiveLib.Tests
             Beetle beetle2 = new Beetle(Piece.PieceColor.Black, 2);
             Beetle beetle3 = new Beetle(Piece.PieceColor.White, 1);
             Beetle beetle4 = new Beetle(Piece.PieceColor.White, 2);
-            BeetleStack bs = new BeetleStack(ant, beetle);
-            bs.Push(beetle3);
+            BeetleStack bs = new BeetleStack(beetle3, new BeetleStack(ant, beetle));
 
-            BeetleStack bs2 = new BeetleStack(ant, beetle);
-            bs2.Push(beetle3);
+            BeetleStack bs2 = new BeetleStack(beetle3, new BeetleStack(ant, beetle));
 
             BeetleStack bs3 = new BeetleStack(ant, beetle4);
 
@@ -69,11 +66,8 @@ namespace HiveLib.Tests
             Beetle beetle2 = new Beetle(Piece.PieceColor.Black, 2);
             Beetle beetle3 = new Beetle(Piece.PieceColor.White, 1);
             Beetle beetle4 = new Beetle(Piece.PieceColor.White, 2);
-            BeetleStack bs = new BeetleStack(ant, beetle);
-            bs.Push(beetle3);
-
-            BeetleStack bs2 = bs.Clone();
-            bs2.Push(beetle4);
+            BeetleStack bs = new BeetleStack(beetle3, new BeetleStack(ant, beetle));
+            BeetleStack bs2 = new BeetleStack(beetle4, bs);
 
             Assert.IsFalse(bs.Equals(bs2));
             Assert.IsTrue(bs.Contains(beetle3));

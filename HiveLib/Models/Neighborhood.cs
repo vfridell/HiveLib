@@ -48,5 +48,23 @@ namespace HiveLib.Models
                     throw new Exception("Invalid position");
             }
         }
+
+        public static Hex GetOppositeHex(Position position)
+        {
+            Hex vector = neighborDirections[(int)position];
+            return new Hex(-vector.x, -vector.y, -vector.z);
+        }
+
+        public static Hex ClockwiseDelta(Position position)
+        {
+            Hex vector = neighborDirections[(int)position];
+            return new Hex(-vector.z, -vector.x, -vector.y);
+        }
+
+        public static Hex CounterClockwiseDelta(Position position)
+        {
+            Hex vector = neighborDirections[(int)position];
+            return new Hex(-vector.y, -vector.z, -vector.x);
+        }
     }
 }

@@ -30,7 +30,8 @@ namespace HiveLib.Helpers
         private Dictionary<TVertex, int> _discoverTimes = new Dictionary<TVertex, int>();
         private Dictionary<TVertex, int> _lowDiscoverTimes = new Dictionary<TVertex, int>();
         private Dictionary<TVertex, int> _dfsChildren = new Dictionary<TVertex, int>();
-        private IDictionary<TVertex, UndirectedEdge<TVertex>> _vertexPredecessors = new Dictionary<TVertex, UndirectedEdge<TVertex>>();
+        //private IDictionary<TVertex, UndirectedEdge<TVertex>> _vertexPredecessors = new Dictionary<TVertex, UndirectedEdge<TVertex>>();
+        private IDictionary<TVertex, TVertex> _vertexPredecessors = new Dictionary<TVertex, TVertex>();
         private readonly ISet<TVertex> _articulationPoints;
         private int _time = 0;
 
@@ -64,12 +65,12 @@ namespace HiveLib.Helpers
             if (_vertexPredecessors.ContainsKey(vertex))
             {
                 // not the root
-                TVertex parent = _vertexPredecessors[vertex].Target;
+                TVertex parent = _vertexPredecessors[vertex];
                 _lowDiscoverTimes[parent] = Math.Min(_lowDiscoverTimes[vertex], _discoverTimes[parent]);
                 // is my parent an articulation point?
                 if (_discoverTimes[parent] <= _lowDiscoverTimes[vertex])
                 {
-                    _articulationPoints.Add(parent);
+                    if(_discoverTimes[parent] != 1) _articulationPoints.Add(parent);
                 }
             }
             else
@@ -85,13 +86,14 @@ namespace HiveLib.Helpers
 
         private void dfs_BackEdge(object sender, UndirectedEdgeEventArgs<TVertex, TEdge> e)
         {
-            _lowDiscoverTimes[e.Source] = _discoverTimes[e.Target];
+            //_lowDiscoverTimes[e.Source] = _discoverTimes[e.Target];
+            _lowDiscoverTimes[e.Source] = Math.Min(_discoverTimes[e.Target], _lowDiscoverTimes[e.Source]);
         }
 
         private void dfs_TreeEdge(object sender, UndirectedEdgeEventArgs<TVertex, TEdge> e)
         {
             // count children of nodes in predessor tree
-            _vertexPredecessors[e.Target] = e.Edge;
+            _vertexPredecessors[e.Target] = e.Source;
             _dfsChildren[e.Source] += 1;
         }
 

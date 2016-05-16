@@ -30,6 +30,7 @@ namespace HiveLib.Models
         internal bool blackQueenPlaced = false;
         internal int turnNumber = 0;
         internal HashSet<Piece> articulationPoints { get { return _articulationPoints; } }
+        internal IList<Hex> hivailableSpaces { get { return _hivailableHexes.Keys.ToArray(); }}
 
         private Board() { }
 
@@ -79,7 +80,7 @@ namespace HiveLib.Models
 
             using (articulationPointObserver.Attach(dfs))
             {
-                if (_playedPieces.Count > 0)
+                if (_playedPieces.Count > 2)
                 {
                     Piece root = _playedPieces.Keys.First();
                     dfs.Compute(root);
@@ -89,9 +90,13 @@ namespace HiveLib.Models
 
         private void GenerateMovementMoves()
         {
-            foreach (var kvp in _playedPieces)
+            PieceColor colorToMove = whiteToPlay ? PieceColor.White : PieceColor.Black;
+            if ( (whiteToPlay && whiteQueenPlaced) || (!whiteToPlay && blackQueenPlaced))
             {
-                _moves.AddRange(kvp.Key.GetMoves(kvp.Value, this));
+                foreach (var kvp in _playedPieces.Where(p => p.Key.color == colorToMove))
+                {
+                    _moves.AddRange(kvp.Key.GetMoves(kvp.Value, this));
+                }
             }
         }
 
@@ -118,11 +123,13 @@ namespace HiveLib.Models
 
             bool placement = true;
             Hex pieceToMoveHex = Board.invalidHex;
+            Piece actualPiece = move.pieceToMove;
             if (!_unplayedPieces.Contains(move.pieceToMove))
             {
                 // the target piece is already played on the board
                 placement = false;
                 if (!TryGetHexOfPlayedPiece(move.pieceToMove, out pieceToMoveHex)) return false;
+                actualPiece = _boardPieceArray[pieceToMoveHex.column, pieceToMoveHex.row];
             }
 
             if(move.hex.Equals(invalidHex))
@@ -138,14 +145,14 @@ namespace HiveLib.Models
             {
                 Hivailability hivailability;
                 if(!_hivailableHexes.TryGetValue(move.hex, out hivailability)) return false;
-                if(!hivailability.CanPlace(move.pieceToMove.color)) return false;
-                PlacePiece(move.pieceToMove, move.hex);
+                if (!hivailability.CanPlace(actualPiece.color)) return false;
+                PlacePiece(actualPiece, move.hex);
             }
             else
             {
                 // check that movement doesn't violate the one-hive rule
-                if (_articulationPoints.Contains(move.pieceToMove)) return false;
-                MovePiece(move.pieceToMove, pieceToMoveHex, move.hex);
+                if (_articulationPoints.Contains(actualPiece) && !(actualPiece is BeetleStack)) return false;
+                MovePiece(actualPiece, pieceToMoveHex, move.hex);
             }
             IncrementTurn();
             return true;
@@ -158,17 +165,104 @@ namespace HiveLib.Models
             // what else?
         }
 
+        /// <summary>
+        /// Move a piece as opposed to placing it.  Does not validate the move.
+        /// </summary>
+        /// <param name="piece"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
         internal void MovePiece(Piece piece, Hex from, Hex to)
         {
             _movesDirty = true;
-            _boardPieceArray[from.column, from.row] = null;
-            _boardPieceArray[to.column, to.row] = null;
-            _playedPieces.Remove(piece);
-            _playedPieces.Add(piece, to);
+            if (piece is Beetle || piece is BeetleStack)
+            {
+                DispatchBeetleMove(piece, from, to);
+            }
+            else
+            {
+                // just a regular move
+                _boardPieceArray[from.column, from.row] = null;
+                _boardPieceArray[to.column, to.row] = piece;
+                _playedPieces.Remove(piece);
+                _playedPieces.Add(piece, to);
+                _adjacencyGraph.RemoveVertex(piece);
+                RefreshHivailabilityEmptyHex(from);
+                _hivailableHexes.Remove(to);
+                RefreshHivailability(piece, to, false);
+            }
 
-            RefreshHivailability(piece, from, false);
-            RefreshHivailability(piece, to, false);
             FindArticulationPoints();
+        }
+
+        private void DispatchBeetleMove(Piece piece, Hex from, Hex to)
+        {
+            Piece actualPiece = piece;
+            if (actualPiece is BeetleStack)
+            {
+                actualPiece = HandleBeetleFromStackMove((BeetleStack)piece, from, to);
+            }
+            else
+            {
+                _boardPieceArray[from.column, from.row] = null;
+                _playedPieces.Remove(actualPiece);
+                _adjacencyGraph.RemoveVertex(actualPiece);
+                RefreshHivailabilityEmptyHex(from);
+            }
+
+            Piece referencePiece;
+            if (TryGetPieceAtHex(to, out referencePiece))
+            {
+                HandleBeetleToStackMove((Beetle)actualPiece, referencePiece, from, to);
+            }
+            else
+            {
+                // beetle moving down
+                HandleBeetleToEmptySpaceMove(actualPiece, from, to);
+            }
+        }
+
+        private void HandleBeetleToEmptySpaceMove(Piece beetle, Hex from, Hex to)
+        {
+            // just a regular move to
+            _boardPieceArray[to.column, to.row] = beetle;
+            _playedPieces.Add(beetle, to);
+            _hivailableHexes.Remove(to);
+            RefreshHivailability(beetle, to, false);
+        }
+
+        private Piece HandleBeetleFromStackMove(BeetleStack stack, Hex from, Hex to)
+        {
+            Piece actualPiece = stack.top;
+            if (stack.height - 1 == 0)
+            {
+                // no more stack
+                _boardPieceArray[from.column, from.row] = stack.bottom;
+                _playedPieces.Remove(stack);
+                _playedPieces.Add(stack.bottom, from);
+                _adjacencyGraph.RemoveVertex(stack);
+                RefreshHivailability(stack.bottom, from, false);
+            }
+            return actualPiece;
+        }
+
+        private void HandleBeetleToStackMove(Beetle movingPiece, Piece referencePiece, Hex from, Hex to)
+        {
+            // beetle climbing
+            BeetleStack newStack;
+            if (referencePiece is BeetleStack)
+            {
+                newStack = new BeetleStack(movingPiece, (BeetleStack)referencePiece);
+            }
+            else
+            {
+                // new beetle stack
+                newStack = new BeetleStack(referencePiece, movingPiece);
+            }
+            _playedPieces.Remove(referencePiece);
+            _boardPieceArray[to.column, to.row] = newStack;
+            _playedPieces.Add(newStack, to);
+            _adjacencyGraph.RemoveVertex(referencePiece);
+            RefreshHivailability(newStack, to, false);
         }
 
         /// <summary>
@@ -188,26 +282,6 @@ namespace HiveLib.Models
             _playedPieces.Add(piece, hex);
             _boardPieceArray[hex.column, hex.row] = piece;
 
-            //// update the data about the board
-            //foreach (Hex directionHex in Neighborhood.neighborDirections)
-            //{
-            //    // don't do the center
-            //    if(directionHex.Equals(hex)) continue;
-
-            //    Piece adjacentPiece;
-            //    Hex adjacentHex = hex + directionHex;
-            //    if (!TryGetPieceAtHex(adjacentHex, out adjacentPiece))
-            //    {
-            //        // empty space, add/update hivailability
-            //        _hivailableHexes.Remove(adjacentHex);
-            //        _hivailableHexes.Add(adjacentHex, Hivailability.GetHivailability(this, adjacentHex, false, forceBlackCanPlace));
-            //    }
-            //    else
-            //    {
-            //        // contains a piece.  Update the adjacency graph
-            //        _adjacencyGraph.AddVerticesAndEdge(new UndirectedEdge<Piece>(piece, adjacentPiece));
-            //    }
-            //}
             RefreshHivailability(piece, hex, forceBlackCanPlace);
             FindArticulationPoints();
 
@@ -222,13 +296,14 @@ namespace HiveLib.Models
 
         private void RefreshHivailability(Piece piece, Hex hex, bool forceBlackCanPlace)
         {
+            _adjacencyGraph.AddVertex(piece);
             foreach (Hex directionHex in Neighborhood.neighborDirections)
             {
+                Hex adjacentHex = hex + directionHex;
                 // don't do the center
-                if (directionHex.Equals(hex)) continue;
+                if (adjacentHex.Equals(hex)) continue;
 
                 Piece adjacentPiece;
-                Hex adjacentHex = hex + directionHex;
                 if (!TryGetPieceAtHex(adjacentHex, out adjacentPiece))
                 {
                     // empty space, add/update hivailability
@@ -239,6 +314,35 @@ namespace HiveLib.Models
                 {
                     // contains a piece.  Update the adjacency graph
                     _adjacencyGraph.AddVerticesAndEdge(new UndirectedEdge<Piece>(piece, adjacentPiece));
+                }
+            }
+        }
+
+        private void RefreshHivailabilityEmptyHex(Hex hex)
+        {
+            var centerHivailability = Hivailability.GetHivailability(this, hex);
+            IList<Hex> emptyNeighborHexes = centerHivailability.EmptyNeighborHexes(hex);
+            if (emptyNeighborHexes.Count >= 6)
+            {
+                _hivailableHexes.Remove(hex);
+                return;
+            }
+            else
+            {
+                _hivailableHexes[hex] = centerHivailability;
+            }
+
+            foreach (Hex adjacentHex in emptyNeighborHexes)
+            {
+                _hivailableHexes.Remove(adjacentHex);
+                var adjacentHivailability = Hivailability.GetHivailability(this, adjacentHex);
+                if (adjacentHivailability.EmptyNeighborHexes(adjacentHex).Count < 6)
+                {
+                    _hivailableHexes.Add(adjacentHex, adjacentHivailability);
+                }
+                else
+                {
+                    _hivailableHexes.Remove(adjacentHex);
                 }
             }
         }
@@ -289,21 +393,17 @@ namespace HiveLib.Models
             {
                 board._hivailableHexes.Add(kvp.Key, kvp.Value);
             }
-            foreach (Piece piece in this._articulationPoints) board._articulationPoints.Add(piece);
+            foreach (Piece piece in this._articulationPoints)
+            {
+                board._articulationPoints.Add(piece);
+            }
+            board._adjacencyGraph.AddVerticesAndEdgeRange(this._adjacencyGraph.Edges);
+            board._unplayedPieces.Clear();
             foreach (Piece piece in this._unplayedPieces) board._unplayedPieces.Add(piece);
             foreach (KeyValuePair<Piece, Hex> kvp in this._playedPieces)
             {
-                Piece p;
-                if (kvp.Key is BeetleStack)
-                {
-                    p = ((BeetleStack)kvp.Key).Clone();
-                }
-                else
-                {
-                    p = kvp.Key;
-                }
-                board._playedPieces.Add(p, kvp.Value);
-                board._boardPieceArray[kvp.Value.column, kvp.Value.row] = p;
+                board._playedPieces.Add(kvp.Key, kvp.Value);
+                board._boardPieceArray[kvp.Value.column, kvp.Value.row] = kvp.Key;
             }
             return board;
         }

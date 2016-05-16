@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HiveLib.Models.Pieces
@@ -18,6 +19,8 @@ namespace HiveLib.Models.Pieces
 
         private readonly PieceColor _color;
         internal virtual PieceColor color { get { return _color; } }
+
+        internal virtual int height { get { return 1; } }
 
         public abstract string GetPieceNotation();
 
