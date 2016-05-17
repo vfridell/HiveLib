@@ -12,6 +12,7 @@ namespace HiveLib.Models
 
     class Board
     {
+        public enum GameResult { Incomplete, WhiteWin, BlackWin, Draw };
         public static readonly int columns = 50;
         public static readonly int rows = 50;
         public static Hex invalidHex = new Hex(-1, -1);
@@ -24,6 +25,8 @@ namespace HiveLib.Models
         private UndirectedGraph<Piece, UndirectedEdge<Piece>> _adjacencyGraph = new UndirectedGraph<Piece, UndirectedEdge<Piece>>();
         private HashSet<Piece> _articulationPoints = new HashSet<Piece>();
         private bool _movesDirty = true;
+        private GameResult _gameResult = GameResult.Incomplete;
+        internal GameResult gameResult { get { return _gameResult; } }
 
         internal bool whiteToPlay = true;
         internal bool whiteQueenPlaced = false;
@@ -31,6 +34,15 @@ namespace HiveLib.Models
         internal int turnNumber = 0;
         internal HashSet<Piece> articulationPoints { get { return _articulationPoints; } }
         internal IList<Hex> hivailableSpaces { get { return _hivailableHexes.Keys.ToArray(); }}
+        internal int BlackQueenBreathingSpaces()
+        {
+            return BreathingSpaces(new QueenBee(PieceColor.Black, 1));
+        }
+
+        internal int WhiteQueenBreathingSpaces()
+        {
+            return BreathingSpaces(new QueenBee(PieceColor.White, 1));
+        }
 
         private Board() { }
 
@@ -102,6 +114,7 @@ namespace HiveLib.Models
 
         internal IList<Move> GetMoves()
         {
+            if (_gameResult != GameResult.Incomplete) return new List<Move>();
             if (_movesDirty)
             {
                 _moves.Clear();
@@ -118,6 +131,7 @@ namespace HiveLib.Models
         /// <param name="move"></param>
         internal bool TryMakeMove(Move move)
         {
+            if (_gameResult != GameResult.Incomplete) return false;
             if (move.pieceToMove.color == PieceColor.White && !whiteToPlay) return false;
             if (move.pieceToMove.color == PieceColor.Black && whiteToPlay) return false;
 
@@ -160,9 +174,28 @@ namespace HiveLib.Models
 
         private void IncrementTurn()
         {
-            whiteToPlay = !whiteToPlay;
-            turnNumber++;
-            // what else?
+            int blackBreathingSpaces = BlackQueenBreathingSpaces();
+            int whiteBreathingSpaces = WhiteQueenBreathingSpaces();
+            bool gameOver = (blackBreathingSpaces * whiteBreathingSpaces == 0);
+            bool draw = (blackBreathingSpaces + whiteBreathingSpaces == 0);
+            if (gameOver)
+            {
+                if (draw) _gameResult = GameResult.Draw;
+                if (blackBreathingSpaces == 0)
+                {
+                    _gameResult = GameResult.WhiteWin;
+                }
+                else
+                {
+                    _gameResult = GameResult.WhiteWin;
+                }
+            }
+            else
+            {
+                _gameResult = GameResult.Incomplete;
+                whiteToPlay = !whiteToPlay;
+                turnNumber++;
+            }
         }
 
         /// <summary>
@@ -381,6 +414,27 @@ namespace HiveLib.Models
         internal bool PiecePlayed(Piece piece)
         {
             return !_unplayedPieces.Contains(piece);
+        }
+
+
+        /// <summary>
+        /// returns the number of empty neighbors for a piece on the board
+        /// returns .int.MaxValue if the given piece is unplayed
+        /// </summary>
+        /// <param name="piece"></param>
+        /// <returns></returns>
+        internal int BreathingSpaces(Piece piece)
+        {
+            Hex hex;
+            if (TryGetHexOfPlayedPiece(piece, out hex))
+            {
+                var hivailability = Hivailability.GetHivailability(this, hex);
+                return hivailability.EmptyNeighborHexes(hex).Count;
+            }
+            else
+            {
+                return int.MaxValue;
+            }
         }
 
         internal Board Clone()

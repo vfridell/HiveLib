@@ -9,7 +9,7 @@ using HiveLib.Models;
 namespace HiveLib.Tests
 {
     [TestClass]
-    public class MovementTest3
+    public class FullGameTest 
     {
         Board _board;
 
@@ -26,32 +26,33 @@ namespace HiveLib.Tests
 
             List<Move> moves = new List<Move>();
 
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wS1 .")));// placement
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wG1 .")));// placement
             Assert.AreEqual(6, _board.hivailableSpaces.Count);
 
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bS1 wS1-")));// placement
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bS1 wG1-")));// placement
             Assert.AreEqual(8, _board.hivailableSpaces.Count);
 
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wQ /wS1")));// placement
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wQ -wG1")));// placement
             Assert.AreEqual(10, _board.hivailableSpaces.Count);
             Assert.AreEqual(1, _board.articulationPoints.Count);
 
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bQ bS1\")));// placement
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bQ bS1/")));// placement
             Assert.AreEqual(12, _board.hivailableSpaces.Count);
             Assert.AreEqual(2, _board.articulationPoints.Count);
 
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wA1 \wS1")));// placement
-            Assert.AreEqual(14, _board.hivailableSpaces.Count);
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wA1 \wG1")));// placement
+            Assert.AreEqual(13, _board.hivailableSpaces.Count);
             Assert.AreEqual(2, _board.articulationPoints.Count);
 
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bB1 bS1-"))); // placement
-            Assert.AreEqual(15, _board.hivailableSpaces.Count);
-            Assert.AreEqual(2, _board.articulationPoints.Count);
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bQ /bS1"))); // movement
+            Assert.AreEqual(12, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
 
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wA1 bQ\"))); // movement
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wA1 bQ/"))); // movement
             Assert.AreEqual(15, _board.hivailableSpaces.Count);
             Assert.AreEqual(3, _board.articulationPoints.Count);
 
+            /*
             Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bB1 bS1"))); // beetle climb
             Assert.AreEqual(14, _board.hivailableSpaces.Count);
             Assert.AreEqual(3, _board.articulationPoints.Count);
@@ -99,6 +100,7 @@ namespace HiveLib.Tests
             Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wS1 \bB2"))); // spider across gate
             Assert.AreEqual(21, _board.hivailableSpaces.Count);
             Assert.AreEqual(5, _board.articulationPoints.Count);
+             */
         }
 
     }

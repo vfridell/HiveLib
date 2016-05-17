@@ -75,6 +75,7 @@
     <Compile Include="Models\Pieces\BeetleStack.cs" />
     <Compile Include="Tests\BoardTests.cs" />
     <Compile Include="Tests\CheckNotationStringParsing.cs" />
+    <Compile Include="Tests\FullGameTest.cs" />
     <Compile Include="Tests\MovementTests2.cs" />
     <Compile Include="Tests\MovementTests.cs" />
     <Compile Include="Tests\MovementTest3.cs" />
@@ -88,15 +89,13 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Strategies\" />
+    <Folder Include="Tests\images\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Tests\images\MovementTests3.JPG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
