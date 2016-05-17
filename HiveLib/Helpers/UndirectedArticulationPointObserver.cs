@@ -30,7 +30,6 @@ namespace HiveLib.Helpers
         private Dictionary<TVertex, int> _discoverTimes = new Dictionary<TVertex, int>();
         private Dictionary<TVertex, int> _lowDiscoverTimes = new Dictionary<TVertex, int>();
         private Dictionary<TVertex, int> _dfsChildren = new Dictionary<TVertex, int>();
-        //private IDictionary<TVertex, UndirectedEdge<TVertex>> _vertexPredecessors = new Dictionary<TVertex, UndirectedEdge<TVertex>>();
         private IDictionary<TVertex, TVertex> _vertexPredecessors = new Dictionary<TVertex, TVertex>();
         private readonly ISet<TVertex> _articulationPoints;
         private int _time = 0;
@@ -66,7 +65,7 @@ namespace HiveLib.Helpers
             {
                 // not the root
                 TVertex parent = _vertexPredecessors[vertex];
-                _lowDiscoverTimes[parent] = Math.Min(_lowDiscoverTimes[vertex], _discoverTimes[parent]);
+                _lowDiscoverTimes[parent] = Math.Min(Math.Min(_lowDiscoverTimes[vertex], _discoverTimes[parent]), _lowDiscoverTimes[parent]);
                 // is my parent an articulation point?
                 if (_discoverTimes[parent] <= _lowDiscoverTimes[vertex])
                 {

@@ -114,6 +114,8 @@ namespace HiveLib.Models
 
         internal IList<Move> GetMoves()
         {
+            // TODO on turn 4 you must place a bee if you haven't already
+            // TODO on turn 1 you cannot place a bee
             if (_gameResult != GameResult.Incomplete) return new List<Move>();
             if (_movesDirty)
             {
