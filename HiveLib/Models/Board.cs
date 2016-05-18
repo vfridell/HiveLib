@@ -107,7 +107,10 @@ namespace HiveLib.Models
             {
                 foreach (var kvp in _playedPieces.Where(p => p.Key.color == colorToMove))
                 {
-                    _moves.AddRange(kvp.Key.GetMoves(kvp.Value, this));
+                    if (!_articulationPoints.Contains(kvp.Key) || kvp.Key is BeetleStack)
+                    {
+                        _moves.AddRange(kvp.Key.GetMoves(kvp.Value, this));
+                    }
                 }
             }
         }
