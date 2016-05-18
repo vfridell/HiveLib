@@ -267,16 +267,24 @@ namespace HiveLib.Models
 
         private Piece HandleBeetleFromStackMove(BeetleStack stack, Hex from, Hex to)
         {
+            //Piece actualPiece = stack.top;
+            //if (stack.height - 1 == 0)
+            //{
+            //    // no more stack
+            //    _boardPieceArray[from.column, from.row] = stack.bottom;
+            //    _playedPieces.Remove(stack);
+            //    _playedPieces.Add(stack.bottom, from);
+            //    _adjacencyGraph.RemoveVertex(stack);
+            //    RefreshHivailability(stack.bottom, from, false);
+            //}
+            //return actualPiece;
             Piece actualPiece = stack.top;
-            if (stack.height - 1 == 0)
-            {
-                // no more stack
-                _boardPieceArray[from.column, from.row] = stack.bottom;
-                _playedPieces.Remove(stack);
-                _playedPieces.Add(stack.bottom, from);
-                _adjacencyGraph.RemoveVertex(stack);
-                RefreshHivailability(stack.bottom, from, false);
-            }
+            Piece newPiece = BeetleStack.PopBeetleStack(stack);
+            _boardPieceArray[from.column, from.row] = newPiece;
+            _playedPieces.Remove(stack);
+            _playedPieces.Add(newPiece, from);
+            _adjacencyGraph.RemoveVertex(stack);
+            RefreshHivailability(newPiece, from, false);
             return actualPiece;
         }
 

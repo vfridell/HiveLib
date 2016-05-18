@@ -75,35 +75,100 @@ namespace HiveLib.Tests
             Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wB1 wS1"))); // beetle climb
             Assert.AreEqual(15, _board.hivailableSpaces.Count);
             Assert.AreEqual(1, _board.articulationPoints.Count);
+            
+            Move beetleGateClimb = Move.GetMove(new Beetle(Piece.PieceColor.Black, 1), new Hex(24, 24));
+            Assert.IsTrue(_board.GetMoves().Contains(beetleGateClimb));
 
             Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bB2 bS1"))); // beetle climb
             Assert.AreEqual(14, _board.hivailableSpaces.Count);
             Assert.AreEqual(1, _board.articulationPoints.Count);
 
-            Move beetleGateClimb = Move.GetMove(new Beetle(Piece.PieceColor.Black, 1), new Hex(24, 24));
             Assert.IsFalse(_board.GetMoves().Contains(beetleGateClimb));
-                
-            /*
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wG1 bQ-"))); // hopper
-            Assert.AreEqual(18, _board.hivailableSpaces.Count);
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wB2 -wB1"))); // last beetle 
+            Assert.AreEqual(15, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bB2 wG1"))); // beetle climb
+            Assert.AreEqual(15, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wB2 wQ"))); // beetle climb
+            Assert.AreEqual(14, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Assert.IsTrue(_board.GetMoves().Contains(beetleGateClimb));
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bB1 bB2"))); // beetle climb
+            Assert.AreEqual(14, _board.hivailableSpaces.Count);
             Assert.AreEqual(2, _board.articulationPoints.Count);
 
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bG1 -wS1"))); // hopper
-            Assert.AreEqual(18, _board.hivailableSpaces.Count);
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wB1 bB1"))); // beetle climb
+            Assert.AreEqual(14, _board.hivailableSpaces.Count);
             Assert.AreEqual(2, _board.articulationPoints.Count);
 
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wS1 -bG1"))); // spider
-            Assert.AreEqual(20, _board.hivailableSpaces.Count);
-            Assert.AreEqual(4, _board.articulationPoints.Count);
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bA1 bS1-"))); // 
+            Assert.AreEqual(16, _board.hivailableSpaces.Count);
+            Assert.AreEqual(3, _board.articulationPoints.Count);
 
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bB2 -bQ"))); // 
-            Assert.AreEqual(20, _board.hivailableSpaces.Count);
-            Assert.AreEqual(4, _board.articulationPoints.Count);
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wB2 wB1"))); // beetle climb
+            Assert.AreEqual(16, _board.hivailableSpaces.Count);
+            Assert.AreEqual(3, _board.articulationPoints.Count);
 
-            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wS1 \bB2"))); // spider across gate
-            Assert.AreEqual(21, _board.hivailableSpaces.Count);
-            Assert.AreEqual(5, _board.articulationPoints.Count);
-             */
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bA1 -bQ"))); // 
+            Assert.AreEqual(14, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Move beetleInternalStackMove = Move.GetMove(new Beetle(Piece.PieceColor.White, 1), new Hex(25, 23));
+            Assert.IsFalse(_board.GetMoves().Contains(beetleInternalStackMove));
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wB2 bQ"))); // 
+            Assert.AreEqual(14, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bG1 bS1-"))); // 
+            Assert.AreEqual(16, _board.hivailableSpaces.Count);
+            Assert.AreEqual(2, _board.articulationPoints.Count);
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wB2 bQ-"))); // 
+            Assert.AreEqual(15, _board.hivailableSpaces.Count);
+            Assert.AreEqual(0, _board.articulationPoints.Count);
+
+            Assert.AreEqual(1, _board.BlackQueenBreathingSpaces());
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bS2 bG1-"))); // 
+            Assert.AreEqual(17, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wB1 wS1-"))); // 
+            Assert.AreEqual(17, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bB1 wQ"))); // 
+            Assert.AreEqual(17, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wA1 /bQ"))); // 
+            Assert.AreEqual(17, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bB2 wS1"))); // 
+            Assert.AreEqual(17, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wG1 bQ/"))); // 
+            Assert.AreEqual(18, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Move antGateMove = Move.GetMove(new Ant(Piece.PieceColor.Black, 1), new Hex(24, 24));
+            Assert.IsFalse(_board.GetMoves().Contains(antGateMove));
+
+            Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bB1 \bQ"))); // 
+            Assert.AreEqual(17, _board.hivailableSpaces.Count);
+            Assert.AreEqual(1, _board.articulationPoints.Count);
+
+            Assert.AreEqual(Board.GameResult.WhiteWin, _board.gameResult);
+            Assert.AreEqual(0, _board.GetMoves().Count);
         }
 
     }

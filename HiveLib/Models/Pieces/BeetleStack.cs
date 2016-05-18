@@ -13,8 +13,8 @@ namespace HiveLib.Models.Pieces
         internal BeetleStack(Piece bottom, Beetle secondLevel)
             : base(bottom.color, bottom.number)
         {
-            this.bottom = bottom;
-            this.secondLevel = secondLevel;
+            this._pieces[0] = bottom;
+            this._pieces[1] = secondLevel;
             _topLevel = 1;
         }
 
@@ -22,35 +22,49 @@ namespace HiveLib.Models.Pieces
             : base(originalStack.color, originalStack.number)
         {
             _topLevel = originalStack._topLevel + 1;
-            this.bottom = originalStack.bottom;
-            this.secondLevel = originalStack.secondLevel;
-            this.thirdLevel = originalStack.thirdLevel;
-            this.fourthLevel = originalStack.fourthLevel;
-            this.fifthLevel = originalStack.fifthLevel;
+            this._pieces[0] = originalStack.bottom;
+            this._pieces[1] = originalStack.secondLevel;
+            this._pieces[2] = originalStack.thirdLevel;
+            this._pieces[3] = originalStack.fourthLevel;
+            this._pieces[4] = originalStack.fifthLevel;
             _pieces[_topLevel] = newPiece;
+        }
+
+        internal static Piece PopBeetleStack(BeetleStack oldStack)
+        {
+            if(oldStack.height == 1) return oldStack.bottom;
+            var newStack = new BeetleStack(oldStack.bottom, oldStack.secondLevel);
+            switch (oldStack.height)
+            {
+                case 2:
+                    return newStack;
+                case 3:
+                    newStack._pieces[2] = oldStack.thirdLevel;
+                    newStack._topLevel = 2;
+                    break;
+                case 4:
+                    newStack._pieces[2] = oldStack.thirdLevel;
+                    newStack._pieces[3] = oldStack.fourthLevel;
+                    newStack._topLevel = 3;
+                    break;
+                default:
+                    throw new Exception("Too many levels!");
+            }
+            return newStack;
         }
 
         private int _topLevel = 1;
 
         private Piece[] _pieces = new Piece[5];
-        internal Piece bottom { get { return _pieces[0]; } set { _pieces[0] = value; } }
-        internal Beetle secondLevel { get { return (Beetle)_pieces[1]; } set { _pieces[1] = value; } }
-        internal Beetle thirdLevel { get { return (Beetle)_pieces[2]; } set { _pieces[2] = value; } }
-        internal Beetle fourthLevel { get { return (Beetle)_pieces[3]; } set { _pieces[3] = value; } }
-        internal Beetle fifthLevel { get { return (Beetle)_pieces[4]; } set { _pieces[4] = value; } }
-
+        internal Piece bottom { get { return _pieces[0]; } }
+        internal Beetle secondLevel { get { return (Beetle)_pieces[1]; }  }
+        internal Beetle thirdLevel { get { return (Beetle)_pieces[2]; } }
+        internal Beetle fourthLevel { get { return (Beetle)_pieces[3]; } }
+        internal Beetle fifthLevel { get { return (Beetle)_pieces[4]; } }
+        internal Piece top { get { return _pieces[_topLevel]; } }
+        internal override PieceColor color { get { return top.color; } }
+        internal override int number { get { return top.number; } }
         internal override int height { get { return _topLevel; } }
-
-        /// <summary>
-        /// the top of the stack.  Pull from whatever level is the top of the stack
-        /// </summary>
-        internal Piece top 
-        { 
-            get 
-            {
-                return _pieces[_topLevel];
-            } 
-        }
 
         internal bool Contains(Piece piece)
         {
@@ -60,22 +74,6 @@ namespace HiveLib.Models.Pieces
                 return false;
             else
                 return true;
-        }
-
-        internal override PieceColor color
-        {
-            get
-            {
-                return top.color;
-            }
-        }
-
-        internal override int number
-        {
-            get
-            {
-                return top.number;
-            }
         }
 
         public override bool Equals(Piece obj)
