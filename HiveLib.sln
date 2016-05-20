@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiveLib", "HiveLib\HiveLib.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{C216B29D-77AB-41AA-BCBE-89E544CA87C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIPlayerInterface", "AIPlayerInterface\AIPlayerInterface.csproj", "{93517E6A-4D12-4032-8146-DD2CC8F01493}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C216B29D-77AB-41AA-BCBE-89E544CA87C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C216B29D-77AB-41AA-BCBE-89E544CA87C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C216B29D-77AB-41AA-BCBE-89E544CA87C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93517E6A-4D12-4032-8146-DD2CC8F01493}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93517E6A-4D12-4032-8146-DD2CC8F01493}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93517E6A-4D12-4032-8146-DD2CC8F01493}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93517E6A-4D12-4032-8146-DD2CC8F01493}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

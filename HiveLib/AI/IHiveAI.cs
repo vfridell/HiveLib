@@ -8,9 +8,10 @@ using HiveLib.ViewModels;
 
 namespace HiveLib.AI
 {
-    interface IHiveAI
+    public interface IHiveAI
     {
         void BeginNewGame(bool PlayingWhite);
-        Move GetBestMove(Board board);
+        string MakeBestMove();
+        bool TryAcceptMove(string notation, out string error);
     }
 }

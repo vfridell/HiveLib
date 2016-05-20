@@ -9,28 +9,6 @@ using QuickGraph;
 
 namespace HiveLib.Tests
 {
-    public class BoardMove 
-    {
-        internal int depth;
-        internal Board board; 
-        internal Move move;
-        public override bool Equals(object obj)
-        {
-            if (obj == null) return false;
-            if (obj.GetType() != typeof(BoardMove)) return false;
-            return Equals((BoardMove)obj);
-        }
-        public bool Equals(BoardMove other)
-        {
-            return depth == other.depth && move.Equals(other.move);
-        }
-
-        public override int GetHashCode()
-        {
-            return depth.GetHashCode() ^ move.GetHashCode();
-        }
-    }
-
     [TestClass]
     public class DoAllTheMoves
     {
