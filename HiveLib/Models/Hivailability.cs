@@ -19,9 +19,9 @@ namespace HiveLib.Models
         public bool[] IsBlockedArray { get { return _isBlocked; } }
         public NeighborStatus[] NeighborStatusArray { get { return _neighborStatus; } }
 
-        internal bool CanPlace(Piece.PieceColor pieceColor)
+        internal bool CanPlace(PieceColor pieceColor)
         {
-            if (pieceColor == Piece.PieceColor.Black) return _blackCanPlace;
+            if (pieceColor == PieceColor.Black) return _blackCanPlace;
             else return _whiteCanPlace;
         }
 
@@ -114,9 +114,9 @@ namespace HiveLib.Models
             Piece tr_piece;
             if(board.TryGetPieceAtHex(tr_hex, out tr_piece))
             {
-                if(tr_piece.color == Piece.PieceColor.Black) 
+                if(tr_piece.color == PieceColor.Black) 
                     return NeighborStatus.Black;
-                else if(tr_piece.color == Piece.PieceColor.White) 
+                else if(tr_piece.color == PieceColor.White) 
                     return NeighborStatus.White;
                 else
                     throw new Exception(string.Format("Bad color status at {0},{1}", hex.column, hex.row));

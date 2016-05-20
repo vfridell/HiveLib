@@ -1,7 +1,7 @@
 ﻿using System;
 namespace HiveLib.Models
 {
-    struct Hex
+    public struct Hex
     {
         public Hex(int column, int row)
         {

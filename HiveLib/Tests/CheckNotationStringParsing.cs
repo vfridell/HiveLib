@@ -112,11 +112,11 @@ namespace HiveLib.Tests
             
             Assert.IsInstanceOfType(move.pieceToMove, typeof(Ant));
             Assert.IsTrue(move.pieceToMove.number == 3);
-            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.White);
+            Assert.IsTrue(move.pieceToMove.color == PieceColor.White);
 
             Assert.IsInstanceOfType(move.referencePiece, typeof(QueenBee));
             Assert.IsTrue(move.referencePiece.number == 1);
-            Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.Black);
+            Assert.IsTrue(move.referencePiece.color == PieceColor.Black);
 
             Assert.IsTrue(move.targetPosition == Neighborhood.Position.right);
         }
@@ -129,11 +129,11 @@ namespace HiveLib.Tests
 
             Assert.IsInstanceOfType(move.pieceToMove, typeof(QueenBee));
             Assert.IsTrue(move.pieceToMove.number == 1);
-            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.Black);
+            Assert.IsTrue(move.pieceToMove.color == PieceColor.Black);
 
             Assert.IsInstanceOfType(move.referencePiece, typeof(QueenBee));
             Assert.IsTrue(move.referencePiece.number == 1);
-            Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.White);
+            Assert.IsTrue(move.referencePiece.color == PieceColor.White);
 
             Assert.IsTrue(move.targetPosition == Neighborhood.Position.bottomright);
         }
@@ -146,11 +146,11 @@ namespace HiveLib.Tests
 
             Assert.IsInstanceOfType(move.pieceToMove, typeof(Hopper));
             Assert.IsTrue(move.pieceToMove.number == 1);
-            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.White);
+            Assert.IsTrue(move.pieceToMove.color == PieceColor.White);
 
             Assert.IsInstanceOfType(move.referencePiece, typeof(Hopper));
             Assert.IsTrue(move.referencePiece.number == 2);
-            Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.White);
+            Assert.IsTrue(move.referencePiece.color == PieceColor.White);
 
             Assert.IsTrue(move.targetPosition == Neighborhood.Position.bottomleft);
         }
@@ -163,11 +163,11 @@ namespace HiveLib.Tests
 
             Assert.IsInstanceOfType(move.pieceToMove, typeof(Beetle));
             Assert.IsTrue(move.pieceToMove.number == 2);
-            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.White);
+            Assert.IsTrue(move.pieceToMove.color == PieceColor.White);
 
             Assert.IsInstanceOfType(move.referencePiece, typeof(QueenBee));
             Assert.IsTrue(move.referencePiece.number == 1);
-            Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.Black);
+            Assert.IsTrue(move.referencePiece.color == PieceColor.Black);
 
             Assert.IsTrue(move.targetPosition == Neighborhood.Position.left);
         }
@@ -180,11 +180,11 @@ namespace HiveLib.Tests
 
             Assert.IsInstanceOfType(move.pieceToMove, typeof(Spider));
             Assert.IsTrue(move.pieceToMove.number == 2);
-            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.White);
+            Assert.IsTrue(move.pieceToMove.color == PieceColor.White);
 
             Assert.IsInstanceOfType(move.referencePiece, typeof(Ant));
             Assert.IsTrue(move.referencePiece.number == 3);
-            Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.Black);
+            Assert.IsTrue(move.referencePiece.color == PieceColor.Black);
 
             Assert.IsTrue(move.targetPosition == Neighborhood.Position.topleft);
         }
@@ -197,11 +197,11 @@ namespace HiveLib.Tests
 
             Assert.IsInstanceOfType(move.pieceToMove, typeof(Beetle));
             Assert.IsTrue(move.pieceToMove.number == 1);
-            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.Black);
+            Assert.IsTrue(move.pieceToMove.color == PieceColor.Black);
 
             Assert.IsInstanceOfType(move.referencePiece, typeof(Spider));
             Assert.IsTrue(move.referencePiece.number == 1);
-            Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.Black);
+            Assert.IsTrue(move.referencePiece.color == PieceColor.Black);
 
             Assert.IsTrue(move.targetPosition == Neighborhood.Position.topright);
         }
@@ -214,11 +214,11 @@ namespace HiveLib.Tests
 
             Assert.IsInstanceOfType(move.pieceToMove, typeof(Beetle));
             Assert.IsTrue(move.pieceToMove.number == 1);
-            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.Black);
+            Assert.IsTrue(move.pieceToMove.color == PieceColor.Black);
 
             Assert.IsInstanceOfType(move.referencePiece, typeof(Spider));
             Assert.IsTrue(move.referencePiece.number == 1);
-            Assert.IsTrue(move.referencePiece.color == Piece.PieceColor.Black);
+            Assert.IsTrue(move.referencePiece.color == PieceColor.Black);
 
             Assert.IsTrue(move.targetPosition == Neighborhood.Position.center);
         }
@@ -231,7 +231,7 @@ namespace HiveLib.Tests
 
             Assert.IsInstanceOfType(move.pieceToMove, typeof(Ant));
             Assert.IsTrue(move.pieceToMove.number == 1);
-            Assert.IsTrue(move.pieceToMove.color == Piece.PieceColor.White);
+            Assert.IsTrue(move.pieceToMove.color == PieceColor.White);
 
             Assert.IsNull(move.referencePiece);
             Assert.IsTrue(move.hex != Board.invalidHex);

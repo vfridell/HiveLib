@@ -4,10 +4,10 @@ using System.Linq;
 
 namespace HiveLib.Models.Pieces
 {
+    public enum PieceColor {White, Black};
+
     abstract class Piece
     {
-        public enum PieceColor {White, Black};
-
         public Piece(PieceColor color, int number)
         {
             _number = number;
@@ -15,12 +15,12 @@ namespace HiveLib.Models.Pieces
         }
 
         private readonly int _number;
-        internal virtual int number { get { return _number; } }
+        public virtual int number { get { return _number; } }
 
         private readonly PieceColor _color;
-        internal virtual PieceColor color { get { return _color; } }
+        public virtual PieceColor color { get { return _color; } }
 
-        internal virtual int height { get { return 1; } }
+        public virtual int height { get { return 1; } }
 
         public abstract string GetPieceNotation();
 

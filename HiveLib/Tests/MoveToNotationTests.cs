@@ -40,7 +40,7 @@ namespace HiveLib.Tests
         [TestMethod]
         public void CheckNotationForMove1()
         {
-            Move move = Move.GetMove(new Ant(Piece.PieceColor.Black, 1), Board.invalidHex);
+            Move move = Move.GetMove(new Ant(PieceColor.Black, 1), Board.invalidHex);
             string notation = NotationParser.GetNotationForMove(move, _board);
             Assert.AreEqual<string>(@"bA1 .", notation);
         }

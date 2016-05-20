@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using HiveLib.Models;
 using HiveLib.ViewModels;
+using PieceColor = HiveLib.Models.Pieces.PieceColor;
+using AutoMapper;
 
 namespace HiveLib.Services
 {
@@ -23,6 +25,12 @@ namespace HiveLib.Services
             }
         }
 
-
+        public static void Initialize()
+        {
+            Mapper.CreateMap<Board, BoardAnalysisDataVM>()
+                  .ForMember(dest => dest.blackArticulationPoints, opt => opt.MapFrom(src => src.articulationPoints.Count(p => p.color == PieceColor.Black)))
+                  .ForMember(dest => dest.whiteArticulationPoints, opt => opt.MapFrom(src => src.articulationPoints.Count(p => p.color == PieceColor.White)));
+                  //.ForMember()
+        }
     }
 }

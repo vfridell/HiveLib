@@ -62,9 +62,9 @@ namespace HiveLib.Models.Pieces
         internal Beetle fourthLevel { get { return (Beetle)_pieces[3]; } }
         internal Beetle fifthLevel { get { return (Beetle)_pieces[4]; } }
         internal Piece top { get { return _pieces[_topLevel]; } }
-        internal override PieceColor color { get { return top.color; } }
-        internal override int number { get { return top.number; } }
-        internal override int height { get { return _topLevel; } }
+        public override PieceColor color { get { return top.color; } }
+        public override int number { get { return top.number; } }
+        public override int height { get { return _topLevel; } }
 
         internal bool Contains(Piece piece)
         {

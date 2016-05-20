@@ -103,14 +103,14 @@ namespace HiveLib.Models
 
         internal static Piece GetPieceByNotation(string pieceNotation)
         {
-            Piece.PieceColor color;
+            PieceColor color;
             int number;
             Piece piece;
 
             if (pieceNotation[0] == 'w')
-                color = Piece.PieceColor.White;
+                color = PieceColor.White;
             else if (pieceNotation[0] == 'b')
-                color = Piece.PieceColor.Black;
+                color = PieceColor.Black;
             else
                 throw new Exception("Invalid color notation");
 
@@ -205,7 +205,7 @@ namespace HiveLib.Models
 
         private static string GetNotationForPiece(Piece piece)
         {
-            return (piece.color == HiveLib.Models.Pieces.Piece.PieceColor.White ? "w" : "b") +
+            return (piece.color == PieceColor.White ? "w" : "b") +
                                              piece.GetPieceNotation() +
                                              piece.number.ToString();
         }

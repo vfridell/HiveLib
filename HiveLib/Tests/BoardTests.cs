@@ -19,20 +19,14 @@ namespace HiveLib.Tests
             Assert.IsFalse(board.blackQueenPlaced);
             Assert.IsTrue(board.whiteToPlay);
             IList<Move> placementMoves = board.GetMoves();
-            Assert.AreEqual(placementMoves.Count, 5);
+            Assert.AreEqual(4, placementMoves.Count);
         }
 
         [TestMethod]
         public void CheckBeeFirstMove()
         {
             Board board = Board.GetNewBoard();
-            Move queenPlacementMove = board.GetMoves().Where(m => m.pieceToMove is QueenBee).FirstOrDefault();
-            Assert.IsTrue(board.TryMakeMove(queenPlacementMove));
-            Assert.IsTrue(board.whiteQueenPlaced);
-            Assert.IsFalse(board.blackQueenPlaced);
-            IList<Move> placementMoves = board.GetMoves();
-            // six spots with five pieces each for the second move
-            Assert.AreEqual(placementMoves.Count, 30);
+            Assert.IsFalse(board.TryMakeMove(Move.GetMove(@"wQ .")));// 
         }
 
         [TestMethod]
@@ -45,12 +39,12 @@ namespace HiveLib.Tests
             Assert.IsFalse(board.blackQueenPlaced);
             IList<Move> secondMoves = board.GetMoves();
             // six spots with five pieces each for the second move
-            Assert.AreEqual(secondMoves.Count, 30);
+            Assert.AreEqual(30, secondMoves.Count);
 
             Assert.IsTrue(board.TryMakeMove(secondMoves[0]));
             IList<Move> thirdMoves = board.GetMoves();
             // if bee is not the first move, there are three spots with five pieces each for the third move
-            Assert.AreEqual(thirdMoves.Count, 15);
+            Assert.AreEqual(15, thirdMoves.Count);
         }
     }
 }

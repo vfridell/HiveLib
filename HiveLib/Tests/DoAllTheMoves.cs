@@ -5,16 +5,39 @@ using HiveLib.Models.Pieces;
 using HiveLib.Services;
 using System.Collections.Generic;
 using HiveLib.Models;
+using QuickGraph;
 
 namespace HiveLib.Tests
 {
+    public class BoardMove 
+    {
+        internal int depth;
+        internal Board board; 
+        internal Move move;
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+            if (obj.GetType() != typeof(BoardMove)) return false;
+            return Equals((BoardMove)obj);
+        }
+        public bool Equals(BoardMove other)
+        {
+            return depth == other.depth && move.Equals(other.move);
+        }
+
+        public override int GetHashCode()
+        {
+            return depth.GetHashCode() ^ move.GetHashCode();
+        }
+    }
+
     [TestClass]
     public class DoAllTheMoves
     {
         Board _initialBoard;
-        int _cutoff = 3;
         int _depth = 1;
         Random _rand = new Random();
+        AdjacencyGraph<BoardMove, Edge<BoardMove>> _boardMovesGraph = new AdjacencyGraph<BoardMove, Edge<BoardMove>>();
 
         [TestInitialize]
         public void Setup()
@@ -33,36 +56,38 @@ namespace HiveLib.Tests
             Assert.AreEqual(2, _initialBoard.articulationPoints.Count);
         }
 
-        class BoardMove { public Board board; public Move move; }
 
         [TestMethod]
         public void BreadthFirstSearchToCutoff()
         {
-            var allTheBoards = new Dictionary<int, IList<BoardMove>>();
-            allTheBoards[0] = new List<BoardMove>();
-            allTheBoards[0].Add(new BoardMove() { board = _initialBoard, move = null });
+            BoardMove initialBoardMove = new BoardMove() { board = _initialBoard, move = Move.GetMove(@"bQ bS1/"), depth = 0 };
+            _boardMovesGraph.AddVertex(initialBoardMove);
 
             // breadth-first search of board states
-            while (_depth < 10)
+            List<BoardMove> lastBoardMovesList = new List<BoardMove>();
+            List<BoardMove> nextBoardMovesList = new List<BoardMove>();
+            lastBoardMovesList.Add(initialBoardMove);
+            List<Move> moves = new List<Move>();
+            do
             {
-                foreach (BoardMove boardMove in allTheBoards[_depth - 1])
+                foreach (BoardMove currentBoardMove in lastBoardMovesList)
                 {
-                    List<Move> moves = new List<Move>();
-                    moves.AddRange(boardMove.board.GetMoves());
-                    List<BoardMove> boardMoves = new List<BoardMove>();
+                    moves.AddRange(currentBoardMove.board.GetMoves());
                     while (moves.Count > 0)
                     {
-                        Board futureBoard = boardMove.board.Clone();
+                        Board futureBoard = currentBoardMove.board.Clone();
                         Move nextMove = GetRandomMove(moves);
                         Assert.IsTrue(futureBoard.TryMakeMove(nextMove));
-                        var newBoardMove = new BoardMove() { board = futureBoard, move = nextMove };
+                        var newBoardMove = new BoardMove() { board = futureBoard, move = nextMove, depth = _depth };
                         moves.Remove(nextMove);
-                        boardMoves.Add(newBoardMove);
+                        _boardMovesGraph.AddVerticesAndEdge(new Edge<BoardMove>(currentBoardMove, newBoardMove));
+                        nextBoardMovesList.Add(newBoardMove);
                     }
-                    allTheBoards[_depth] = boardMoves;
                 }
+                lastBoardMovesList = nextBoardMovesList;
+                nextBoardMovesList = new List<BoardMove>();
                 _depth++;
-            }
+            } while (_depth < 4);
         }
 
         Move GetRandomMove(IList<Move> moves)

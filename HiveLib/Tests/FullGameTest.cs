@@ -76,7 +76,7 @@ namespace HiveLib.Tests
             Assert.AreEqual(15, _board.hivailableSpaces.Count);
             Assert.AreEqual(1, _board.articulationPoints.Count);
             
-            Move beetleGateClimb = Move.GetMove(new Beetle(Piece.PieceColor.Black, 1), new Hex(24, 24));
+            Move beetleGateClimb = Move.GetMove(new Beetle(PieceColor.Black, 1), new Hex(24, 24));
             Assert.IsTrue(_board.GetMoves().Contains(beetleGateClimb));
 
             Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bB2 bS1"))); // beetle climb
@@ -119,7 +119,7 @@ namespace HiveLib.Tests
             Assert.AreEqual(14, _board.hivailableSpaces.Count);
             Assert.AreEqual(1, _board.articulationPoints.Count);
 
-            Move beetleInternalStackMove = Move.GetMove(new Beetle(Piece.PieceColor.White, 1), new Hex(25, 23));
+            Move beetleInternalStackMove = Move.GetMove(new Beetle(PieceColor.White, 1), new Hex(25, 23));
             Assert.IsFalse(_board.GetMoves().Contains(beetleInternalStackMove));
 
             Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"wB2 bQ"))); // 
@@ -160,14 +160,14 @@ namespace HiveLib.Tests
             Assert.AreEqual(18, _board.hivailableSpaces.Count);
             Assert.AreEqual(1, _board.articulationPoints.Count);
 
-            Move antGateMove = Move.GetMove(new Ant(Piece.PieceColor.Black, 1), new Hex(24, 24));
+            Move antGateMove = Move.GetMove(new Ant(PieceColor.Black, 1), new Hex(24, 24));
             Assert.IsFalse(_board.GetMoves().Contains(antGateMove));
 
             Assert.IsTrue(_board.TryMakeMove(Move.GetMove(@"bB1 \bQ"))); // 
             Assert.AreEqual(17, _board.hivailableSpaces.Count);
             Assert.AreEqual(1, _board.articulationPoints.Count);
 
-            Assert.AreEqual(Board.GameResult.WhiteWin, _board.gameResult);
+            Assert.AreEqual(GameResult.WhiteWin, _board.gameResult);
             Assert.AreEqual(0, _board.GetMoves().Count);
         }
 

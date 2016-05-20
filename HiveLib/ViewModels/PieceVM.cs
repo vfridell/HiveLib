@@ -7,14 +7,19 @@ using HiveLib.Models.Pieces;
 
 namespace HiveLib.ViewModels
 {
-    class PieceVM
-    {
-        //public enum PieceType { Blank, Ant, Bee, Beetle, Hopper, Spider, BeetleStack };
-        // TODO should probably subclass just like model
+    public enum PieceType { Blank, Ant, Bee, Beetle, Hopper, Spider, BeetleStack };
 
-        //public PieceType pieceType { get; set; }
+    public class PieceVM
+    {
+        public PieceType pieceType { get; set; }
         public int number { get; set; }
-        public Piece.PieceColor color { get; set; }
-        //TODO do something that works for a beetlestack
+        public PieceColor color { get; set; }
+
+        public bool isBeetleStack { get; set; }
+        public PieceVM bottom { get; set; }
+        public PieceVM secondLevel { get ;set; }
+        public PieceVM thirdLevel { get ;set; }
+        public PieceVM fourthLevel { get ;set; }
+        public PieceVM fifthLevel { get ;set; }
     }
 }

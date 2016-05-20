@@ -5,14 +5,14 @@ using System.Text;
 using QuickGraph;
 using System.Threading.Tasks;
 using HiveLib.Models.Pieces;
-using PieceColor = HiveLib.Models.Pieces.Piece.PieceColor;
+using PieceColor = HiveLib.Models.Pieces.PieceColor;
 using QuickGraph.Algorithms.Search;
 namespace HiveLib.Models
 {
+    public enum GameResult { Incomplete, WhiteWin, BlackWin, Draw };
 
     class Board
     {
-        public enum GameResult { Incomplete, WhiteWin, BlackWin, Draw };
         public static readonly int columns = 50;
         public static readonly int rows = 50;
         public static Hex invalidHex = new Hex(-1, -1);
@@ -31,7 +31,7 @@ namespace HiveLib.Models
         internal bool whiteToPlay = true;
         internal bool whiteQueenPlaced = false;
         internal bool blackQueenPlaced = false;
-        internal int turnNumber = 0;
+        internal int turnNumber = 1;
         internal HashSet<Piece> articulationPoints { get { return _articulationPoints; } }
         internal IList<Hex> hivailableSpaces { get { return _hivailableHexes.Keys.ToArray(); }}
         internal int BlackQueenBreathingSpaces()
@@ -44,6 +44,48 @@ namespace HiveLib.Models
             return BreathingSpaces(new QueenBee(PieceColor.White, 1));
         }
 
+        internal int possibleMoves { get { return GetMoves().Count; } }
+        internal int blackUnplayedPieces { get { return _unplayedPieces.Count(p => p.color == PieceColor.Black); } }
+        internal int whiteUnplayedPieces { get { return _unplayedPieces.Count(p => p.color == PieceColor.White); } }
+        internal int blackHivailableSpaces { get { return _hivailableHexes.Count(kvp => kvp.Value.BlackCanPlace); } }
+        internal int whiteHivailableSpaces { get { return _hivailableHexes.Count(kvp => kvp.Value.WhiteCanPlace); } }
+        internal bool whiteCanMoveAnt 
+        { 
+            get 
+            {
+                return  CanMovePiece(new Ant(PieceColor.White, 1)) ||
+                        CanMovePiece(new Ant(PieceColor.White, 2)) ||
+                        CanMovePiece(new Ant(PieceColor.White, 3));
+            } 
+        }
+        internal bool blackCanMoveAnt
+        {
+            get
+            {
+                return CanMovePiece(new Ant(PieceColor.Black, 1)) ||
+                        CanMovePiece(new Ant(PieceColor.Black, 2)) ||
+                        CanMovePiece(new Ant(PieceColor.Black, 3));
+            }
+        }
+        internal bool blackCanMoveQueen { get { return CanMovePiece(new QueenBee(PieceColor.Black, 1)); } }
+        internal bool whiteCanMoveQueen { get { return CanMovePiece(new QueenBee(PieceColor.White, 1)); } }
+
+        internal bool CanMovePiece(Piece checkPiece)
+        {
+            Hex hex;
+            if (TryGetHexOfPlayedPiece(checkPiece, out hex))
+            {
+                if (!_articulationPoints.Contains(checkPiece))
+                {
+                    Piece piece;
+                    TryGetPieceAtHex(hex, out piece);
+                    if (!(piece is BeetleStack)) return true;
+                    return ((BeetleStack)piece).top.Equals(checkPiece);
+                }
+            }
+            return false;
+        }
+
         private Board() { }
 
         private void GeneratePlacementMoves()
@@ -52,28 +94,42 @@ namespace HiveLib.Models
             {
                 if (kvp.Value.BlackCanPlace && !whiteToPlay)
                 {
+                    // on turn 1 you cannot place a bee
+                    if (!(turnNumber == 1))
+                    {
+                        QueenBee queenBee = _unplayedPieces.OfType<QueenBee>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
+                        if (null != queenBee) _moves.Add(Move.GetMove(queenBee, kvp.Key));
+                        // on turn 4 you must place a bee if you haven't already
+                        if (!blackQueenPlaced && turnNumber == 8) continue;
+                    }
+
                     Beetle beetle = _unplayedPieces.OfType<Beetle>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
                     Ant ant = _unplayedPieces.OfType<Ant>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
                     Spider spider = _unplayedPieces.OfType<Spider>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
-                    QueenBee queenBee = _unplayedPieces.OfType<QueenBee>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
                     Hopper hopper = _unplayedPieces.OfType<Hopper>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
                     if (null != beetle) _moves.Add(Move.GetMove(beetle, kvp.Key));
                     if (null != ant) _moves.Add(Move.GetMove(ant, kvp.Key));
                     if (null != spider) _moves.Add(Move.GetMove(spider, kvp.Key));
-                    if (null != queenBee) _moves.Add(Move.GetMove(queenBee, kvp.Key));
                     if (null != hopper) _moves.Add(Move.GetMove(hopper, kvp.Key));
                 }
                 if (kvp.Value.WhiteCanPlace && whiteToPlay)
                 {
+                    // on turn 1 you cannot place a bee
+                    if (!(turnNumber == 1))
+                    {
+                        QueenBee queenBee = _unplayedPieces.OfType<QueenBee>().Where(p => p.color == PieceColor.White).FirstOrDefault();
+                        if (null != queenBee) _moves.Add(Move.GetMove(queenBee, kvp.Key));
+                        // on turn 4 you must place a bee if you haven't already
+                        if (!whiteQueenPlaced && turnNumber == 7) continue;
+                    }
+
                     Beetle beetle = _unplayedPieces.OfType<Beetle>().Where(p => p.color == PieceColor.White).FirstOrDefault();
                     Ant ant = _unplayedPieces.OfType<Ant>().Where(p => p.color == PieceColor.White).FirstOrDefault();
                     Spider spider = _unplayedPieces.OfType<Spider>().Where(p => p.color == PieceColor.White).FirstOrDefault();
-                    QueenBee queenBee = _unplayedPieces.OfType<QueenBee>().Where(p => p.color == PieceColor.White).FirstOrDefault();
                     Hopper hopper = _unplayedPieces.OfType<Hopper>().Where(p => p.color == PieceColor.White).FirstOrDefault();
                     if (null != beetle) _moves.Add(Move.GetMove(beetle, kvp.Key));
                     if (null != ant) _moves.Add(Move.GetMove(ant, kvp.Key));
                     if (null != spider) _moves.Add(Move.GetMove(spider, kvp.Key));
-                    if (null != queenBee) _moves.Add(Move.GetMove(queenBee, kvp.Key));
                     if (null != hopper) _moves.Add(Move.GetMove(hopper, kvp.Key));
                 }
             }
@@ -117,8 +173,6 @@ namespace HiveLib.Models
 
         internal IList<Move> GetMoves()
         {
-            // TODO on turn 4 you must place a bee if you haven't already
-            // TODO on turn 1 you cannot place a bee
             if (_gameResult != GameResult.Incomplete) return new List<Move>();
             if (_movesDirty)
             {
@@ -456,6 +510,7 @@ namespace HiveLib.Models
             board.whiteQueenPlaced = this.whiteQueenPlaced;
             board.blackQueenPlaced = this.blackQueenPlaced;
             board.whiteToPlay = this.whiteToPlay;
+            board.turnNumber = this.turnNumber;
             foreach (KeyValuePair<Hex, Hivailability> kvp in this._hivailableHexes)
             {
                 board._hivailableHexes.Add(kvp.Key, kvp.Value);
@@ -478,29 +533,29 @@ namespace HiveLib.Models
         internal static Board GetNewBoard()
         {
             Board board = new Board();
-            board._unplayedPieces.Add(new QueenBee(Piece.PieceColor.White, 1));
-            board._unplayedPieces.Add(new Beetle(Piece.PieceColor.White, 1));
-            board._unplayedPieces.Add(new Beetle(Piece.PieceColor.White, 2));
-            board._unplayedPieces.Add(new Spider(Piece.PieceColor.White, 1));
-            board._unplayedPieces.Add(new Spider(Piece.PieceColor.White, 2));
-            board._unplayedPieces.Add(new Hopper(Piece.PieceColor.White, 1));
-            board._unplayedPieces.Add(new Hopper(Piece.PieceColor.White, 2));
-            board._unplayedPieces.Add(new Hopper(Piece.PieceColor.White, 3));
-            board._unplayedPieces.Add(new Ant(Piece.PieceColor.White, 1));
-            board._unplayedPieces.Add(new Ant(Piece.PieceColor.White, 2));
-            board._unplayedPieces.Add(new Ant(Piece.PieceColor.White, 3));
+            board._unplayedPieces.Add(new QueenBee(PieceColor.White, 1));
+            board._unplayedPieces.Add(new Beetle(PieceColor.White, 1));
+            board._unplayedPieces.Add(new Beetle(PieceColor.White, 2));
+            board._unplayedPieces.Add(new Spider(PieceColor.White, 1));
+            board._unplayedPieces.Add(new Spider(PieceColor.White, 2));
+            board._unplayedPieces.Add(new Hopper(PieceColor.White, 1));
+            board._unplayedPieces.Add(new Hopper(PieceColor.White, 2));
+            board._unplayedPieces.Add(new Hopper(PieceColor.White, 3));
+            board._unplayedPieces.Add(new Ant(PieceColor.White, 1));
+            board._unplayedPieces.Add(new Ant(PieceColor.White, 2));
+            board._unplayedPieces.Add(new Ant(PieceColor.White, 3));
 
-            board._unplayedPieces.Add(new QueenBee(Piece.PieceColor.Black, 1));
-            board._unplayedPieces.Add(new Beetle(Piece.PieceColor.Black, 1));
-            board._unplayedPieces.Add(new Beetle(Piece.PieceColor.Black, 2));
-            board._unplayedPieces.Add(new Spider(Piece.PieceColor.Black, 1));
-            board._unplayedPieces.Add(new Spider(Piece.PieceColor.Black, 2));
-            board._unplayedPieces.Add(new Hopper(Piece.PieceColor.Black, 1));
-            board._unplayedPieces.Add(new Hopper(Piece.PieceColor.Black, 2));
-            board._unplayedPieces.Add(new Hopper(Piece.PieceColor.Black, 3));
-            board._unplayedPieces.Add(new Ant(Piece.PieceColor.Black, 1));
-            board._unplayedPieces.Add(new Ant(Piece.PieceColor.Black, 2));
-            board._unplayedPieces.Add(new Ant(Piece.PieceColor.Black, 3));
+            board._unplayedPieces.Add(new QueenBee(PieceColor.Black, 1));
+            board._unplayedPieces.Add(new Beetle(PieceColor.Black, 1));
+            board._unplayedPieces.Add(new Beetle(PieceColor.Black, 2));
+            board._unplayedPieces.Add(new Spider(PieceColor.Black, 1));
+            board._unplayedPieces.Add(new Spider(PieceColor.Black, 2));
+            board._unplayedPieces.Add(new Hopper(PieceColor.Black, 1));
+            board._unplayedPieces.Add(new Hopper(PieceColor.Black, 2));
+            board._unplayedPieces.Add(new Hopper(PieceColor.Black, 3));
+            board._unplayedPieces.Add(new Ant(PieceColor.Black, 1));
+            board._unplayedPieces.Add(new Ant(PieceColor.Black, 2));
+            board._unplayedPieces.Add(new Ant(PieceColor.Black, 3));
             board._hivailableHexes.Add(new Hex(24, 24), Hivailability.GetHivailability(board, new Hex(24, 24), true));
             return board;
         }
