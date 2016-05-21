@@ -89,7 +89,6 @@
     <Compile Include="AI\IHiveAI.cs" />
     <Compile Include="Services\HiveService.cs" />
     <Compile Include="ViewModels\BoardAnalysisDataVM.cs" />
-    <Compile Include="ViewModels\BoardVisualizeVM.cs" />
     <Compile Include="ViewModels\PieceVM.cs" />
   </ItemGroup>
   <ItemGroup>

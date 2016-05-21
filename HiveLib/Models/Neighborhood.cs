@@ -7,11 +7,12 @@ using HiveLib.Models.Pieces;
 
 namespace HiveLib.Models
 {
+    public enum Position { center, topleft, topright, right, bottomright, bottomleft, left };
+
     // Axial coordinates
     // ref: http://www.redblobgames.com/grids/hexagons/
     class Neighborhood
     {
-        public enum Position { center, topleft, topright, right, bottomright, bottomleft, left };
         public static readonly Hex[] neighborDirections = { new Hex(0,0), new Hex(0,-1), new Hex(1,-1), new Hex(1,0), new Hex(0,1), new Hex(-1,1), new Hex(-1,0), };
         public static readonly string[] neighborDirectionNotationTemplates = { "{0}", "/{0}", "{0}/", "{0}-", @"{0}\", @"\{0}", "-{0}", };
 

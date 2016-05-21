@@ -11,10 +11,10 @@ namespace HiveLib.Tests
     [TestClass]
     public class MovementTests
     {
-        IList<Move> _firstMoves;
-        IList<Move> _secondMoves;
-        IList<Move> _thirdMoves;
-        IList<Move> _fourthMoves;
+        IReadOnlyList<Move> _firstMoves;
+        IReadOnlyList<Move> _secondMoves;
+        IReadOnlyList<Move> _thirdMoves;
+        IReadOnlyList<Move> _fourthMoves;
         Board _board;
 
         [TestInitialize]

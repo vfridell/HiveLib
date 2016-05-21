@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using HiveLib.Models.Pieces;
-using Position = HiveLib.Models.Neighborhood.Position;
+using Position = HiveLib.Models.Position;
 using System.Collections.Generic;
 
 namespace HiveLib.Models

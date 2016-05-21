@@ -25,7 +25,7 @@ namespace HiveLib.Models
             if (!NotationValid(pieceToMoveNotation, targetLocation, referencePieceNotation, targetpositionLeft, targetpositionRight)) return false;
 
             Piece pieceToMove = GetPieceByNotation(pieceToMoveNotation);
-            Neighborhood.Position targetPosition;
+            Position targetPosition;
             if (targetLocation == ".")
             {
                 // the first move is always to this hex
@@ -39,11 +39,11 @@ namespace HiveLib.Models
             {
                 // left
                 if (targetpositionLeft == @"\")
-                    targetPosition = Neighborhood.Position.bottomleft;
+                    targetPosition = Position.bottomleft;
                 else if (targetpositionLeft == @"-")
-                    targetPosition = Neighborhood.Position.left;
+                    targetPosition = Position.left;
                 else if (targetpositionLeft == @"/")
-                    targetPosition = Neighborhood.Position.topleft;
+                    targetPosition = Position.topleft;
                 else
                     return false;
             }
@@ -51,18 +51,18 @@ namespace HiveLib.Models
             {
                 // right
                 if (targetpositionRight == @"\")
-                    targetPosition = Neighborhood.Position.bottomright;
+                    targetPosition = Position.bottomright;
                 else if (targetpositionRight == @"-")
-                    targetPosition = Neighborhood.Position.right;
+                    targetPosition = Position.right;
                 else if (targetpositionRight == @"/")
-                    targetPosition = Neighborhood.Position.topright;
+                    targetPosition = Position.topright;
                 else
                     return false;
             }
             else
             {
                 // beetle on top
-                targetPosition = Neighborhood.Position.center;
+                targetPosition = Position.center;
             }
 
             move = Move.GetMove(pieceToMove, referencePiece, targetPosition);
@@ -173,14 +173,14 @@ namespace HiveLib.Models
                 else
                 {
                     Hex refHex = Board.invalidHex;
-                    Neighborhood.Position refPosition = Neighborhood.Position.center;
+                    Position refPosition = Position.center;
                     bool found = false;
                     int i = 0;  // zero is center.  we dont care about center
                     while(!found && i < Neighborhood.neighborDirections.Length)
                     {
                         i++;
                         refHex = Neighborhood.neighborDirections[i] + move.hex;
-                        refPosition = Neighborhood.GetOpposite((Neighborhood.Position)i);
+                        refPosition = Neighborhood.GetOpposite((Position)i);
                         found = board.TryGetPieceAtHex(refHex, out refPiece);
                     }
                     // must be a first move

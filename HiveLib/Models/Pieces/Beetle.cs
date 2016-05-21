@@ -4,7 +4,7 @@ using HiveLib.Models;
 
 namespace HiveLib.Models.Pieces
 {
-    class Beetle : Piece
+    public class Beetle : Piece
     {
         internal Beetle(PieceColor color, int number) : base(color, number) { }
         public override string GetPieceNotation()
@@ -29,10 +29,10 @@ namespace HiveLib.Models.Pieces
             var hivailability = Hivailability.GetHivailability(board, start);
             for (int i = 1; i < 7; i++)
             {
-                Hex neighborHex = Neighborhood.GetNeighborHex(start, (Neighborhood.Position)i);
+                Hex neighborHex = Neighborhood.GetNeighborHex(start, (Position)i);
                 if (hivailability.NeighborStatusArray[i] != Hivailability.NeighborStatus.Empty)
                 {
-                    if (!IsDirectionClimbingBlocked(start, board, (Neighborhood.Position)i))
+                    if (!IsDirectionClimbingBlocked(start, board, (Position)i))
                     {
                         validMoves.Add(Move.GetMove(this, neighborHex));
                     }
@@ -62,7 +62,7 @@ namespace HiveLib.Models.Pieces
  *  cannot slip through the "gate" formed by C and D, which are both strictly higher than A and B.
  *  Otherwise, movement between A and B is legal.
  * */
-        private bool IsDirectionClimbingBlocked(Hex start, Board board, Neighborhood.Position directionToCheck)
+        private bool IsDirectionClimbingBlocked(Hex start, Board board, Position directionToCheck)
         {
             Hex directionHex = Neighborhood.GetNeighborHex(start, directionToCheck);
             Hex counterClockwiseHex = Neighborhood.CounterClockwiseDelta(directionToCheck) + start;

@@ -118,7 +118,7 @@ namespace HiveLib.Tests
             Assert.IsTrue(move.referencePiece.number == 1);
             Assert.IsTrue(move.referencePiece.color == PieceColor.Black);
 
-            Assert.IsTrue(move.targetPosition == Neighborhood.Position.right);
+            Assert.IsTrue(move.targetPosition == Position.right);
         }
 
         [TestMethod]
@@ -135,7 +135,7 @@ namespace HiveLib.Tests
             Assert.IsTrue(move.referencePiece.number == 1);
             Assert.IsTrue(move.referencePiece.color == PieceColor.White);
 
-            Assert.IsTrue(move.targetPosition == Neighborhood.Position.bottomright);
+            Assert.IsTrue(move.targetPosition == Position.bottomright);
         }
 
         [TestMethod]
@@ -152,7 +152,7 @@ namespace HiveLib.Tests
             Assert.IsTrue(move.referencePiece.number == 2);
             Assert.IsTrue(move.referencePiece.color == PieceColor.White);
 
-            Assert.IsTrue(move.targetPosition == Neighborhood.Position.bottomleft);
+            Assert.IsTrue(move.targetPosition == Position.bottomleft);
         }
 
         [TestMethod]
@@ -169,7 +169,7 @@ namespace HiveLib.Tests
             Assert.IsTrue(move.referencePiece.number == 1);
             Assert.IsTrue(move.referencePiece.color == PieceColor.Black);
 
-            Assert.IsTrue(move.targetPosition == Neighborhood.Position.left);
+            Assert.IsTrue(move.targetPosition == Position.left);
         }
 
         [TestMethod]
@@ -186,7 +186,7 @@ namespace HiveLib.Tests
             Assert.IsTrue(move.referencePiece.number == 3);
             Assert.IsTrue(move.referencePiece.color == PieceColor.Black);
 
-            Assert.IsTrue(move.targetPosition == Neighborhood.Position.topleft);
+            Assert.IsTrue(move.targetPosition == Position.topleft);
         }
 
         [TestMethod]
@@ -203,7 +203,7 @@ namespace HiveLib.Tests
             Assert.IsTrue(move.referencePiece.number == 1);
             Assert.IsTrue(move.referencePiece.color == PieceColor.Black);
 
-            Assert.IsTrue(move.targetPosition == Neighborhood.Position.topright);
+            Assert.IsTrue(move.targetPosition == Position.topright);
         }
 
         [TestMethod]
@@ -220,7 +220,7 @@ namespace HiveLib.Tests
             Assert.IsTrue(move.referencePiece.number == 1);
             Assert.IsTrue(move.referencePiece.color == PieceColor.Black);
 
-            Assert.IsTrue(move.targetPosition == Neighborhood.Position.center);
+            Assert.IsTrue(move.targetPosition == Position.center);
         }
 
         [TestMethod]

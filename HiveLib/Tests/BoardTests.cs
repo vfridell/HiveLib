@@ -18,7 +18,7 @@ namespace HiveLib.Tests
             Assert.IsFalse(board.whiteQueenPlaced);
             Assert.IsFalse(board.blackQueenPlaced);
             Assert.IsTrue(board.whiteToPlay);
-            IList<Move> placementMoves = board.GetMoves();
+            IReadOnlyList<Move> placementMoves = board.GetMoves();
             Assert.AreEqual(4, placementMoves.Count);
         }
 
@@ -37,12 +37,12 @@ namespace HiveLib.Tests
             Assert.IsTrue(board.TryMakeMove(antPlacementMove));
             Assert.IsFalse(board.whiteQueenPlaced);
             Assert.IsFalse(board.blackQueenPlaced);
-            IList<Move> secondMoves = board.GetMoves();
+            IReadOnlyList<Move> secondMoves = board.GetMoves();
             // six spots with five pieces each for the second move
             Assert.AreEqual(30, secondMoves.Count);
 
             Assert.IsTrue(board.TryMakeMove(secondMoves[0]));
-            IList<Move> thirdMoves = board.GetMoves();
+            IReadOnlyList<Move> thirdMoves = board.GetMoves();
             // if bee is not the first move, there are three spots with five pieces each for the third move
             Assert.AreEqual(15, thirdMoves.Count);
         }

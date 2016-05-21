@@ -10,19 +10,28 @@ namespace HiveLib.Models
 {
     public class Move
     {
-        internal string notation;
-        internal Piece pieceToMove { get; set; }
-        internal Piece referencePiece { get; set; }
-        internal Neighborhood.Position targetPosition { get; set; }
-        internal Hex hex;
+        private string _notation;
+        public string notation { get { return _notation; } }
 
-        private Move() { hex = Board.invalidHex; }
+        private Piece _pieceToMove;
+        public Piece pieceToMove { get { return _pieceToMove; } }
 
-        internal static bool TryGetMove(string notation, out Move move)
+        private Piece _referencePiece;
+        public Piece referencePiece { get { return _referencePiece; } }
+
+        private Position _targetPosition;
+        public Position targetPosition { get { return _targetPosition; } }
+
+        private Hex _hex;
+        public Hex hex { get { return _hex; } }
+
+        private Move() { _hex = Board.invalidHex; }
+
+        public static bool TryGetMove(string notation, out Move move)
         {
             if (NotationParser.TryParseNotation(notation, out move))
             {
-                move.notation = notation;
+                move._notation = notation;
                 return true;
             }
             else
@@ -31,12 +40,12 @@ namespace HiveLib.Models
             }
         }
 
-        internal static Move GetMove(string notation)
+        public static Move GetMove(string notation)
         {
             Move move;
             if (NotationParser.TryParseNotation(notation, out move))
             {
-                move.notation = notation;
+                move._notation = notation;
                 return move;
             }
             else
@@ -45,21 +54,32 @@ namespace HiveLib.Models
             }
         }
 
-        internal static Move GetMove(Piece pieceToMove, Piece referencePiece, Neighborhood.Position targetPosition)
+        public static Move GetMove(Piece pieceToMove, Piece referencePiece, Position targetPosition)
         {
             Move move = new Move();
-            move.pieceToMove = pieceToMove;
-            move.referencePiece = referencePiece;
-            move.targetPosition = targetPosition;
+            move._pieceToMove = pieceToMove;
+            move._referencePiece = referencePiece;
+            move._targetPosition = targetPosition;
             return move;
         }
 
-        internal static Move GetMove(Piece pieceToMove, Hex hex)
+        public static Move GetMove(Piece pieceToMove, Hex hex)
         {
             Move move = new Move();
-            move.pieceToMove = pieceToMove;
-            move.hex = hex;
+            move._pieceToMove = pieceToMove;
+            move._hex = hex;
             return move;
+        }
+
+        internal static Move GetMove(Move move, Hex hex)
+        {
+            Move newMove = new Move();
+            newMove._pieceToMove = move._pieceToMove;
+            newMove._targetPosition = move.targetPosition;
+            newMove._notation = move._notation;
+            newMove._referencePiece = move._referencePiece;
+            newMove._hex = hex;
+            return newMove;
         }
 
         public override bool Equals(object obj)

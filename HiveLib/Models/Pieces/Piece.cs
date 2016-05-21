@@ -6,7 +6,10 @@ namespace HiveLib.Models.Pieces
 {
     public enum PieceColor {White, Black};
 
-    abstract class Piece
+    /// <summary>
+    /// Pieces must be immutable
+    /// </summary>
+    public abstract class Piece
     {
         public Piece(PieceColor color, int number)
         {

@@ -9,9 +9,9 @@ namespace HiveLib.Tests
     [TestClass]
     public class MoveToNotationTests
     {
-        IList<Move> _firstMoves;
-        IList<Move> _secondMoves;
-        IList<Move> _thirdMoves;
+        IReadOnlyList<Move> _firstMoves;
+        IReadOnlyList<Move> _secondMoves;
+        IReadOnlyList<Move> _thirdMoves;
         Board _board;
 
         [TestInitialize]
@@ -28,7 +28,7 @@ namespace HiveLib.Tests
             Assert.AreEqual(_secondMoves.Count, 30);
 
             Move beetlePlaceMove = _secondMoves.Where(m => m.pieceToMove is Beetle)
-                                               .Where(m => m.hex == Neighborhood.GetNeighborHex(new Hex(24,24), Neighborhood.Position.right))
+                                               .Where(m => m.hex == Neighborhood.GetNeighborHex(new Hex(24,24), Position.right))
                                                .FirstOrDefault();
 
             Assert.IsTrue(_board.TryMakeMove(beetlePlaceMove));
@@ -49,7 +49,7 @@ namespace HiveLib.Tests
         public void CheckNotationForMove2()
         {
             Move move = _thirdMoves.Where(m => m.pieceToMove is QueenBee)
-                                   .Where(m => m.hex == Neighborhood.GetNeighborHex(new Hex(24, 24), Neighborhood.Position.left))
+                                   .Where(m => m.hex == Neighborhood.GetNeighborHex(new Hex(24, 24), Position.left))
                                    .FirstOrDefault();
             string notation = NotationParser.GetNotationForMove(move, _board);
             Assert.AreEqual<string>(@"wQ1 -wA1", notation);

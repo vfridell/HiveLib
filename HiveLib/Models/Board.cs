@@ -12,14 +12,14 @@ namespace HiveLib.Models
 {
     public enum GameResult { Incomplete, WhiteWin, BlackWin, Draw };
 
-    class Board
+    public class Board
     {
         public static readonly int columns = 50;
         public static readonly int rows = 50;
         public static Hex invalidHex = new Hex(-1, -1);
 
         private Dictionary<Hex, Hivailability> _hivailableHexes = new Dictionary<Hex, Hivailability>();
-        public IList<Hex> hivailableSpaces { get { return _hivailableHexes.Keys.ToList().AsReadOnly(); }}
+        public IReadOnlyList<Hex> hivailableSpaces { get { return _hivailableHexes.Keys.ToList().AsReadOnly(); }}
 
         private HashSet<Piece> _unplayedPieces = new HashSet<Piece>();
         public ReadOnlySet<Piece> unplayedPieces { get { return _unplayedPieces.AsReadOnly(); } }
@@ -33,26 +33,36 @@ namespace HiveLib.Models
         private UndirectedGraph<Piece, UndirectedEdge<Piece>> _adjacencyGraph = new UndirectedGraph<Piece, UndirectedEdge<Piece>>();
         
         private HashSet<Piece> _articulationPoints = new HashSet<Piece>();
-        internal ReadOnlySet<Piece> articulationPoints { get { return _articulationPoints.AsReadOnly(); } }
+        public ReadOnlySet<Piece> articulationPoints { get { return _articulationPoints.AsReadOnly(); } }
 
         private bool _movesDirty = true;
         private GameResult _gameResult = GameResult.Incomplete;
-        internal GameResult gameResult { get { return _gameResult; } }
+        public GameResult gameResult { get { return _gameResult; } }
 
-        internal bool whiteToPlay = true;
-        internal bool whiteQueenPlaced = false;
-        internal bool blackQueenPlaced = false;
-        internal int turnNumber = 1;
+        private bool _whiteToPlay = true;
+        public bool whiteToPlay { get { return _whiteToPlay; } }
 
-        internal int BlackQueenBreathingSpaces() { return BreathingSpaces(new QueenBee(PieceColor.Black, 1)); }
-        internal int WhiteQueenBreathingSpaces() { return BreathingSpaces(new QueenBee(PieceColor.White, 1)); }
+        private bool _whiteQueenPlaced = false;
+        public bool whiteQueenPlaced { get { return _whiteQueenPlaced; } }
 
-        internal int possibleMoves { get { return GetMoves().Count; } }
-        internal int blackUnplayedPieces { get { return _unplayedPieces.Count(p => p.color == PieceColor.Black); } }
-        internal int whiteUnplayedPieces { get { return _unplayedPieces.Count(p => p.color == PieceColor.White); } }
-        internal int blackHivailableSpaces { get { return _hivailableHexes.Count(kvp => kvp.Value.BlackCanPlace); } }
-        internal int whiteHivailableSpaces { get { return _hivailableHexes.Count(kvp => kvp.Value.WhiteCanPlace); } }
-        internal bool whiteCanMoveAnt 
+        private bool _blackQueenPlaced = false;
+        public bool blackQueenPlaced { get { return _blackQueenPlaced; } }
+
+        private int _turnNumber = 1;
+        public int turnNumber { get { return _turnNumber; } }
+
+        private string _lastError;
+        public string lastError { get { return _lastError; } }
+
+        public int BlackQueenBreathingSpaces() { return BreathingSpaces(new QueenBee(PieceColor.Black, 1)); }
+        public int WhiteQueenBreathingSpaces() { return BreathingSpaces(new QueenBee(PieceColor.White, 1)); }
+
+        public int possibleMoves { get { return GetMoves().Count; } }
+        public int blackUnplayedPieces { get { return _unplayedPieces.Count(p => p.color == PieceColor.Black); } }
+        public int whiteUnplayedPieces { get { return _unplayedPieces.Count(p => p.color == PieceColor.White); } }
+        public int blackHivailableSpaces { get { return _hivailableHexes.Count(kvp => kvp.Value.BlackCanPlace); } }
+        public int whiteHivailableSpaces { get { return _hivailableHexes.Count(kvp => kvp.Value.WhiteCanPlace); } }
+        public bool whiteCanMoveAnt 
         { 
             get 
             {
@@ -61,7 +71,7 @@ namespace HiveLib.Models
                         CanMovePiece(new Ant(PieceColor.White, 3));
             } 
         }
-        internal bool blackCanMoveAnt
+        public bool blackCanMoveAnt
         {
             get
             {
@@ -70,10 +80,10 @@ namespace HiveLib.Models
                         CanMovePiece(new Ant(PieceColor.Black, 3));
             }
         }
-        internal bool blackCanMoveQueen { get { return CanMovePiece(new QueenBee(PieceColor.Black, 1)); } }
-        internal bool whiteCanMoveQueen { get { return CanMovePiece(new QueenBee(PieceColor.White, 1)); } }
+        public bool blackCanMoveQueen { get { return CanMovePiece(new QueenBee(PieceColor.Black, 1)); } }
+        public bool whiteCanMoveQueen { get { return CanMovePiece(new QueenBee(PieceColor.White, 1)); } }
 
-        internal bool CanMovePiece(Piece checkPiece)
+        public bool CanMovePiece(Piece checkPiece)
         {
             Hex hex;
             if (TryGetHexOfPlayedPiece(checkPiece, out hex))
@@ -95,7 +105,7 @@ namespace HiveLib.Models
         {
             foreach (KeyValuePair<Hex, Hivailability> kvp in _hivailableHexes)
             {
-                if (kvp.Value.BlackCanPlace && !whiteToPlay)
+                if (kvp.Value.BlackCanPlace && !_whiteToPlay)
                 {
                     // on turn 1 you cannot place a bee
                     if (!(turnNumber == 1))
@@ -115,7 +125,7 @@ namespace HiveLib.Models
                     if (null != spider) _moves.Add(Move.GetMove(spider, kvp.Key));
                     if (null != hopper) _moves.Add(Move.GetMove(hopper, kvp.Key));
                 }
-                if (kvp.Value.WhiteCanPlace && whiteToPlay)
+                if (kvp.Value.WhiteCanPlace && _whiteToPlay)
                 {
                     // on turn 1 you cannot place a bee
                     if (!(turnNumber == 1))
@@ -161,8 +171,8 @@ namespace HiveLib.Models
 
         private void GenerateMovementMoves()
         {
-            PieceColor colorToMove = whiteToPlay ? PieceColor.White : PieceColor.Black;
-            if ( (whiteToPlay && whiteQueenPlaced) || (!whiteToPlay && blackQueenPlaced))
+            PieceColor colorToMove = _whiteToPlay ? PieceColor.White : PieceColor.Black;
+            if ( (_whiteToPlay && whiteQueenPlaced) || (!_whiteToPlay && blackQueenPlaced))
             {
                 foreach (var kvp in _playedPieces.Where(p => p.Key.color == colorToMove))
                 {
@@ -174,7 +184,7 @@ namespace HiveLib.Models
             }
         }
 
-        internal IList<Move> GetMoves()
+        public IReadOnlyList<Move> GetMoves()
         {
             if (_gameResult != GameResult.Incomplete) return new List<Move>();
             if (_movesDirty)
@@ -184,18 +194,18 @@ namespace HiveLib.Models
                 GenerateMovementMoves();
                 _movesDirty = false;
             }
-            return _moves;
+            return _moves.AsReadOnly();
         }
 
         /// <summary>
         /// Make a move.  Validates the move or fails.
         /// </summary>
         /// <param name="move"></param>
-        internal bool TryMakeMove(Move move)
+        public bool TryMakeMove(Move move)
         {
-            if (_gameResult != GameResult.Incomplete) return false;
-            if (move.pieceToMove.color == PieceColor.White && !whiteToPlay) return false;
-            if (move.pieceToMove.color == PieceColor.Black && whiteToPlay) return false;
+            if (_gameResult != GameResult.Incomplete) { _lastError = "This game is over"; return false; }
+            if (move.pieceToMove.color == PieceColor.White && !_whiteToPlay) { _lastError = "Cannot move a white piece on black's turn"; return false; }
+            if (move.pieceToMove.color == PieceColor.Black && _whiteToPlay) { _lastError = "Cannot move a black piece on white's turn"; return false; }
 
             bool placement = true;
             Hex pieceToMoveHex = Board.invalidHex;
@@ -204,31 +214,30 @@ namespace HiveLib.Models
             {
                 // the target piece is already played on the board
                 placement = false;
-                if (!TryGetHexOfPlayedPiece(move.pieceToMove, out pieceToMoveHex)) return false;
-                if (!TryGetPieceAtHex(pieceToMoveHex, out actualPiece)) throw new Exception("This should never happen");
-                //actualPiece = _boardPieceArray[pieceToMoveHex.column, pieceToMoveHex.row];
+                if (!TryGetHexOfPlayedPiece(move.pieceToMove, out pieceToMoveHex)) { _lastError = "Piece is played but Board can't find it"; return false; }
+                if (!TryGetPieceAtHex(pieceToMoveHex, out actualPiece)) { _lastError = "Piece is played but Board can't find it, again"; return false; }
             }
 
             if(move.hex.Equals(invalidHex))
             {
                 Hex referencePieceHex;
-                if (!TryGetHexOfPlayedPiece(move.referencePiece, out referencePieceHex)) return false;
-                move.hex = Neighborhood.GetNeighborHex(referencePieceHex, move.targetPosition);
+                if (!TryGetHexOfPlayedPiece(move.referencePiece, out referencePieceHex)) { _lastError = "Cannot find reference piece on the board"; return false; }
+                move = Move.GetMove(move, Neighborhood.GetNeighborHex(referencePieceHex, move.targetPosition));
             }
 
-            if (!GetMoves().Contains(move)) return false;
+            if (!GetMoves().Contains(move)) { _lastError = "Not a valid move"; return false; };
 
             if (placement)
             {
                 Hivailability hivailability;
-                if(!_hivailableHexes.TryGetValue(move.hex, out hivailability)) return false;
-                if (!hivailability.CanPlace(actualPiece.color)) return false;
+                if (!_hivailableHexes.TryGetValue(move.hex, out hivailability)) { _lastError = "Target hex is not hivailable"; return false; }
+                if (!hivailability.CanPlace(actualPiece.color)) { _lastError = "Target hivailable hex is not playable by your color"; return false; }
                 PlacePiece(actualPiece, move.hex);
             }
             else
             {
                 // check that movement doesn't violate the one-hive rule
-                if (_articulationPoints.Contains(actualPiece) && !(actualPiece is BeetleStack)) return false;
+                if (_articulationPoints.Contains(actualPiece) && !(actualPiece is BeetleStack)) { _lastError = "Move violates one-hive rule"; return false; }
                 MovePiece(actualPiece, pieceToMoveHex, move.hex);
             }
             IncrementTurn();
@@ -256,8 +265,8 @@ namespace HiveLib.Models
             else
             {
                 _gameResult = GameResult.Incomplete;
-                whiteToPlay = !whiteToPlay;
-                turnNumber++;
+                _whiteToPlay = !_whiteToPlay;
+                _turnNumber++;
             }
         }
 
@@ -328,17 +337,6 @@ namespace HiveLib.Models
 
         private Piece HandleBeetleFromStackMove(BeetleStack stack, Hex from, Hex to)
         {
-            //Piece actualPiece = stack.top;
-            //if (stack.height - 1 == 0)
-            //{
-            //    // no more stack
-            //    _boardPieceArray[from.column, from.row] = stack.bottom;
-            //    _playedPieces.Remove(stack);
-            //    _playedPieces.Add(stack.bottom, from);
-            //    _adjacencyGraph.RemoveVertex(stack);
-            //    RefreshHivailability(stack.bottom, from, false);
-            //}
-            //return actualPiece;
             Piece actualPiece = stack.top;
             Piece newPiece = BeetleStack.PopBeetleStack(stack);
             _boardPieceArray[from.column, from.row] = newPiece;
@@ -392,9 +390,9 @@ namespace HiveLib.Models
             if (piece is QueenBee)
             {
                 if (piece.color == PieceColor.White)
-                    whiteQueenPlaced = true;
+                    _whiteQueenPlaced = true;
                 else
-                    blackQueenPlaced = true;
+                    _blackQueenPlaced = true;
             }
         }
 
@@ -451,13 +449,13 @@ namespace HiveLib.Models
             }
         }
 
-        internal bool TryGetPieceAtHex(Hex hex, out Piece piece)
+        public bool TryGetPieceAtHex(Hex hex, out Piece piece)
         {
             piece = _boardPieceArray[hex.column, hex.row];
             return (null != piece);
         }
 
-        internal bool TryGetHexOfPlayedPiece(Piece piece, out Hex hex)
+        public bool TryGetHexOfPlayedPiece(Piece piece, out Hex hex)
         {
             // look for it non-stacked
             if (_playedPieces.TryGetValue(piece, out hex))
@@ -482,7 +480,7 @@ namespace HiveLib.Models
             }
         }
 
-        internal bool PiecePlayed(Piece piece)
+        public bool PiecePlayed(Piece piece)
         {
             return !_unplayedPieces.Contains(piece);
         }
@@ -494,7 +492,7 @@ namespace HiveLib.Models
         /// </summary>
         /// <param name="piece"></param>
         /// <returns></returns>
-        internal int BreathingSpaces(Piece piece)
+        public int BreathingSpaces(Piece piece)
         {
             Hex hex;
             if (TryGetHexOfPlayedPiece(piece, out hex))
@@ -508,13 +506,13 @@ namespace HiveLib.Models
             }
         }
 
-        internal Board Clone()
+        public Board Clone()
         {
             Board board = new Board();
-            board.whiteQueenPlaced = this.whiteQueenPlaced;
-            board.blackQueenPlaced = this.blackQueenPlaced;
-            board.whiteToPlay = this.whiteToPlay;
-            board.turnNumber = this.turnNumber;
+            board._whiteQueenPlaced = this.whiteQueenPlaced;
+            board._blackQueenPlaced = this.blackQueenPlaced;
+            board._whiteToPlay = this._whiteToPlay;
+            board._turnNumber = this.turnNumber;
             foreach (KeyValuePair<Hex, Hivailability> kvp in this._hivailableHexes)
             {
                 board._hivailableHexes.Add(kvp.Key, kvp.Value);
@@ -534,7 +532,7 @@ namespace HiveLib.Models
             return board;
         }
 
-        internal static Board GetNewBoard()
+        public static Board GetNewBoard()
         {
             Board board = new Board();
             board._unplayedPieces.Add(new QueenBee(PieceColor.White, 1));
