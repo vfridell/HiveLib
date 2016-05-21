@@ -9,12 +9,24 @@ namespace HiveLib.AI
 {
     public class JohnnyHive : IHiveAI
     {
+        private Random _rand = new Random();
         private Board _board;
         private bool _playingWhite;
 
         public string MakeBestMove()
         {
-            throw new NotImplementedException();
+            if (_playingWhite && _board.whiteToPlay)
+            {
+                throw new NotImplementedException();
+            }
+            else if (!_playingWhite && !_board.whiteToPlay)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                throw new Exception("It is not my move :(");
+            }
         }
 
         public bool TryAcceptMove(string notation, out string error)
@@ -69,9 +81,9 @@ namespace HiveLib.AI
         //    } while (_depth < 4);
         //}
 
-        //Move GetRandomMove(IList<Move> moves)
-        //{
-        //    return moves[_rand.Next(0, moves.Count - 1)];
-        //}
+        Move GetRandomMove(IList<Move> moves)
+        {
+            return moves[_rand.Next(0, moves.Count - 1)];
+        }
     }
 }

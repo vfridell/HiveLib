@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using QuickGraph;
 using System.Threading.Tasks;
+using HiveLib.Helpers;
 using HiveLib.Models.Pieces;
 using PieceColor = HiveLib.Models.Pieces.PieceColor;
 using QuickGraph.Algorithms.Search;
@@ -18,12 +19,22 @@ namespace HiveLib.Models
         public static Hex invalidHex = new Hex(-1, -1);
 
         private Dictionary<Hex, Hivailability> _hivailableHexes = new Dictionary<Hex, Hivailability>();
+        public IList<Hex> hivailableSpaces { get { return _hivailableHexes.Keys.ToList().AsReadOnly(); }}
+
         private HashSet<Piece> _unplayedPieces = new HashSet<Piece>();
+        public ReadOnlySet<Piece> unplayedPieces { get { return _unplayedPieces.AsReadOnly(); } }
+        
         private Dictionary<Piece, Hex> _playedPieces = new Dictionary<Piece, Hex>();
+        public Dictionary<Piece, Hex> playedPieces { get { return new Dictionary<Piece,Hex>(_playedPieces); } }
+
         private Piece [,] _boardPieceArray = new Piece[columns, rows];
+
         private List<Move> _moves = new List<Move>();
         private UndirectedGraph<Piece, UndirectedEdge<Piece>> _adjacencyGraph = new UndirectedGraph<Piece, UndirectedEdge<Piece>>();
+        
         private HashSet<Piece> _articulationPoints = new HashSet<Piece>();
+        internal ReadOnlySet<Piece> articulationPoints { get { return _articulationPoints.AsReadOnly(); } }
+
         private bool _movesDirty = true;
         private GameResult _gameResult = GameResult.Incomplete;
         internal GameResult gameResult { get { return _gameResult; } }
@@ -32,17 +43,9 @@ namespace HiveLib.Models
         internal bool whiteQueenPlaced = false;
         internal bool blackQueenPlaced = false;
         internal int turnNumber = 1;
-        internal HashSet<Piece> articulationPoints { get { return _articulationPoints; } }
-        internal IList<Hex> hivailableSpaces { get { return _hivailableHexes.Keys.ToArray(); }}
-        internal int BlackQueenBreathingSpaces()
-        {
-            return BreathingSpaces(new QueenBee(PieceColor.Black, 1));
-        }
 
-        internal int WhiteQueenBreathingSpaces()
-        {
-            return BreathingSpaces(new QueenBee(PieceColor.White, 1));
-        }
+        internal int BlackQueenBreathingSpaces() { return BreathingSpaces(new QueenBee(PieceColor.Black, 1)); }
+        internal int WhiteQueenBreathingSpaces() { return BreathingSpaces(new QueenBee(PieceColor.White, 1)); }
 
         internal int possibleMoves { get { return GetMoves().Count; } }
         internal int blackUnplayedPieces { get { return _unplayedPieces.Count(p => p.color == PieceColor.Black); } }
@@ -202,7 +205,8 @@ namespace HiveLib.Models
                 // the target piece is already played on the board
                 placement = false;
                 if (!TryGetHexOfPlayedPiece(move.pieceToMove, out pieceToMoveHex)) return false;
-                actualPiece = _boardPieceArray[pieceToMoveHex.column, pieceToMoveHex.row];
+                if (!TryGetPieceAtHex(pieceToMoveHex, out actualPiece)) throw new Exception("This should never happen");
+                //actualPiece = _boardPieceArray[pieceToMoveHex.column, pieceToMoveHex.row];
             }
 
             if(move.hex.Equals(invalidHex))

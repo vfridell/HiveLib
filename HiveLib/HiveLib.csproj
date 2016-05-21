@@ -58,9 +58,11 @@
   <ItemGroup>
     <Compile Include="AI\JohnnyHive.cs" />
     <Compile Include="Helpers\DisposableAction.cs" />
+    <Compile Include="Helpers\ReadOnlySet.cs" />
     <Compile Include="Helpers\UndirectedArticulationPointObserver.cs" />
     <Compile Include="Models\Board.cs" />
     <Compile Include="Models\BoardMove.cs" />
+    <Compile Include="Models\Game.cs" />
     <Compile Include="Models\Hex.cs" />
     <Compile Include="Models\Hivailability.cs" />
     <Compile Include="Models\HumanReadableMove.cs" />
