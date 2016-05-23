@@ -55,6 +55,41 @@ namespace HiveLib.Tests
             Assert.AreEqual<string>(@"wQ1 -wA1", notation);
         }
 
+        [TestMethod]
+        public void CheckNotationForMove3()
+        {
+            Board board = Board.GetNewBoard();
+
+            List<Move> moves = new List<Move>();
+
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wB1 .")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"bS1 wB1-")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wB2 -wB1")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"bQ bS1\")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wA1 /wB1")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"bG1 bS1/")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wQ wB2\")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"bG1 wQ-")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wA2 -wA1")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"bA1 \bQ")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wA2 bA1\")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"bS1 /wA1")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wA3 \wQ")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"bG2 bQ-")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wA3 \bS1")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"bG2 -wQ")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wQ bG2\")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"bB1 -bG2")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wS1 \wQ")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"bB1 /bG2")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wS1 -wA2")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"bB1 bG2")));
+            Assert.IsTrue(board.TryMakeMove(Move.GetMove(@"wA1 bQ-")));
+            
+            string notation = NotationParser.GetNotationForMove(Move.GetMove(new Beetle(PieceColor.Black, 1), new Hex(21,26)), board);
+            
+            Assert.AreNotEqual(@"bB1 \bB1", notation);
+        }
         // TODO add tests for all types of moves.  especially beetle moves climbing
     }
 }

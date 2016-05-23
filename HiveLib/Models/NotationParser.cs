@@ -196,6 +196,11 @@ namespace HiveLib.Models
                     else
                     {
                         referencePieceNotation = GetNotationForPiece(refPiece);
+                        if(referencePieceNotation == targetPieceNotation && refPiece is BeetleStack)
+                        {
+                            refPiece = BeetleStack.PopBeetleStack((BeetleStack)refPiece);
+                            referencePieceNotation = GetNotationForPiece(refPiece);
+                        }
                         referencePieceNotation = string.Format(Neighborhood.neighborDirectionNotationTemplates[(int)refPosition], referencePieceNotation);
                     }
                 }
