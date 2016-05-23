@@ -67,7 +67,7 @@ namespace HiveLib.Models.Pieces
                 Hivailability hivailableNeighbor = Hivailability.GetHivailability(board, hex);
                 emptyNeighborNeighbors = hivailableNeighbor.EmptyNeighborHexes(hex).Concat(emptyNeighborNeighbors).ToList();
             }
-            HashSet<Hex> validMovementHexes = new HashSet<Hex>((emptyNeighborNeighbors.Intersect(emptyNeighbors)).Except(blockedNeighbors));
+            HashSet<Hex> validMovementHexes = new HashSet<Hex>(((emptyNeighborNeighbors.Intersect(emptyNeighbors)).Except(blockedNeighbors)).Except(visited));
 
             visited.Add(current);
             

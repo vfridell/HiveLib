@@ -186,7 +186,10 @@ namespace HiveLib.Models
                         i++;
                         refHex = Neighborhood.neighborDirections[i] + move.hex;
                         refPosition = Neighborhood.GetOpposite((Position)i);
-                        found = board.TryGetPieceAtHex(refHex, out refPiece);
+                        if(board.TryGetPieceAtHex(refHex, out refPiece))
+                        {
+                            found = !refPiece.Equals(move.pieceToMove);
+                        }
                     }
                     // must be a first move
                     if (!found)
@@ -196,9 +199,15 @@ namespace HiveLib.Models
                     else
                     {
                         referencePieceNotation = GetNotationForPiece(refPiece);
-                        if(referencePieceNotation == targetPieceNotation && refPiece is BeetleStack)
+                        if(referencePieceNotation == targetPieceNotation)
                         {
-                            refPiece = BeetleStack.PopBeetleStack((BeetleStack)refPiece);
+                            if (refPiece is BeetleStack)
+                            {
+                                refPiece = BeetleStack.PopBeetleStack((BeetleStack)refPiece);
+                            }
+                            else
+                            {
+                            }
                             referencePieceNotation = GetNotationForPiece(refPiece);
                         }
                         referencePieceNotation = string.Format(Neighborhood.neighborDirectionNotationTemplates[(int)refPosition], referencePieceNotation);

@@ -10,7 +10,7 @@ namespace HiveLib.ViewModels
 {
     public class BoardAnalysisData
     {
-        public static int [] turnQueenPlayedPts = {0, 5, 3, 1, 0};
+        public static int [] turnQueenPlayedPts = {0, 25, 35, 41, 0};
 
         public int blackArticulationPoints;
         public int whiteArticulationPoints;
@@ -78,12 +78,12 @@ namespace HiveLib.ViewModels
         {
             get
             {
-                return (articulationPointDiff * 1.0) +
-                        (hivailableSpaceDiff * 1.0) +
+                return (articulationPointDiff * 1.5) +
+                        (hivailableSpaceDiff * 0.5) +
                         (possibleMovesDiff * 1.0) +
-                        (queenBreathingSpaceDiff * 1.0) +
+                        (queenBreathingSpaceDiff * 2.0) +
                         (unplayedPiecesDiff * 1.0) +
-                        (queenPlacementDiff * 1.0);
+                        (queenPlacementDiff * 100.0);
             }
         }
 

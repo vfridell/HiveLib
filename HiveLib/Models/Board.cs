@@ -281,6 +281,14 @@ namespace HiveLib.Models
                 _whiteToPlay = !_whiteToPlay;
                 _turnNumber++;
             }
+
+            // check for automatic pass
+            if(GetMoves().Count == 0)
+            {
+                _movesDirty = true;
+                _whiteToPlay = !_whiteToPlay;
+                _turnNumber++;
+            }
         }
 
         /// <summary>
@@ -515,7 +523,7 @@ namespace HiveLib.Models
             }
             else
             {
-                return int.MaxValue;
+                return 6;
             }
         }
 
