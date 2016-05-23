@@ -36,7 +36,9 @@ namespace HiveLib.Models.Pieces
             {
                 var visited = new List<Hex>();
                 var results = new Dictionary<int, HashSet<Hex>>();
-                GetSlideMovesRecursive(start, board, stopAtDepth, 1, visited, results);
+                Board boardClone = board.CloneAndRemove(this);
+
+                GetSlideMovesRecursive(start, boardClone, stopAtDepth, 1, visited, results);
 
                 List<Move> validMoves = new List<Move>();
                 foreach (var kvp in results)

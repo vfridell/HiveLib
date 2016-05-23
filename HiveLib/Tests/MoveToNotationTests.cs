@@ -24,8 +24,8 @@ namespace HiveLib.Tests
             Assert.IsFalse(_board.whiteQueenPlaced);
             Assert.IsFalse(_board.blackQueenPlaced);
             _secondMoves = _board.GetMoves();
-            // six spots with five pieces each for the second move
-            Assert.AreEqual(_secondMoves.Count, 30);
+            // six spots with four (no queen first move) pieces each for the second move
+            Assert.AreEqual(_secondMoves.Count, 24);
 
             Move beetlePlaceMove = _secondMoves.Where(m => m.pieceToMove is Beetle)
                                                .Where(m => m.hex == Neighborhood.GetNeighborHex(new Hex(24,24), Position.right))
@@ -54,5 +54,7 @@ namespace HiveLib.Tests
             string notation = NotationParser.GetNotationForMove(move, _board);
             Assert.AreEqual<string>(@"wQ1 -wA1", notation);
         }
+
+        // TODO add tests for all types of moves.  especially beetle moves climbing
     }
 }

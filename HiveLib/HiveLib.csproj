@@ -56,6 +56,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\RandomAI.cs" />
     <Compile Include="AI\JohnnyHive.cs" />
     <Compile Include="Helpers\DisposableAction.cs" />
     <Compile Include="Helpers\ReadOnlySet.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Models\Pieces\BeetleStack.cs" />
     <Compile Include="Tests\BoardTests.cs" />
     <Compile Include="Tests\CheckNotationStringParsing.cs" />
+    <Compile Include="Tests\FullGameTest2.cs" />
     <Compile Include="Tests\DoAllTheMoves.cs" />
     <Compile Include="Tests\FullGameTest.cs" />
     <Compile Include="Tests\MovementTests2.cs" />
@@ -88,7 +90,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AI\IHiveAI.cs" />
     <Compile Include="Services\HiveService.cs" />
-    <Compile Include="ViewModels\BoardAnalysisDataVM.cs" />
+    <Compile Include="ViewModels\BoardAnalysisDataDiff.cs" />
+    <Compile Include="ViewModels\BoardAnalysisData.cs" />
     <Compile Include="ViewModels\PieceVM.cs" />
   </ItemGroup>
   <ItemGroup>

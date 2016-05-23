@@ -11,7 +11,10 @@ namespace HiveLib.AI
     public interface IHiveAI
     {
         void BeginNewGame(bool PlayingWhite);
-        string MakeBestMove();
-        bool TryAcceptMove(string notation, out string error);
+        Move MakeBestMove(Game game);
+        Move PickBestMove(Board board);
+        bool playingWhite { get; }
+
+        string Name { get; }
     }
 }

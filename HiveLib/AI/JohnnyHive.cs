@@ -4,86 +4,84 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HiveLib.Models;
+using HiveLib.ViewModels;
 
 namespace HiveLib.AI
 {
     public class JohnnyHive : IHiveAI
     {
         private Random _rand = new Random();
-        private Board _board;
         private bool _playingWhite;
+        public bool playingWhite { get { return _playingWhite; } }
 
-        public string MakeBestMove()
+        public Move MakeBestMove(Game game)
         {
-            if (_playingWhite && _board.whiteToPlay)
+            Board board = game.GetCurrentBoard();
+            Move move;
+            if ( (_playingWhite && board.whiteToPlay) || (!_playingWhite && !board.whiteToPlay))
             {
-                throw new NotImplementedException();
-            }
-            else if (!_playingWhite && !_board.whiteToPlay)
-            {
-                throw new NotImplementedException();
+                move = PickBestMove(board);
+                game.TryMakeMove(move);
             }
             else
             {
                 throw new Exception("It is not my move :(");
             }
+            return move;
         }
 
-        public bool TryAcceptMove(string notation, out string error)
+        public Move PickBestMove(Board board)
         {
-            Move move;
-            if(!Move.TryGetMove("notation", out move))
+            IDictionary<Move, BoardAnalysisData> movesData;
+            IDictionary<Move, BoardAnalysisDataDiff> dataDiffs;
+            AnalyzeNextMoves(board, out movesData, out dataDiffs);
+
+            List<Move> orderedMoves;
+            if (_playingWhite)
             {
-                error = "Error parsing move notation";
-                return false;
+                orderedMoves = movesData.OrderByDescending(m => m.Value.whiteAdvantage).Select<KeyValuePair<Move, BoardAnalysisData>, Move>(m => m.Key).ToList();
             }
-            if(!_board.TryMakeMove(move))
+            else
             {
-                error = "Bad move for this board state";
-                return false;
+                orderedMoves = movesData.OrderBy(m => m.Value.whiteAdvantage).Select<KeyValuePair<Move, BoardAnalysisData>, Move>(m => m.Key).ToList();
             }
-            error = "";
-            return true;
+
+            return orderedMoves[0];
         }
 
         public void BeginNewGame(bool playingWhite)
         {
             _playingWhite = playingWhite;
-            _board = Board.GetNewBoard();
         }
 
-        //private void BreadthFirstSearchToCutoff()
-        //{
-        //    // breadth-first search of board states
-        //    List<BoardMove> lastBoardMovesList = new List<BoardMove>();
-        //    List<BoardMove> nextBoardMovesList = new List<BoardMove>();
-        //    lastBoardMovesList.Add(initialBoardMove);
-        //    List<Move> moves = new List<Move>();
-        //    do
-        //    {
-        //        foreach (BoardMove currentBoardMove in lastBoardMovesList)
-        //        {
-        //            moves.AddRange(currentBoardMove.board.GetMoves());
-        //            while (moves.Count > 0)
-        //            {
-        //                Board futureBoard = currentBoardMove.board.Clone();
-        //                Move nextMove = GetRandomMove(moves);
-        //                Assert.IsTrue(futureBoard.TryMakeMove(nextMove));
-        //                var newBoardMove = new BoardMove() { board = futureBoard, move = nextMove, depth = _depth };
-        //                moves.Remove(nextMove);
-        //                _boardMovesGraph.AddVerticesAndEdge(new Edge<BoardMove>(currentBoardMove, newBoardMove));
-        //                nextBoardMovesList.Add(newBoardMove);
-        //            }
-        //        }
-        //        lastBoardMovesList = nextBoardMovesList;
-        //        nextBoardMovesList = new List<BoardMove>();
-        //        _depth++;
-        //    } while (_depth < 4);
-        //}
+        private void AnalyzeNextMoves(Board board, out IDictionary<Move, BoardAnalysisData> movesData, out IDictionary<Move, BoardAnalysisDataDiff> dataDiffs)
+        {
+            movesData = new Dictionary<Move, BoardAnalysisData>();
+            dataDiffs = new Dictionary<Move, BoardAnalysisDataDiff>();
 
-        Move GetRandomMove(IList<Move> moves)
+            List<Move> moves = new List<Move>();
+
+            moves.AddRange(board.GetMoves());
+            while (moves.Count > 0)
+            {
+                Board futureBoard = board.Clone();
+                Move nextMove = GetRandomMove(moves);
+                if (!futureBoard.TryMakeMove(nextMove)) throw new Exception("Oh noe!  Bad move.");
+                movesData[nextMove] = BoardAnalysisData.GetBoardAnalysisData(futureBoard);
+                dataDiffs[nextMove] = BoardAnalysisData.Diff(board, futureBoard);
+                moves.Remove(nextMove);
+            }
+        }
+
+        Move GetRandomMove(IReadOnlyList<Move> moves)
         {
             return moves[_rand.Next(0, moves.Count - 1)];
         }
+
+        public string Name
+        {
+            get { return "JohnnyHive"; }
+        }
+
     }
 }

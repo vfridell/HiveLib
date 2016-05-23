@@ -17,6 +17,11 @@ namespace HiveLib.Models
         public readonly string whitePlayerName;
         public readonly string blackPlayerName;
 
+        public bool whiteToPlay { get { return _currentBoard.whiteToPlay; } }
+        public GameResult gameResult { get { return _currentBoard.gameResult; } }
+        public string lastError { get { return _currentBoard.lastError; } }
+        public int turnNumber { get { return _currentBoard.turnNumber; } }
+
         private Game(string whitePlayerName, string blackPlayerName) 
         { 
             this.whitePlayerName = whitePlayerName;
@@ -36,22 +41,17 @@ namespace HiveLib.Models
             }
         }
 
-        public GameResult GetGameResult()
-        {
-            return _currentBoard.gameResult;
-        }
-
         public Board GetCurrentBoard()
         {
             return _currentBoard.Clone();
         }
 
-        public BoardAnalysisDataVM GetAnalysisData()
+        public BoardAnalysisData GetAnalysisData()
         {
-            return new BoardAnalysisDataVM(_currentBoard);
+            return BoardAnalysisData.GetBoardAnalysisData(_currentBoard);
         }
 
-        public Game GetNewGame(string whitePlayerName, string blackPlayerName)
+        public static Game GetNewGame(string whitePlayerName, string blackPlayerName)
         {
             Game game = new Game(whitePlayerName, blackPlayerName);
             game._currentBoard = Board.GetNewBoard();
@@ -64,5 +64,6 @@ namespace HiveLib.Models
             _movesMade.ForEach(m => sb.Append(m.notation).Append("\n"));
             return sb.ToString();
         }
+
     }
 }

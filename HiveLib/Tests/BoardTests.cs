@@ -38,8 +38,8 @@ namespace HiveLib.Tests
             Assert.IsFalse(board.whiteQueenPlaced);
             Assert.IsFalse(board.blackQueenPlaced);
             IReadOnlyList<Move> secondMoves = board.GetMoves();
-            // six spots with five pieces each for the second move
-            Assert.AreEqual(30, secondMoves.Count);
+            // six spots with four (no queen first move) pieces each for the second move
+            Assert.AreEqual(24, secondMoves.Count);
 
             Assert.IsTrue(board.TryMakeMove(secondMoves[0]));
             IReadOnlyList<Move> thirdMoves = board.GetMoves();

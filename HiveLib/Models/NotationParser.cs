@@ -5,7 +5,7 @@ using HiveLib.Models.Pieces;
 
 namespace HiveLib.Models
 {
-    class NotationParser
+    public class NotationParser
     {
         private static Regex _notationStringRegex = new Regex(@"([bw]([BS][12]|[GA][123]|Q)) (([-\\/]?)([bw]([BS][12]|[GA][123]|Q))([-\\/]?)|\.)");
 
@@ -101,7 +101,7 @@ namespace HiveLib.Models
             return true;
         }
 
-        internal static Piece GetPieceByNotation(string pieceNotation)
+        public static Piece GetPieceByNotation(string pieceNotation)
         {
             PieceColor color;
             int number;
@@ -155,9 +155,14 @@ namespace HiveLib.Models
         /// <returns></returns>
         internal static string GetNotationForMove(Move move, Board board)
         {
+            //TODO fix problem where beetle moves generate a "next to myself" reference piece
             string referencePieceNotation;
             string targetPieceNotation = GetNotationForPiece(move.pieceToMove);
-            if (move.referencePiece != null)
+            if (board.hivailableSpaces.Count == 1)
+            {
+                referencePieceNotation = ".";
+            }
+            else if (move.referencePiece != null)
             {
                 referencePieceNotation = GetNotationForPiece(move.referencePiece);
                 referencePieceNotation = string.Format(Neighborhood.neighborDirectionNotationTemplates[(int)move.targetPosition], referencePieceNotation);

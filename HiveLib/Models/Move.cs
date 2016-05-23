@@ -82,6 +82,17 @@ namespace HiveLib.Models
             return newMove;
         }
 
+        public static Move GetMoveWithNotation(Move move, Board board)
+        {
+            Move newMove = new Move();
+            newMove._pieceToMove = move._pieceToMove;
+            newMove._targetPosition = move.targetPosition;
+            newMove._referencePiece = move._referencePiece;
+            newMove._hex = move._hex;
+            newMove._notation = NotationParser.GetNotationForMove(move, board);
+            return newMove;
+        }
+
         public override bool Equals(object obj)
         {
             if (obj == null) return false;

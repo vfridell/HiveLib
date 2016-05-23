@@ -32,8 +32,8 @@ namespace HiveLib.Tests
             Assert.IsFalse(_board.whiteQueenPlaced);
             Assert.IsFalse(_board.blackQueenPlaced);
             _secondMoves = _board.GetMoves();
-            // six spots with five pieces each for the second move
-            Assert.AreEqual(_secondMoves.Count, 30);
+            // six spots with four (no queen first move) pieces each for the second move
+            Assert.AreEqual(_secondMoves.Count, 24);
 
             Move beetlePlaceMove = moves[1];
             Assert.IsTrue(_board.TryMakeMove(beetlePlaceMove));

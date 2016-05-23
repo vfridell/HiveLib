@@ -108,7 +108,7 @@ namespace HiveLib.Models
                 if (kvp.Value.BlackCanPlace && !_whiteToPlay)
                 {
                     // on turn 1 you cannot place a bee
-                    if (!(turnNumber == 1))
+                    if (!(turnNumber == 2))
                     {
                         QueenBee queenBee = _unplayedPieces.OfType<QueenBee>().Where(p => p.color == PieceColor.Black).FirstOrDefault();
                         if (null != queenBee) _moves.Add(Move.GetMove(queenBee, kvp.Key));
@@ -174,14 +174,27 @@ namespace HiveLib.Models
             PieceColor colorToMove = _whiteToPlay ? PieceColor.White : PieceColor.Black;
             if ( (_whiteToPlay && whiteQueenPlaced) || (!_whiteToPlay && blackQueenPlaced))
             {
-                foreach (var kvp in _playedPieces.Where(p => p.Key.color == colorToMove))
+                foreach (Move move in GenerateAllMovementMoves().Where(m => m.pieceToMove.color == colorToMove))
+                {
+                    _moves.Add(move);
+                }
+            }
+        }
+
+        public IReadOnlyList<Move> GenerateAllMovementMoves()
+        {
+            List<Move> moves = new List<Move>();
+            if ((_whiteToPlay && whiteQueenPlaced) || (!_whiteToPlay && blackQueenPlaced))
+            {
+                foreach (var kvp in _playedPieces)
                 {
                     if (!_articulationPoints.Contains(kvp.Key) || kvp.Key is BeetleStack)
                     {
-                        _moves.AddRange(kvp.Key.GetMoves(kvp.Value, this));
+                        moves.AddRange(kvp.Key.GetMoves(kvp.Value, this));
                     }
                 }
             }
+            return moves.AsReadOnly();
         }
 
         public IReadOnlyList<Move> GetMoves()
@@ -529,6 +542,16 @@ namespace HiveLib.Models
                 board._playedPieces.Add(kvp.Key, kvp.Value);
                 board._boardPieceArray[kvp.Value.column, kvp.Value.row] = kvp.Key;
             }
+            return board;
+        }
+
+        internal Board CloneAndRemove(Piece piece)
+        {
+            Board board = this.Clone();
+            Hex hex;
+            if(!board.TryGetHexOfPlayedPiece(piece, out hex)) throw new Exception("piece is not played");
+            board._playedPieces.Remove(piece);
+            board._boardPieceArray[hex.column, hex.row] = null;
             return board;
         }
 

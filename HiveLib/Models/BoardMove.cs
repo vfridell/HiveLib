@@ -34,7 +34,7 @@ namespace HiveLib.Models
     public class BoardMove2
     {
         internal int depth;
-        internal BoardAnalysisDataVM board;
+        internal BoardAnalysisData board;
         internal Move move;
         public override bool Equals(object obj)
         {
