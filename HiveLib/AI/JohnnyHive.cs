@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,26 @@ namespace HiveLib.AI
     {
         private Random _rand = new Random();
         private bool _playingWhite;
+        private BoardAnalysisWeights blockingWeights = new BoardAnalysisWeights()
+        {
+            articulationPointDiffWeight = 1.5,
+            hivailableSpaceDiffWeight = 0.5,
+            possibleMovesDiffWeight = 1.0,
+            queenBreathingSpaceDiffWeight = 2.0,
+            unplayedPiecesDiffWeight = 1.0,
+            queenPlacementDiffWeight = 100.0,
+        };
+
+        private BoardAnalysisWeights weights = new BoardAnalysisWeights()
+        {
+            articulationPointDiffWeight = 0.1,
+            hivailableSpaceDiffWeight = 0.1,
+            possibleMovesDiffWeight = 0.1,
+            queenBreathingSpaceDiffWeight = 14.0,
+            unplayedPiecesDiffWeight = 1.0,
+            queenPlacementDiffWeight = 100.0,
+        };
+
         public bool playingWhite { get { return _playingWhite; } }
 
         public Move MakeBestMove(Game game)
@@ -56,26 +77,24 @@ namespace HiveLib.AI
 
         private void AnalyzeNextMoves(Board board, out IDictionary<Move, BoardAnalysisData> movesData, out IDictionary<Move, BoardAnalysisDataDiff> dataDiffs)
         {
-            movesData = new Dictionary<Move, BoardAnalysisData>();
-            dataDiffs = new Dictionary<Move, BoardAnalysisDataDiff>();
+            var localMovesData = new ConcurrentDictionary<Move, BoardAnalysisData>();
+            var localDataDiffs = new ConcurrentDictionary<Move, BoardAnalysisDataDiff>();
 
-            List<Move> moves = new List<Move>();
+            var moves = new ConcurrentQueue<Move>();
+            foreach(Move move in board.GetMoves())
+            {
+                moves.Enqueue(move);
+            }
 
-            moves.AddRange(board.GetMoves());
-            while (moves.Count > 0)
+            Parallel.ForEach(moves, (nextMove) =>
             {
                 Board futureBoard = board.Clone();
-                Move nextMove = GetRandomMove(moves);
                 if (!futureBoard.TryMakeMove(nextMove)) throw new Exception("Oh noe!  Bad move.");
-                movesData[nextMove] = BoardAnalysisData.GetBoardAnalysisData(futureBoard);
-                dataDiffs[nextMove] = BoardAnalysisData.Diff(board, futureBoard);
-                moves.Remove(nextMove);
-            }
-        }
-
-        Move GetRandomMove(IReadOnlyList<Move> moves)
-        {
-            return moves[_rand.Next(0, moves.Count - 1)];
+                localMovesData[nextMove] = BoardAnalysisData.GetBoardAnalysisData(futureBoard, weights);
+                localDataDiffs[nextMove] = BoardAnalysisData.Diff(board, futureBoard, weights);
+            });
+            movesData = localMovesData;
+            dataDiffs = localDataDiffs;
         }
 
         public string Name

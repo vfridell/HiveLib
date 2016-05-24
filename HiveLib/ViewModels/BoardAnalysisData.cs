@@ -73,25 +73,27 @@ namespace HiveLib.ViewModels
         public bool blackCanMoveQueen;
 
         public GameResult gameResult;
-        public bool graded = false;
+
+        private BoardAnalysisWeights _weights;
         public double whiteAdvantage
         {
             get
             {
-                return (articulationPointDiff * 1.5) +
-                        (hivailableSpaceDiff * 0.5) +
-                        (possibleMovesDiff * 1.0) +
-                        (queenBreathingSpaceDiff * 2.0) +
-                        (unplayedPiecesDiff * 1.0) +
-                        (queenPlacementDiff * 100.0);
+                return (articulationPointDiff * _weights.articulationPointDiffWeight) +
+                        (hivailableSpaceDiff * _weights.hivailableSpaceDiffWeight) +
+                        (possibleMovesDiff * _weights.possibleMovesDiffWeight) +
+                        (queenBreathingSpaceDiff * _weights.queenBreathingSpaceDiffWeight) +
+                        (unplayedPiecesDiff * _weights.unplayedPiecesDiffWeight) +
+                        (queenPlacementDiff * _weights.queenPlacementDiffWeight);
             }
         }
 
         private BoardAnalysisData() { }
 
-        public static BoardAnalysisData GetBoardAnalysisData(Board board)
+        public static BoardAnalysisData GetBoardAnalysisData(Board board, BoardAnalysisWeights weights)
         {
             BoardAnalysisData d = new BoardAnalysisData();
+            d._weights = weights;
             d.blackArticulationPoints = board.articulationPoints.Count(p => p.color == PieceColor.Black);
             d.whiteArticulationPoints = board.articulationPoints.Count(p => p.color == PieceColor.White);
 
@@ -118,19 +120,19 @@ namespace HiveLib.ViewModels
             return d;
         }
 
-        public static BoardAnalysisDataDiff Diff(Board board1, Board board2)
+        public static BoardAnalysisDataDiff Diff(Board board1, Board board2, BoardAnalysisWeights weights)
         {
             BoardAnalysisData earlierBoardData;
             BoardAnalysisData laterBoardData;
             if (board1.turnNumber > board2.turnNumber)
             {
-                earlierBoardData = BoardAnalysisData.GetBoardAnalysisData(board2);
-                laterBoardData = BoardAnalysisData.GetBoardAnalysisData(board1);
+                earlierBoardData = BoardAnalysisData.GetBoardAnalysisData(board2, weights);
+                laterBoardData = BoardAnalysisData.GetBoardAnalysisData(board1, weights);
             }
             else
             {
-                earlierBoardData = BoardAnalysisData.GetBoardAnalysisData(board1);
-                laterBoardData = BoardAnalysisData.GetBoardAnalysisData(board2);
+                earlierBoardData = BoardAnalysisData.GetBoardAnalysisData(board1, weights);
+                laterBoardData = BoardAnalysisData.GetBoardAnalysisData(board2, weights);
             }
 
             var diff = new BoardAnalysisDataDiff();

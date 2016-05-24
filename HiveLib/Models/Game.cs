@@ -46,11 +46,6 @@ namespace HiveLib.Models
             return _currentBoard.Clone();
         }
 
-        public BoardAnalysisData GetAnalysisData()
-        {
-            return BoardAnalysisData.GetBoardAnalysisData(_currentBoard);
-        }
-
         public static Game GetNewGame(string whitePlayerName, string blackPlayerName)
         {
             Game game = new Game(whitePlayerName, blackPlayerName);

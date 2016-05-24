@@ -18,36 +18,54 @@ namespace AIPlayerInterface
 
         static void Main(string[] args)
         {
-            IHiveAI AI = new JohnnyHive();
-
-            YesNo yn = PromptYesOrNo("Is this AI playing white? ");
-            string opponentName = PromptForString("Enter the other player's name: ");
-
-            Game game;
-            if (yn == YesNo.Yes)
-                game = Game.GetNewGame(AI.Name, opponentName);
-            else
-                game = Game.GetNewGame(opponentName, AI.Name);
-
-            AI.BeginNewGame(yn == YesNo.Yes);
-
             do
             {
-                Board currentBoard = game.GetCurrentBoard();
-                Move move;
-                if (game.whiteToPlay == AI.playingWhite)
-                {
-                    move = AI.MakeBestMove(game);
-                    Console.WriteLine("Moved: " + Move.GetMoveWithNotation(move, currentBoard).notation);
-                }
-                else
-                {
-                    move = PromptForMove("Enter your move: ", game);
-                    Console.WriteLine("Moved: " + move.notation);
-                }
-            } while (game.gameResult == GameResult.Incomplete);
+                IHiveAI AI = new JohnnyHive();
 
-            Console.WriteLine("Winner: ", game.gameResult.ToString());
+                YesNo yn = PromptYesOrNo("Is this AI playing white? ");
+                string opponentName = PromptForString("Enter the other player's name: ");
+
+                Game game;
+                if (yn == YesNo.Yes)
+                    game = Game.GetNewGame(AI.Name, opponentName);
+                else
+                    game = Game.GetNewGame(opponentName, AI.Name);
+
+                AI.BeginNewGame(yn == YesNo.Yes);
+
+                do
+                {
+                    Board currentBoard = game.GetCurrentBoard();
+                    Move move;
+                    if (game.whiteToPlay == AI.playingWhite)
+                    {
+                        move = AI.MakeBestMove(game);
+                        Console.WriteLine("Moved: " + Move.GetMoveWithNotation(move, currentBoard).notation);
+                    }
+                    else
+                    {
+                        move = PromptForMove("Enter your move: ", game);
+                        Console.WriteLine("Moved: " + move.notation);
+                    }
+                } while (game.gameResult == GameResult.Incomplete);
+
+                Console.WriteLine(GetWinnerString(game));
+            } while (PromptYesOrNo("Play again?") == YesNo.Yes);
+        }
+
+        private static string GetWinnerString(Game game)
+        {
+            switch (game.gameResult)
+            {
+                case GameResult.Draw:
+                    return "Draw";
+                case GameResult.WhiteWin:
+                    return string.Format("{0} wins!", game.whitePlayerName);
+                case GameResult.BlackWin:
+                    return string.Format("{0} wins!", game.blackPlayerName);
+                default:
+                    throw new Exception("Bad game result");
+            }
         }
 
         static YesNo PromptYesOrNo(string prompt)

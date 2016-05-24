@@ -92,6 +92,7 @@
     <Compile Include="Services\HiveService.cs" />
     <Compile Include="ViewModels\BoardAnalysisDataDiff.cs" />
     <Compile Include="ViewModels\BoardAnalysisData.cs" />
+    <Compile Include="ViewModels\BoardAnalysisWeights.cs" />
     <Compile Include="ViewModels\PieceVM.cs" />
   </ItemGroup>
   <ItemGroup>

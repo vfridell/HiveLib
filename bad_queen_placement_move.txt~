@@ -1,0 +1,34 @@
+RandomAI Moved: wS1 .
+JohnnyHive Moved: bB1 wS1\
+RandomAI Moved: wB1 wS1/
+JohnnyHive Moved: bQ -wS1   *what?* force black placement and no regeneration
+RandomAI Moved: wB2 wB1-
+JohnnyHive Moved: bG1 bB1-
+RandomAI Moved: wQ wB2/
+JohnnyHive Moved: bA1 bB1\
+RandomAI Moved: wS2 wQ-
+JohnnyHive Moved: bA1 /wQ
+RandomAI Moved: wA1 wS2/
+JohnnyHive Moved: bA2 bB1\
+RandomAI Moved: wA1 bA2\
+JohnnyHive Moved: bA3 \bB1
+RandomAI Moved: wA1 /bQ
+JohnnyHive Moved: bA2 /wS2
+RandomAI Moved: wA1 -wB1
+JohnnyHive Moved: bQ -wA1
+RandomAI Moved: wG1 wS2-
+JohnnyHive Moved: bA3 wQ\
+RandomAI Moved: wA2 wG1-
+JohnnyHive Moved: bB2 /bA2
+RandomAI Moved: wA2 /bQ
+JohnnyHive Moved: bG1 \wS1
+RandomAI Moved: wA2 \bG1
+JohnnyHive Moved: bQ /wA1
+RandomAI Moved: wA3 -wA2
+JohnnyHive Moved: bS1 -bB2
+RandomAI Moved: wA3 wB2\
+JohnnyHive Moved: bG2 /bB2
+RandomAI Moved: wA3 bQ/
+JohnnyHive Moved: bS1 \bA1
+RandomAI wins!
+Play again?

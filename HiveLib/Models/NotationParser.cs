@@ -226,7 +226,7 @@ namespace HiveLib.Models
         {
             return (piece.color == PieceColor.White ? "w" : "b") +
                                              piece.GetPieceNotation() +
-                                             piece.number.ToString();
+                                             ((piece is QueenBee) ? "" : piece.number.ToString());
         }
 
     }
