@@ -20,7 +20,7 @@ namespace AIPlayerInterface
         {
             do
             {
-                IHiveAI AI = new JohnnyHive();
+                IHiveAI AI = new JohnnyHive(JohnnyHive._winningWeights);
 
                 YesNo yn = PromptYesOrNo("Is this AI playing white? ");
                 string opponentName = PromptForString("Enter the other player's name: ");

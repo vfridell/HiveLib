@@ -20,19 +20,20 @@ namespace JohnnyVersusRandom
         {
             do
             {
-                IHiveAI AI = new JohnnyHive();
-                IHiveAI randomAI = new RandomAI();
+                IHiveAI AI = new JohnnyHive(JohnnyHive._blockingWeights);
+                IHiveAI AI2 = new RandomAI();
+                //IHiveAI AI2 = new JohnnyHive(JohnnyHive._blockingWeights);
 
                 YesNo yn = PromptYesOrNo(string.Format("Is {0} playing white? ", AI.Name));
 
                 Game game;
                 if (yn == YesNo.Yes)
-                    game = Game.GetNewGame(AI.Name, randomAI.Name);
+                    game = Game.GetNewGame(AI.Name, AI2.Name);
                 else
-                    game = Game.GetNewGame(randomAI.Name, AI.Name);
+                    game = Game.GetNewGame(AI2.Name, AI.Name);
 
                 AI.BeginNewGame(yn == YesNo.Yes);
-                randomAI.BeginNewGame(yn == YesNo.No);
+                AI2.BeginNewGame(yn == YesNo.No);
 
                 do
                 {
@@ -45,8 +46,8 @@ namespace JohnnyVersusRandom
                     }
                     else
                     {
-                        move = randomAI.MakeBestMove(game);
-                        Console.WriteLine(string.Format("{0} Moved: {1}", randomAI.Name, Move.GetMoveWithNotation(move, currentBoard).notation));
+                        move = AI2.MakeBestMove(game);
+                        Console.WriteLine(string.Format("{0} Moved: {1}", AI2.Name, Move.GetMoveWithNotation(move, currentBoard).notation));
                     }
                 } while (game.gameResult == GameResult.Incomplete);
 

@@ -13,7 +13,14 @@ namespace HiveLib.AI
     {
         private Random _rand = new Random();
         private bool _playingWhite;
-        private BoardAnalysisWeights blockingWeights = new BoardAnalysisWeights()
+
+        public JohnnyHive(BoardAnalysisWeights weights)
+        {
+            _weights = weights;
+        }
+
+        private BoardAnalysisWeights _weights;
+        public static BoardAnalysisWeights _blockingWeights = new BoardAnalysisWeights()
         {
             articulationPointDiffWeight = 1.5,
             hivailableSpaceDiffWeight = 0.5,
@@ -23,7 +30,7 @@ namespace HiveLib.AI
             queenPlacementDiffWeight = 100.0,
         };
 
-        private BoardAnalysisWeights weights = new BoardAnalysisWeights()
+        public static BoardAnalysisWeights _winningWeights = new BoardAnalysisWeights()
         {
             articulationPointDiffWeight = 0.1,
             hivailableSpaceDiffWeight = 0.1,
@@ -58,14 +65,16 @@ namespace HiveLib.AI
             AnalyzeNextMoves(board, out movesData, out dataDiffs);
 
             List<Move> orderedMoves;
+            IOrderedEnumerable<KeyValuePair<Move, BoardAnalysisData>> orderedAnalysis;
             if (_playingWhite)
             {
-                orderedMoves = movesData.OrderByDescending(m => m.Value.whiteAdvantage).Select<KeyValuePair<Move, BoardAnalysisData>, Move>(m => m.Key).ToList();
+                orderedAnalysis = movesData.OrderByDescending(m => m.Value.whiteAdvantage);
             }
             else
             {
-                orderedMoves = movesData.OrderBy(m => m.Value.whiteAdvantage).Select<KeyValuePair<Move, BoardAnalysisData>, Move>(m => m.Key).ToList();
+                orderedAnalysis = movesData.OrderBy(m => m.Value.whiteAdvantage);
             }
+            orderedMoves = orderedAnalysis.Select<KeyValuePair<Move, BoardAnalysisData>, Move>(m => m.Key).ToList();
 
             return orderedMoves[0];
         }
@@ -90,8 +99,8 @@ namespace HiveLib.AI
             {
                 Board futureBoard = board.Clone();
                 if (!futureBoard.TryMakeMove(nextMove)) throw new Exception("Oh noe!  Bad move.");
-                localMovesData[nextMove] = BoardAnalysisData.GetBoardAnalysisData(futureBoard, weights);
-                localDataDiffs[nextMove] = BoardAnalysisData.Diff(board, futureBoard, weights);
+                localMovesData[nextMove] = BoardAnalysisData.GetBoardAnalysisData(futureBoard, _weights);
+                localDataDiffs[nextMove] = BoardAnalysisData.Diff(board, futureBoard, _weights);
             });
             movesData = localMovesData;
             dataDiffs = localDataDiffs;

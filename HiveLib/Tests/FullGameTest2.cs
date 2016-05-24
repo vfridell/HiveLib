@@ -23,7 +23,7 @@ namespace HiveLib.Tests
         [TestMethod]
         public void CheckHivailabilityAndArticulationPoints()
         {
-            IHiveAI AI = new JohnnyHive();
+            IHiveAI AI = new JohnnyHive(JohnnyHive._winningWeights);
             AI.BeginNewGame(true);
             Game game = Game.GetNewGame(AI.Name, "test");
             _board = Board.GetNewBoard();

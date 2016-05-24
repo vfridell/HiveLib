@@ -272,7 +272,7 @@ namespace HiveLib.Models
                 }
                 else
                 {
-                    _gameResult = GameResult.WhiteWin;
+                    _gameResult = GameResult.BlackWin;
                 }
             }
             else
