@@ -52,7 +52,7 @@ namespace HiveLib.Tests
                                    .Where(m => m.hex == Neighborhood.GetNeighborHex(new Hex(24, 24), Position.left))
                                    .FirstOrDefault();
             string notation = NotationParser.GetNotationForMove(move, _board);
-            Assert.AreEqual<string>(@"wQ1 -wA1", notation);
+            Assert.AreEqual<string>(@"wQ -wA1", notation);
         }
 
         [TestMethod]
