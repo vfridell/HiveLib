@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIPlayerInterface", "AIPlay
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIJohnnyVersusRandom", "JohnnyVersusRandon\AIJohnnyVersusRandom.csproj", "{447ACEF2-24E7-4A81-AA0D-8CA07113EFFB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiveDisplay", "WpfApplication1\HiveDisplay.csproj", "{FA3A57F0-7944-4FA2-ABC3-84C207484297}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{447ACEF2-24E7-4A81-AA0D-8CA07113EFFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{447ACEF2-24E7-4A81-AA0D-8CA07113EFFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{447ACEF2-24E7-4A81-AA0D-8CA07113EFFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA3A57F0-7944-4FA2-ABC3-84C207484297}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA3A57F0-7944-4FA2-ABC3-84C207484297}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA3A57F0-7944-4FA2-ABC3-84C207484297}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA3A57F0-7944-4FA2-ABC3-84C207484297}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

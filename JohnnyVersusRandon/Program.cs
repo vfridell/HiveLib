@@ -20,8 +20,8 @@ namespace JohnnyVersusRandom
         {
             do
             {
-                //IHiveAI AI = new JohnnyHive(JohnnyHive._winningWeights, "JohnnyHive winningWeights");
-                IHiveAI AI = new RandomAI();
+                IHiveAI AI = new JohnnyHive(JohnnyHive._winningWeights, "JohnnyHive winningWeights");
+                //IHiveAI AI = new RandomAI();
                 IHiveAI AI2 = new RandomAI();
                 //IHiveAI AI2 = new JohnnyHive(JohnnyHive._blockingWeights, "JohnnyHive blockingWeights");
 
