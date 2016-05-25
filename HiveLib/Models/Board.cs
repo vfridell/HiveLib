@@ -223,7 +223,6 @@ namespace HiveLib.Models
                 }
                 finishedVertices.Add(kvp.Key);
             }
-            _adjacencyGraph.TrimEdgeExcess();
         }
 
         private void GenerateMovementMoves()
