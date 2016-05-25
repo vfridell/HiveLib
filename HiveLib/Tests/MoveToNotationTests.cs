@@ -25,7 +25,7 @@ namespace HiveLib.Tests
             Assert.IsFalse(_board.blackQueenPlaced);
             _secondMoves = _board.GetMoves();
             // six spots with four (no queen first move) pieces each for the second move
-            Assert.AreEqual(_secondMoves.Count, 24);
+            Assert.AreEqual(24, _secondMoves.Count);
 
             Move beetlePlaceMove = _secondMoves.Where(m => m.pieceToMove is Beetle)
                                                .Where(m => m.hex == Neighborhood.GetNeighborHex(new Hex(24,24), Position.right))
@@ -34,7 +34,7 @@ namespace HiveLib.Tests
             Assert.IsTrue(_board.TryMakeMove(beetlePlaceMove));
             _thirdMoves = _board.GetMoves();
             // if bee is not the first move, there are three spots with five pieces each for the third move
-            Assert.AreEqual(_thirdMoves.Count, 15);
+            Assert.AreEqual(15, _thirdMoves.Count);
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@ namespace HiveLib.Tests
                                    .Where(m => m.hex == Neighborhood.GetNeighborHex(new Hex(24, 24), Position.left))
                                    .FirstOrDefault();
             string notation = NotationParser.GetNotationForMove(move, _board);
-            Assert.AreEqual<string>(@"wQ1 -wA1", notation);
+            Assert.AreEqual<string>(@"wQ -wA1", notation);
         }
 
         [TestMethod]
