@@ -19,6 +19,12 @@ namespace HiveLib.AI
             _weights = weights;
         }
 
+        public JohnnyHive(BoardAnalysisWeights weights, string name)
+            : this(weights)
+        {
+            _name = name;
+        }
+
         private BoardAnalysisWeights _weights;
         public static BoardAnalysisWeights _blockingWeights = new BoardAnalysisWeights()
         {
@@ -106,9 +112,10 @@ namespace HiveLib.AI
             dataDiffs = localDataDiffs;
         }
 
+        private string _name;
         public string Name
         {
-            get { return "JohnnyHive"; }
+            get { return string.IsNullOrEmpty(_name) ? "JohnnyHive" : _name; }
         }
 
     }

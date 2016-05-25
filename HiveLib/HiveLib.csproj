@@ -79,7 +79,7 @@
     <Compile Include="Models\Pieces\BeetleStack.cs" />
     <Compile Include="Tests\BoardTests.cs" />
     <Compile Include="Tests\CheckNotationStringParsing.cs" />
-    <Compile Include="Tests\FullGameTest2.cs" />
+    <Compile Include="Tests\PlacementTest.cs" />
     <Compile Include="Tests\DoAllTheMoves.cs" />
     <Compile Include="Tests\FullGameTest.cs" />
     <Compile Include="Tests\MovementTests2.cs" />
