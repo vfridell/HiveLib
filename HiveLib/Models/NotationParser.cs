@@ -222,7 +222,7 @@ namespace HiveLib.Models
             return targetPieceNotation + " " + referencePieceNotation;
         }
 
-        private static string GetNotationForPiece(Piece piece)
+        public static string GetNotationForPiece(Piece piece)
         {
             return (piece.color == PieceColor.White ? "w" : "b") +
                                              piece.GetPieceNotation() +

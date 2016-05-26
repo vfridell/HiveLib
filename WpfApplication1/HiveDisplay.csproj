@@ -37,6 +37,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -100,6 +101,32 @@
       <Project>{296b8570-bbd5-4f2c-915b-b6748c778204}</Project>
       <Name>HiveLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\bA1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\bA2.png" />
+    <Resource Include="images\bA3.png" />
+    <Resource Include="images\bB1.png" />
+    <Resource Include="images\bB2.png" />
+    <Resource Include="images\bG1.png" />
+    <Resource Include="images\bG2.png" />
+    <Resource Include="images\bG3.png" />
+    <Resource Include="images\bQ.png" />
+    <Resource Include="images\bS1.png" />
+    <Resource Include="images\bS2.png" />
+    <Resource Include="images\wA1.png" />
+    <Resource Include="images\wA2.png" />
+    <Resource Include="images\wA3.png" />
+    <Resource Include="images\wB1.png" />
+    <Resource Include="images\wB2.png" />
+    <Resource Include="images\wG1.png" />
+    <Resource Include="images\wG2.png" />
+    <Resource Include="images\wG3.png" />
+    <Resource Include="images\wQ.png" />
+    <Resource Include="images\wS1.png" />
+    <Resource Include="images\wS2.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

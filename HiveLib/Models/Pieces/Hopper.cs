@@ -5,7 +5,7 @@ namespace HiveLib.Models.Pieces
 {
     public class Hopper : Piece
     {
-        internal Hopper(PieceColor color, int number) : base(color, number) { }
+        public Hopper(PieceColor color, int number) : base(color, number) { }
         public override string GetPieceNotation()
         {
             return "G";
