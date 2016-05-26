@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="504" Width="893" Loaded="Window_Loaded">
     <StackPanel>
-        <Canvas Name="MainCanvas" MouseWheel="Canvas_MouseWheel" MouseDown="Canvas_MouseDown">
+        <Canvas Name="MainCanvas" >
             <Canvas.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Open" Command="{Binding OpenCommand}"></MenuItem>

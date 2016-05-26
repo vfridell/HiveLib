@@ -56,18 +56,49 @@ namespace WpfApplication1
                 MainCanvas.Children.Add(hexWithImage.image);
                 MainCanvas.Children.Add(hexWithImage.polygon);
                 _imageToPieceMap[hexWithImage.polygon] = kvp.Key;
-                hexWithImage.polygon.MouseEnter += image_MouseEnter;
-                hexWithImage.polygon.MouseLeave += image_MouseLeave;
+                hexWithImage.polygon.MouseLeftButtonDown += polygon_MouseLeftButtonDown;
             }
-            translateTransform.X = -800;
-            translateTransform.Y = -500;
+            translateTransform.X = -1450;
+            translateTransform.Y = -850;
+            scaleTransform.ScaleX *= 1.5;
+            scaleTransform.ScaleY *= 1.5;
+        }
+
+        void polygon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            RemoveAllFutureMoveDrawing();
+            Piece piece = _imageToPieceMap[((Polygon)e.Source)];
+            AddFutureMoveDrawing(piece);
         }
 
         void image_MouseLeave(object sender, MouseEventArgs e)
         {
             Piece piece = _imageToPieceMap[((Polygon)e.Source)];
-            if (!_tempUIElements.ContainsKey(piece)) return;
+            RemoveFutureMoveDrawing(piece);
+        }
 
+        void image_MouseEnter(object sender, MouseEventArgs e)
+        {
+            //((Image)e.Source).Visibility = System.Windows.Visibility.Hidden;
+            Piece piece = _imageToPieceMap[((Polygon)e.Source)];
+            AddFutureMoveDrawing(piece);
+        }
+
+        private void RemoveAllFutureMoveDrawing()
+        {
+            foreach (var kvp in _tempUIElements)
+            {
+                foreach (UIElement element in kvp.Value)
+                {
+                    MainCanvas.Children.Remove(element);
+                }
+            }
+            _tempUIElements.Clear();
+        }
+
+        private void RemoveFutureMoveDrawing(Piece piece)
+        {
+            if (!_tempUIElements.ContainsKey(piece)) return;
             foreach (UIElement element in _tempUIElements[piece])
             {
                 MainCanvas.Children.Remove(element);
@@ -75,10 +106,8 @@ namespace WpfApplication1
             _tempUIElements.Remove(piece);
         }
 
-        void image_MouseEnter(object sender, MouseEventArgs e)
+        private void AddFutureMoveDrawing(Piece piece)
         {
-            //((Image)e.Source).Visibility = System.Windows.Visibility.Hidden;
-            Piece piece = _imageToPieceMap[((Polygon)e.Source)];
 
             List<UIElement> elementList = new List<UIElement>();
             foreach (Move move in _board.GenerateAllMovementMoves().Where(m => m.pieceToMove == piece))
@@ -89,32 +118,6 @@ namespace WpfApplication1
             }
             _tempUIElements.Add(piece, elementList);
         }
-
-        const double _scaleRate = 1.1;
-        private void Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (e.Delta > 0)
-            {
-                scaleTransform.ScaleX *= _scaleRate;
-                scaleTransform.ScaleY *= _scaleRate;
-                _centerHex.polygon.BringIntoView();
-                Point point = e.MouseDevice.GetPosition(MainCanvas);
- //               translateTransform.X -= ;
-   //             translateTransform.Y -= 100;
-            }
-            else
-            {
-                scaleTransform.ScaleX /= _scaleRate;
-                scaleTransform.ScaleY /= _scaleRate;
-                _centerHex.polygon.BringIntoView();
-            }
-        }
-
-        private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            //if(e.RightButton == MouseButtonState.Pressed) contextMenu.
-        }
-
 
     }
 }
