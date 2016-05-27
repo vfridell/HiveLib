@@ -111,5 +111,10 @@ namespace HiveLib.Models
             // this probably sucks
             return (this.hex.column ^ this.hex.row) + this.pieceToMove.GetHashCode();
         }
+
+        internal void FixNotation(Board board)
+        {
+            _notation = NotationParser.GetNotationForMove(this, board);
+        }
     }
 }

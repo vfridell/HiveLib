@@ -15,7 +15,7 @@ using Bitmap = System.Drawing.Bitmap;
 
 
 
-namespace WpfApplication1
+namespace HiveDisplay
 {
     public class FutureMoveDrawing : HexagonDrawing
     {
@@ -51,6 +51,8 @@ namespace WpfApplication1
             _polygon.Fill = Brushes.Transparent;
             height = size * 2;
             width = Math.Sqrt(3) / 2 * height;
+            Canvas.SetLeft(_polygon, center.X - 847);
+            Canvas.SetTop(_polygon, center.Y - 485);
         }
 
         public HexagonDrawing(Hex hex, double size, Piece piece)
@@ -58,6 +60,8 @@ namespace WpfApplication1
         {
             this.piece = piece;
             _image = PieceToImage(piece);
+            //_image.RenderTransform = new ScaleTransform(.65, .65);
+            //_image.RenderTransform = new ScaleTransform(.65, .65);
             Canvas.SetZIndex(_image, -1);
             Canvas.SetLeft(_image, center.X - 24);
             Canvas.SetTop(_image, center.Y - 24);
@@ -72,14 +76,16 @@ namespace WpfApplication1
 
         private Point HexCoordToCenterPoint(Hex hex, double size)
         {
+            //var basis = new Matrix(size * Math.Sqrt(3), size * Math.Sqrt(3) / 2, 0, size * 3 / 2, -400, -235);
             var basis = new Matrix(size * Math.Sqrt(3), size * Math.Sqrt(3) / 2, 0, size * 3 / 2, 0, 0);
             Matrix xy = Matrix.Multiply(basis, new Matrix(hex.column, 0, hex.row, 0, 0, 0));
+            
             return new Point(xy.M11, xy.M21);
         }
 
         private Image PieceToImage(Piece piece)
         {
-            string imagePath = string.Format(@"C:\Workroot\Projects\HiveLib\WpfApplication1\images\{0}.png", NotationParser.GetNotationForPiece(piece));
+            string imagePath = string.Format(@"images\{0}.png", NotationParser.GetNotationForPiece(piece));
             var bitmap = new System.Drawing.Bitmap(imagePath);
             Image image = new Image();
             image.Source = BitmapToImageSource(bitmap);

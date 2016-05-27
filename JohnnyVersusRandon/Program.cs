@@ -53,7 +53,23 @@ namespace JohnnyVersusRandom
                 } while (game.gameResult == GameResult.Incomplete);
 
                 Console.WriteLine(GetWinnerString(game));
+                if (PromptYesOrNo("Write out game transcript?") == YesNo.Yes)
+                {
+                    string filename = WriteGameTranscript(game);
+                    Console.WriteLine("Written to " + filename);
+                }
+
             } while (PromptYesOrNo("Play again?") == YesNo.Yes);
+        }
+
+        private static string WriteGameTranscript(Game game)
+        {
+            string filename = string.Format("transcript_{0}.txt", DateTime.Now.ToString("yyyy.MM.dd.HHmmss"));
+            using (System.IO.StreamWriter writer = new System.IO.StreamWriter(filename))
+            {
+                writer.Write(game.GetMoveTranscript());
+            }
+            return filename;
         }
 
         private static string GetWinnerString(Game game)

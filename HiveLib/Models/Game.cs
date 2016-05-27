@@ -30,6 +30,7 @@ namespace HiveLib.Models
 
         public bool TryMakeMove(Move move)
         {
+            move.FixNotation(_currentBoard);
             if (_currentBoard.TryMakeMove(move))
             {
                 _movesMade.Add(move);

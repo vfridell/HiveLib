@@ -11,11 +11,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.IO;
 using HiveLib.Models;
 using HiveLib.Models.Pieces;
 
 
-namespace WpfApplication1
+namespace HiveDisplay
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -27,14 +28,13 @@ namespace WpfApplication1
             InitializeComponent();
         }
 
-        HexagonDrawing _centerHex = new HexagonDrawing(new Hex(24,24), 20);
+        HexagonDrawing _centerHex = new HexagonDrawing(new Hex(24,24), 10); // x: 1247, y: 720 height: 40
         Dictionary<Polygon, Piece> _imageToPieceMap = new Dictionary<Polygon, Piece>();
         Board _board = Board.GetNewBoard();
         Dictionary<Piece, List<UIElement>> _tempUIElements = new Dictionary<Piece, List<UIElement>>();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            MainCanvas.Background = Brushes.Transparent;
             MainCanvas.Children.Add(_centerHex.polygon);
 
             _board.TryMakeMove(Move.GetMove(@"wG1 ."));
@@ -51,17 +51,12 @@ namespace WpfApplication1
             _board.TryMakeMove(Move.GetMove(@"bB2 bB1-"));
             foreach (var kvp in _board.playedPieces)
             {
-                HexagonDrawing hexWithImage = new HexagonDrawing(kvp.Value, 20, kvp.Key);
-                hexWithImage.image.RenderTransform = new ScaleTransform(.65, .65);
+                HexagonDrawing hexWithImage = new HexagonDrawing(kvp.Value, 10, kvp.Key);
                 MainCanvas.Children.Add(hexWithImage.image);
                 MainCanvas.Children.Add(hexWithImage.polygon);
                 _imageToPieceMap[hexWithImage.polygon] = kvp.Key;
                 hexWithImage.polygon.MouseLeftButtonDown += polygon_MouseLeftButtonDown;
             }
-            translateTransform.X = -1450;
-            translateTransform.Y = -850;
-            scaleTransform.ScaleX *= 1.5;
-            scaleTransform.ScaleY *= 1.5;
         }
 
         void polygon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -117,6 +112,37 @@ namespace WpfApplication1
                 elementList.Add(hexWithImage.polygon);
             }
             _tempUIElements.Add(piece, elementList);
+        }
+
+        private void MovesTextBlock_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                string filename = files[0];
+
+                using(StreamReader stream = new StreamReader(filename))
+                {
+                    string currentLine = stream.ReadLine();
+                    Move move;
+                    int turn = 1;
+                    if (!Move.TryGetMove(currentLine, out move))
+                    {
+                        MovesListBox.Items.Add("Invalid file");
+                    }
+                    else
+                    {
+                        MovesListBox.Items.Add(string.Format("{0}: {1}", turn, currentLine));
+                        currentLine = stream.ReadLine();
+                        while (!stream.EndOfStream)
+                        {
+                            turn++;
+                            currentLine = stream.ReadLine();
+                            MovesListBox.Items.Add(string.Format("{0}: {1}", turn, currentLine));
+                        }
+                    }
+                }
+            }
         }
 
     }

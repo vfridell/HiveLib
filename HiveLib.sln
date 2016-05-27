@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIPlayerInterface", "AIPlay
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIJohnnyVersusRandom", "JohnnyVersusRandon\AIJohnnyVersusRandom.csproj", "{447ACEF2-24E7-4A81-AA0D-8CA07113EFFB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiveDisplay", "WpfApplication1\HiveDisplay.csproj", "{FA3A57F0-7944-4FA2-ABC3-84C207484297}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiveDisplay", "HiveDisplay\HiveDisplay.csproj", "{FA3A57F0-7944-4FA2-ABC3-84C207484297}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
