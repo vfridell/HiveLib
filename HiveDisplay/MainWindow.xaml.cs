@@ -28,34 +28,49 @@ namespace HiveDisplay
             InitializeComponent();
         }
 
-        HexagonDrawing _centerHex = new HexagonDrawing(new Hex(24,24), 10); // x: 1247, y: 720 height: 40
+        double _drawSize = 30;
         Dictionary<Polygon, Piece> _imageToPieceMap = new Dictionary<Polygon, Piece>();
-        Board _board = Board.GetNewBoard();
         Dictionary<Piece, List<UIElement>> _tempUIElements = new Dictionary<Piece, List<UIElement>>();
+        IList<Board> _boards = new List<Board>();
+        Board _currentBoard;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            MainCanvas.Children.Add(_centerHex.polygon);
+            Point canvasCenterPoint = new Point(MainCanvas.ActualWidth / 2, MainCanvas.ActualHeight / 2);
+            HexagonDrawing.SetCenterPoint(canvasCenterPoint, _drawSize);
+            MovesListBox.PreviewMouseDown += MovesListBox_PreviewMouseDown;
+        }
 
-            _board.TryMakeMove(Move.GetMove(@"wG1 ."));
-            _board.TryMakeMove(Move.GetMove(@"bS1 wG1-"));
-            _board.TryMakeMove(Move.GetMove(@"wQ -wG1"));
-            _board.TryMakeMove(Move.GetMove(@"bQ bS1/"));
-            _board.TryMakeMove(Move.GetMove(@"wA1 \wG1"));
-            _board.TryMakeMove(Move.GetMove(@"bQ /bS1"));
-            _board.TryMakeMove(Move.GetMove(@"wA1 bQ/"));
-            _board.TryMakeMove(Move.GetMove(@"bB1 bS1\"));
-            _board.TryMakeMove(Move.GetMove(@"wS1 wQ\"));
-            _board.TryMakeMove(Move.GetMove(@"bB1 wS1-"));
-            _board.TryMakeMove(Move.GetMove(@"wB1 \wS1"));
-            _board.TryMakeMove(Move.GetMove(@"bB2 bB1-"));
-            foreach (var kvp in _board.playedPieces)
+        void MovesListBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var item = ItemsControl.ContainerFromElement((ListBox)sender, e.OriginalSource as DependencyObject) as ListBoxItem;
+            if (item != null)
             {
-                HexagonDrawing hexWithImage = new HexagonDrawing(kvp.Value, 10, kvp.Key);
-                MainCanvas.Children.Add(hexWithImage.image);
-                MainCanvas.Children.Add(hexWithImage.polygon);
-                _imageToPieceMap[hexWithImage.polygon] = kvp.Key;
-                hexWithImage.polygon.MouseLeftButtonDown += polygon_MouseLeftButtonDown;
+                string moveString = ((string)item.Content);
+                string numString = moveString.Substring(0, moveString.IndexOf(':'));
+                int boardNumber = int.Parse(numString);
+                DrawBoard(_boards[boardNumber]);
+                _currentBoard = _boards[boardNumber];
+            }
+        }
+
+        void DrawBoard(Board board)
+        {
+            try
+            {
+                MainCanvas.Children.Clear();
+                foreach (var kvp in board.playedPieces)
+                {
+                    HexagonDrawing hexWithImage = HexagonDrawing.GetHexagonDrawing(kvp.Value, _drawSize, kvp.Key);
+                    MainCanvas.Children.Add(hexWithImage.image);
+                    MainCanvas.Children.Add(hexWithImage.polygon);
+                    _imageToPieceMap[hexWithImage.polygon] = kvp.Key;
+                    hexWithImage.polygon.MouseLeftButtonDown += polygon_MouseLeftButtonDown;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
             }
         }
 
@@ -74,7 +89,6 @@ namespace HiveDisplay
 
         void image_MouseEnter(object sender, MouseEventArgs e)
         {
-            //((Image)e.Source).Visibility = System.Windows.Visibility.Hidden;
             Piece piece = _imageToPieceMap[((Polygon)e.Source)];
             AddFutureMoveDrawing(piece);
         }
@@ -105,9 +119,9 @@ namespace HiveDisplay
         {
 
             List<UIElement> elementList = new List<UIElement>();
-            foreach (Move move in _board.GenerateAllMovementMoves().Where(m => m.pieceToMove == piece))
+            foreach (Move move in _currentBoard.GenerateAllMovementMoves().Where(m => m.pieceToMove == piece))
             {
-                FutureMoveDrawing hexWithImage = new FutureMoveDrawing(move.hex, 20);
+                FutureMoveDrawing hexWithImage = FutureMoveDrawing.GetFutureMoveDrawing(move.hex, _drawSize);
                 MainCanvas.Children.Add(hexWithImage.polygon);
                 elementList.Add(hexWithImage.polygon);
             }
@@ -118,29 +132,51 @@ namespace HiveDisplay
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
+                MovesListBox.Items.Clear();
+                _boards.Clear();
+                _currentBoard = null;
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 string filename = files[0];
 
+                Board board = Board.GetNewBoard();
                 using(StreamReader stream = new StreamReader(filename))
                 {
+                    int turn = 0;
                     string currentLine = stream.ReadLine();
-                    Move move;
-                    int turn = 1;
-                    if (!Move.TryGetMove(currentLine, out move))
+                    while (!stream.EndOfStream)
                     {
-                        MovesListBox.Items.Add("Invalid file");
-                    }
-                    else
-                    {
-                        MovesListBox.Items.Add(string.Format("{0}: {1}", turn, currentLine));
+                        if (!TryAddMoveListItem(currentLine, turn, board)) return;
                         currentLine = stream.ReadLine();
-                        while (!stream.EndOfStream)
-                        {
-                            turn++;
-                            currentLine = stream.ReadLine();
-                            MovesListBox.Items.Add(string.Format("{0}: {1}", turn, currentLine));
-                        }
+                        turn++;
                     }
+                    if (!TryAddMoveListItem(currentLine, turn, board)) return;
+                }
+
+                DrawBoard(_boards[0]);
+                _currentBoard = _boards[0];
+            }
+        }
+
+        private bool TryAddMoveListItem(string currentLine, int turn, Board board)
+        {
+            Move move;
+            if (!Move.TryGetMove(currentLine, out move))
+            {
+                MovesListBox.Items.Add("Invalid file");
+                return false;
+            }
+            else
+            {
+                if (!board.TryMakeMove(move))
+                {
+                    MovesListBox.Items.Add("Invalid move");
+                    return false;
+                }
+                else
+                {
+                    _boards.Add(board.Clone());
+                    MovesListBox.Items.Add(string.Format("{0}: {1}", turn, currentLine));
+                    return true;
                 }
             }
         }

@@ -321,8 +321,11 @@ namespace HiveLib.Models
             bool draw = (blackBreathingSpaces + whiteBreathingSpaces == 0);
             if (gameOver)
             {
-                if (draw) _gameResult = GameResult.Draw;
-                if (blackBreathingSpaces == 0)
+                if (draw)
+                {
+                    _gameResult = GameResult.Draw;
+                }
+                else if (blackBreathingSpaces == 0)
                 {
                     _gameResult = GameResult.WhiteWin;
                 }

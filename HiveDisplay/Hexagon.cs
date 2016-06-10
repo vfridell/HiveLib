@@ -19,11 +19,20 @@ namespace HiveDisplay
 {
     public class FutureMoveDrawing : HexagonDrawing
     {
-        public FutureMoveDrawing(Hex hex, double size)
-            : base(hex, size)
+        protected FutureMoveDrawing() { }
+        public static FutureMoveDrawing GetFutureMoveDrawing(Hex hex, double size)
         {
-            Canvas.SetZIndex(this._polygon, 99);
-            _polygon.Fill = Brushes.Tan;
+            HexagonDrawing hexDrawing = GetHexagonDrawing(hex, size);
+            FutureMoveDrawing drawing = new FutureMoveDrawing();
+            drawing._center = hexDrawing.center;
+            drawing._piece = hexDrawing.piece;
+            drawing._polygon = hexDrawing.polygon;
+            drawing._image = hexDrawing.image;
+            drawing.height = hexDrawing.height;
+            drawing.width = hexDrawing.width;
+            Canvas.SetZIndex(drawing._polygon, 99);
+            drawing._polygon.Fill = Brushes.Tan;
+            return drawing;
         }
     }
 
@@ -36,54 +45,74 @@ namespace HiveDisplay
 
         protected Polygon _polygon;
         protected Image _image;
-        public readonly Piece piece;
-        public readonly Point center;
 
-        public HexagonDrawing(Hex hex, double size)
+        protected Piece _piece;
+        public Piece piece { get { return _piece; } }
+
+        protected Point _center;
+        public Point center { get { return _center; } }
+
+        protected HexagonDrawing() { }
+
+        protected static double xOffset;
+        protected static double yOffset;
+
+        public static void SetCenterPoint(Point point, double size)
         {
-            _polygon = new Polygon();
-            center = HexCoordToCenterPoint(hex, size);
+            HexagonDrawing calculatedCenter = GetHexagonDrawing(new Hex(24, 24), size);
+            xOffset = calculatedCenter._center.X - point.X;
+            yOffset = calculatedCenter._center.Y - point.Y;
+        }
+
+        public static HexagonDrawing GetHexagonDrawing(Hex hex, double size)
+        {
+            HexagonDrawing drawing = new HexagonDrawing();
+            drawing._polygon = new Polygon();
+            drawing._center = HexCoordToCenterPoint(hex, size);
             for(int i = 1; i<=6; i++)
             {
-                _polygon.Points.Add(HexCorner(center, size, i));
+                drawing._polygon.Points.Add(HexCorner(drawing.center, size, i));
             }
-            _polygon.Stroke = Brushes.Black;
-            _polygon.Fill = Brushes.Transparent;
-            height = size * 2;
-            width = Math.Sqrt(3) / 2 * height;
-            Canvas.SetLeft(_polygon, center.X - 847);
-            Canvas.SetTop(_polygon, center.Y - 485);
+            drawing._polygon.Stroke = Brushes.Black;
+            drawing._polygon.Fill = Brushes.Transparent;
+            drawing.height = size * 2;
+            drawing.width = Math.Sqrt(3) / 2 * drawing.height;
+            return drawing;
         }
 
-        public HexagonDrawing(Hex hex, double size, Piece piece)
-            : this(hex, size)
+        public static HexagonDrawing GetHexagonDrawing(Hex hex, double size, Piece piece)
         {
-            this.piece = piece;
-            _image = PieceToImage(piece);
-            //_image.RenderTransform = new ScaleTransform(.65, .65);
-            //_image.RenderTransform = new ScaleTransform(.65, .65);
-            Canvas.SetZIndex(_image, -1);
-            Canvas.SetLeft(_image, center.X - 24);
-            Canvas.SetTop(_image, center.Y - 24);
+            HexagonDrawing drawing = GetHexagonDrawing(hex, size);
+            drawing._piece = piece;
+            drawing._image = PieceToImage(piece);
+            double imageXOffset = drawing._image.Source.Width / 2;
+            double imageYOffset = drawing._image.Source.Height / 2;
+            double scale = drawing.width / drawing._image.Source.Width + .25;
+            drawing._image.RenderTransform = new ScaleTransform(scale, scale, imageXOffset, imageYOffset);
+            Canvas.SetZIndex(drawing._image, -1);
+            Canvas.SetLeft(drawing._image, drawing.center.X - imageXOffset );
+            Canvas.SetTop(drawing._image, drawing.center.Y - imageYOffset);
+            return drawing;
         }
 
-        private Point HexCorner(Point center, double size, int corner_number)
+        public static Point HexCorner(Point center, double size, int corner_number)
         {
             double angle_deg = 60 * corner_number + 30;
             double angle_rad = Math.PI / 180 * angle_deg;
             return new Point(center.X + size * Math.Cos(angle_rad), center.Y + size * Math.Sin(angle_rad));
         }
 
-        private Point HexCoordToCenterPoint(Hex hex, double size)
+        public static Point HexCoordToCenterPoint(Hex hex, double size)
         {
-            //var basis = new Matrix(size * Math.Sqrt(3), size * Math.Sqrt(3) / 2, 0, size * 3 / 2, -400, -235);
+            double height = size * 2;
+            double width = Math.Sqrt(3) / 2 * height;
             var basis = new Matrix(size * Math.Sqrt(3), size * Math.Sqrt(3) / 2, 0, size * 3 / 2, 0, 0);
             Matrix xy = Matrix.Multiply(basis, new Matrix(hex.column, 0, hex.row, 0, 0, 0));
-            
-            return new Point(xy.M11, xy.M21);
+
+            return new Point(xy.M11 - xOffset, xy.M21 - yOffset);
         }
 
-        private Image PieceToImage(Piece piece)
+        public static Image PieceToImage(Piece piece)
         {
             string imagePath = string.Format(@"images\{0}.png", NotationParser.GetNotationForPiece(piece));
             var bitmap = new System.Drawing.Bitmap(imagePath);
@@ -92,7 +121,7 @@ namespace HiveDisplay
             return image;
         }
 
-        private BitmapImage BitmapToImageSource(Bitmap bitmap)
+        public static BitmapImage BitmapToImageSource(Bitmap bitmap)
         {
             using (MemoryStream memory = new MemoryStream())
             {
