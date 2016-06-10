@@ -38,20 +38,25 @@ namespace HiveDisplay
         {
             Point canvasCenterPoint = new Point(MainCanvas.ActualWidth / 2, MainCanvas.ActualHeight / 2);
             HexagonDrawing.SetCenterPoint(canvasCenterPoint, _drawSize);
-            MovesListBox.PreviewMouseDown += MovesListBox_PreviewMouseDown;
+            MovesListBox.SelectionChanged += MovesListBox_SelectionChanged;
         }
 
-        void MovesListBox_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        void MovesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var item = ItemsControl.ContainerFromElement((ListBox)sender, e.OriginalSource as DependencyObject) as ListBoxItem;
-            if (item != null)
+            ListBox movesListBox = (ListBox)e.Source;
+            if (-1 != movesListBox.SelectedIndex)
             {
-                string moveString = ((string)item.Content);
-                string numString = moveString.Substring(0, moveString.IndexOf(':'));
-                int boardNumber = int.Parse(numString);
+                string moveString = (string)movesListBox.Items[movesListBox.SelectedIndex];
+                int boardNumber = GetListIndexFromMoveString(moveString);
                 DrawBoard(_boards[boardNumber]);
                 _currentBoard = _boards[boardNumber];
             }
+        }
+
+        int GetListIndexFromMoveString(string moveString)
+        {
+            string numString = moveString.Substring(0, moveString.IndexOf(':'));
+            return int.Parse(numString);
         }
 
         void DrawBoard(Board board)
