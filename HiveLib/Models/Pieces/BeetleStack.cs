@@ -8,6 +8,7 @@ namespace HiveLib.Models.Pieces
     /// We treat a beetle stack as a type of Piece for convienence
     /// It allows us to override the methods for color and type
     /// </summary>
+    [Serializable]
     public class BeetleStack : Piece
     {
         internal BeetleStack(Piece bottom, Beetle secondLevel)

@@ -8,6 +8,7 @@ using HiveLib.Models.Pieces;
 
 namespace HiveLib.Models
 {
+    [Serializable]
     public class Move
     {
         private string _notation;

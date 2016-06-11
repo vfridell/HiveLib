@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HiveLib.Models.Pieces
 {
+    [Serializable]
     public class Spider : Piece
     {
         public Spider(PieceColor color, int number) : base(color, number) { }

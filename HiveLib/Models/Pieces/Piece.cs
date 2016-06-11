@@ -9,6 +9,7 @@ namespace HiveLib.Models.Pieces
     /// <summary>
     /// Pieces must be immutable
     /// </summary>
+    [Serializable]
     public abstract class Piece
     {
         public Piece(PieceColor color, int number)

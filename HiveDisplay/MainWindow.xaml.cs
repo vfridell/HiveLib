@@ -143,6 +143,7 @@ namespace HiveDisplay
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 string filename = files[0];
 
+                // HERE deserialize bin file of Game and display details on canvas
                 Board board = Board.GetNewBoard();
                 using(StreamReader stream = new StreamReader(filename))
                 {

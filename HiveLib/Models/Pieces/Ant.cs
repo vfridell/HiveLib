@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace HiveLib.Models.Pieces
 {
+    [Serializable]
     public class Ant : Piece
     {
         public Ant(PieceColor color, int number) : base(color, number) { }

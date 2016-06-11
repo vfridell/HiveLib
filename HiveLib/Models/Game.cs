@@ -7,6 +7,7 @@ using HiveLib.ViewModels;
 
 namespace HiveLib.Models
 {
+    [Serializable]
     public class Game
     {
         private List<Move> _movesMade = new List<Move>();

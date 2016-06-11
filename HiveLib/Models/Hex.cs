@@ -1,6 +1,7 @@
 ﻿using System;
 namespace HiveLib.Models
 {
+    [Serializable]
     public struct Hex
     {
         public Hex(int column, int row)

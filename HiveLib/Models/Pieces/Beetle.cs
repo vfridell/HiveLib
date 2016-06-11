@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using HiveLib.Models;
 
 namespace HiveLib.Models.Pieces
 {
+    [Serializable]
     public class Beetle : Piece
     {
         public Beetle(PieceColor color, int number) : base(color, number) { }

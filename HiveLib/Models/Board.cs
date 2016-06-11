@@ -8,19 +8,37 @@ using HiveLib.Helpers;
 using HiveLib.Models.Pieces;
 using PieceColor = HiveLib.Models.Pieces.PieceColor;
 using QuickGraph.Algorithms.Search;
+using System.Runtime.Serialization;
 namespace HiveLib.Models
 {
     public enum GameResult { Incomplete, WhiteWin, BlackWin, Draw };
 
-    public class Board
+    [Serializable]
+    public class Board : IDeserializationCallback
     {
+        private Board() { }
+
         public static readonly int columns = 50;
         public static readonly int rows = 50;
         public static Hex invalidHex = new Hex(-1, -1);
 
+        [NonSerialized]
+        private bool _movesDirty = true;
+
+        [NonSerialized]
         private Dictionary<Hex, Hivailability> _hivailableHexes = new Dictionary<Hex, Hivailability>();
         public IReadOnlyList<Hex> hivailableSpaces { get { return _hivailableHexes.Keys.ToList().AsReadOnly(); }}
 
+        [NonSerialized]
+        private List<Move> _moves = new List<Move>();
+        [NonSerialized]
+        private UndirectedGraph<Piece, UndirectedEdge<Piece>> _adjacencyGraph = new UndirectedGraph<Piece, UndirectedEdge<Piece>>();
+        
+        [NonSerialized]
+        private HashSet<Piece> _articulationPoints = new HashSet<Piece>();
+        public ReadOnlySet<Piece> articulationPoints { get { return _articulationPoints.AsReadOnly(); } }
+
+        // serialize this stuff
         private HashSet<Piece> _unplayedPieces = new HashSet<Piece>();
         public ReadOnlySet<Piece> unplayedPieces { get { return _unplayedPieces.AsReadOnly(); } }
         
@@ -29,13 +47,6 @@ namespace HiveLib.Models
 
         private Piece [,] _boardPieceArray = new Piece[columns, rows];
 
-        private List<Move> _moves = new List<Move>();
-        private UndirectedGraph<Piece, UndirectedEdge<Piece>> _adjacencyGraph = new UndirectedGraph<Piece, UndirectedEdge<Piece>>();
-        
-        private HashSet<Piece> _articulationPoints = new HashSet<Piece>();
-        public ReadOnlySet<Piece> articulationPoints { get { return _articulationPoints.AsReadOnly(); } }
-
-        private bool _movesDirty = true;
         private GameResult _gameResult = GameResult.Incomplete;
         public GameResult gameResult { get { return _gameResult; } }
 
@@ -53,6 +64,7 @@ namespace HiveLib.Models
 
         private string _lastError;
         public string lastError { get { return _lastError; } }
+        // end serialize this stuff
 
         public int BlackQueenBreathingSpaces() { return BreathingSpaces(new QueenBee(PieceColor.Black, 1)); }
         public int WhiteQueenBreathingSpaces() { return BreathingSpaces(new QueenBee(PieceColor.White, 1)); }
@@ -98,8 +110,6 @@ namespace HiveLib.Models
             }
             return false;
         }
-
-        private Board() { }
 
         private void GeneratePlacementMoves()
         {
@@ -584,5 +594,14 @@ namespace HiveLib.Models
             board._hivailableHexes.Add(new Hex(24, 24), Hivailability.GetHivailability(board, new Hex(24, 24), true));
             return board;
         }
+
+        #region IDeserializationCallback Members
+
+        public void OnDeserialization(object sender)
+        {
+            RefreshDependantBoardData();
+        }
+
+        #endregion
     }
 }
