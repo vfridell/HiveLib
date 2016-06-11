@@ -14,5 +14,7 @@ namespace HiveLib.ViewModels
         public double queenBreathingSpaceDiffWeight;
         public double unplayedPiecesDiffWeight;
         public double queenPlacementDiffWeight;
+        public double movementPlacementDiffWeight;
+        public double ownedBeetleStacksWeight;
     }
 }

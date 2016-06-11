@@ -31,8 +31,8 @@ namespace HiveDisplay
         double _drawSize = 30;
         Dictionary<Polygon, Piece> _imageToPieceMap = new Dictionary<Polygon, Piece>();
         Dictionary<Piece, List<UIElement>> _tempUIElements = new Dictionary<Piece, List<UIElement>>();
-        IList<Board> _boards = new List<Board>();
         Board _currentBoard;
+        Game _game;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -48,8 +48,8 @@ namespace HiveDisplay
             {
                 string moveString = (string)movesListBox.Items[movesListBox.SelectedIndex];
                 int boardNumber = GetListIndexFromMoveString(moveString);
-                DrawBoard(_boards[boardNumber]);
-                _currentBoard = _boards[boardNumber];
+                DrawBoard(_game.boards[boardNumber]);
+                _currentBoard = _game.boards[boardNumber];
             }
         }
 
@@ -98,7 +98,7 @@ namespace HiveDisplay
             AddFutureMoveDrawing(piece);
         }
 
-        private void RemoveAllFutureMoveDrawing()
+        public void RemoveAllFutureMoveDrawing()
         {
             foreach (var kvp in _tempUIElements)
             {
@@ -110,7 +110,7 @@ namespace HiveDisplay
             _tempUIElements.Clear();
         }
 
-        private void RemoveFutureMoveDrawing(Piece piece)
+        public void RemoveFutureMoveDrawing(Piece piece)
         {
             if (!_tempUIElements.ContainsKey(piece)) return;
             foreach (UIElement element in _tempUIElements[piece])
@@ -120,7 +120,7 @@ namespace HiveDisplay
             _tempUIElements.Remove(piece);
         }
 
-        private void AddFutureMoveDrawing(Piece piece)
+        public void AddFutureMoveDrawing(Piece piece)
         {
 
             List<UIElement> elementList = new List<UIElement>();
@@ -133,37 +133,48 @@ namespace HiveDisplay
             _tempUIElements.Add(piece, elementList);
         }
 
+        public bool TryMakeMove(Move move)
+        {
+            if (!_game.TryMakeMove(move))
+            {
+                MovesListBox.Items.Add("Invalid move");
+                return false;
+            }
+            else
+            {
+                MovesListBox.Items.Add(string.Format("{0}: {1}", MovesListBox.Items.Count, move.notation));
+                return true;
+            }
+        }
+
         private void MovesTextBlock_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 MovesListBox.Items.Clear();
-                _boards.Clear();
+                _game = Game.GetNewGame("player1", "player2");
                 _currentBoard = null;
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 string filename = files[0];
 
                 // HERE deserialize bin file of Game and display details on canvas
-                Board board = Board.GetNewBoard();
                 using(StreamReader stream = new StreamReader(filename))
                 {
-                    int turn = 0;
                     string currentLine = stream.ReadLine();
                     while (!stream.EndOfStream)
                     {
-                        if (!TryAddMoveListItem(currentLine, turn, board)) return;
+                        if (!TryAddMoveListItem(currentLine)) return;
                         currentLine = stream.ReadLine();
-                        turn++;
                     }
-                    if (!TryAddMoveListItem(currentLine, turn, board)) return;
+                    if (!TryAddMoveListItem(currentLine)) return;
                 }
 
-                DrawBoard(_boards[0]);
-                _currentBoard = _boards[0];
+                DrawBoard(_game.boards[0]);
+                _currentBoard = _game.boards[0];
             }
         }
 
-        private bool TryAddMoveListItem(string currentLine, int turn, Board board)
+        private bool TryAddMoveListItem(string currentLine)
         {
             Move move;
             if (!Move.TryGetMove(currentLine, out move))
@@ -173,17 +184,7 @@ namespace HiveDisplay
             }
             else
             {
-                if (!board.TryMakeMove(move))
-                {
-                    MovesListBox.Items.Add("Invalid move");
-                    return false;
-                }
-                else
-                {
-                    _boards.Add(board.Clone());
-                    MovesListBox.Items.Add(string.Format("{0}: {1}", turn, currentLine));
-                    return true;
-                }
+                return TryMakeMove(move);
             }
         }
 

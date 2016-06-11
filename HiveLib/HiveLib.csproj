@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\JohnnyDeep.cs" />
     <Compile Include="AI\RandomAI.cs" />
     <Compile Include="AI\JohnnyHive.cs" />
     <Compile Include="Helpers\DisposableAction.cs" />

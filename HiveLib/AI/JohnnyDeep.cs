@@ -9,17 +9,17 @@ using HiveLib.ViewModels;
 
 namespace HiveLib.AI
 {
-    public class JohnnyHive : IHiveAI
+    public class JohnnyDeep : IHiveAI
     {
         private Random _rand = new Random();
         private bool _playingWhite;
 
-        public JohnnyHive(BoardAnalysisWeights weights)
+        public JohnnyDeep(BoardAnalysisWeights weights)
         {
             _weights = weights;
         }
 
-        public JohnnyHive(BoardAnalysisWeights weights, string name)
+        public JohnnyDeep(BoardAnalysisWeights weights, string name)
             : this(weights)
         {
             _name = name;
@@ -46,7 +46,6 @@ namespace HiveLib.AI
             unplayedPiecesDiffWeight = 1.0,
             queenPlacementDiffWeight = 100.0,
             movementPlacementDiffWeight = 0,
-            ownedBeetleStacksWeight = 10,
         };
 
         public static BoardAnalysisWeights _newWeights = new BoardAnalysisWeights()
@@ -58,7 +57,6 @@ namespace HiveLib.AI
             unplayedPiecesDiffWeight = 0,
             queenPlacementDiffWeight = 100.0,
             movementPlacementDiffWeight = 15.0,
-            ownedBeetleStacksWeight = 10,
         };
 
         public bool playingWhite { get { return _playingWhite; } }

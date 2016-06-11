@@ -12,7 +12,10 @@ namespace HiveLib.Models
     {
         private List<Move> _movesMade = new List<Move>();
         public IReadOnlyList<Move> movesMade { get { return _movesMade.AsReadOnly(); } }
-
+        
+        private List<Board> _boards = new List<Board>();
+        public IReadOnlyList<Board> boards { get { return _boards.AsReadOnly(); } }
+        
         private Board _currentBoard;
 
         public readonly string whitePlayerName;
@@ -22,6 +25,7 @@ namespace HiveLib.Models
         public GameResult gameResult { get { return _currentBoard.gameResult; } }
         public string lastError { get { return _currentBoard.lastError; } }
         public int turnNumber { get { return _currentBoard.turnNumber; } }
+        public int currentBoardIndex { get { return _currentBoard.turnNumber - 2; } }
 
         private Game(string whitePlayerName, string blackPlayerName) 
         { 
@@ -34,6 +38,7 @@ namespace HiveLib.Models
             move.FixNotation(_currentBoard);
             if (_currentBoard.TryMakeMove(move))
             {
+                _boards.Add(_currentBoard.Clone());
                 _movesMade.Add(move);
                 return true;
             }

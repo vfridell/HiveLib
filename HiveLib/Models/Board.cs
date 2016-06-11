@@ -32,6 +32,10 @@ namespace HiveLib.Models
         [NonSerialized]
         private List<Move> _moves = new List<Move>();
         [NonSerialized]
+        private List<Move> _allMoves = new List<Move>();
+        public IReadOnlyList<Move> AllMoves { get { GetMoves(); return _allMoves.AsReadOnly(); } }
+
+        [NonSerialized]
         private UndirectedGraph<Piece, UndirectedEdge<Piece>> _adjacencyGraph = new UndirectedGraph<Piece, UndirectedEdge<Piece>>();
         
         [NonSerialized]
@@ -74,6 +78,12 @@ namespace HiveLib.Models
         public int whiteUnplayedPieces { get { return _unplayedPieces.Count(p => p.color == PieceColor.White); } }
         public int blackHivailableSpaces { get { return _hivailableHexes.Count(kvp => kvp.Value.BlackCanPlace); } }
         public int whiteHivailableSpaces { get { return _hivailableHexes.Count(kvp => kvp.Value.WhiteCanPlace); } }
+        public int blackMoveablePieces { get { return AllMoves.GroupBy(m => NotationParser.GetNotationForPiece(m.pieceToMove)).Count(m => m.Key[0] == 'b'); } }
+        public int whiteMoveablePieces { get { return AllMoves.GroupBy(m => NotationParser.GetNotationForPiece(m.pieceToMove)).Count(m => m.Key[0] == 'w'); } }
+
+        public int blackOwnedBeetleStacks { get { return _playedPieces.Where(kvp => kvp.Key is BeetleStack && kvp.Key.color == PieceColor.Black).Count(); } }
+        public int whiteOwnedBeetleStacks { get { return _playedPieces.Where(kvp => kvp.Key is BeetleStack && kvp.Key.color == PieceColor.White).Count(); } }
+
         public bool whiteCanMoveAnt 
         { 
             get 
@@ -240,9 +250,10 @@ namespace HiveLib.Models
             PieceColor colorToMove = _whiteToPlay ? PieceColor.White : PieceColor.Black;
             if ( (_whiteToPlay && whiteQueenPlaced) || (!_whiteToPlay && blackQueenPlaced))
             {
-                foreach (Move move in GenerateAllMovementMoves().Where(m => m.pieceToMove.color == colorToMove))
+                foreach (Move move in GenerateAllMovementMoves())
                 {
-                    _moves.Add(move);
+                    _allMoves.Add(move);
+                    if(move.pieceToMove.color == colorToMove) _moves.Add(move);
                 }
             }
         }
@@ -268,6 +279,7 @@ namespace HiveLib.Models
             if (_gameResult != GameResult.Incomplete) return new List<Move>();
             if (_movesDirty)
             {
+                _allMoves.Clear();
                 _moves.Clear();
                 GeneratePlacementMoves();
                 GenerateMovementMoves();
@@ -563,6 +575,16 @@ namespace HiveLib.Models
             board._playedPieces.Remove(piece);
             board._boardPieceArray[hex.column, hex.row] = null;
             return board;
+        }
+
+        public static bool BoardPositionsEqual(Board x, Board y)
+        {
+            if (x.playedPieces.Count != y.playedPieces.Count) return false;
+            foreach (var kvp in x.playedPieces)
+            {
+                if (!y._boardPieceArray[kvp.Value.column, kvp.Value.row].Equals(kvp.Key)) return false;
+            }
+            return true;
         }
 
         public static Board GetNewBoard()

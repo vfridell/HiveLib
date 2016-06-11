@@ -72,7 +72,32 @@ namespace HiveLib.ViewModels
         public bool blackCanMoveAnt;
         public bool blackCanMoveQueen;
 
+        public int whiteMoveablePieces;
+        public int blackMoveablePieces;
+        // more is better
+        public int movementPlacementAdvantageDiff { get { return (whiteMoveablePieces + whiteHivailableSpaces) - (blackMoveablePieces + blackHivailableSpaces); } }
+
+        public int blackOwnedBeetleStacks;
+        public int whiteOwnedBeetleStacks;
+        // more is better
+        public int ownedBeetleStacksDiff { get { return whiteOwnedBeetleStacks - blackOwnedBeetleStacks; } }
+
         public GameResult gameResult;
+        public int winningResultDiff 
+        { 
+            get 
+            {
+                switch (gameResult)
+                {
+                    case GameResult.WhiteWin:
+                        return 9999;
+                    case GameResult.BlackWin:
+                        return -9999;
+                    default:
+                        return 0;
+                }
+            } 
+        }
 
         private BoardAnalysisWeights _weights;
         public double whiteAdvantage
@@ -84,7 +109,10 @@ namespace HiveLib.ViewModels
                         (possibleMovesDiff * _weights.possibleMovesDiffWeight) +
                         (queenBreathingSpaceDiff * _weights.queenBreathingSpaceDiffWeight) +
                         (unplayedPiecesDiff * _weights.unplayedPiecesDiffWeight) +
-                        (queenPlacementDiff * _weights.queenPlacementDiffWeight);
+                        (queenPlacementDiff * _weights.queenPlacementDiffWeight) +
+                        (winningResultDiff) +
+                        (ownedBeetleStacksDiff * _weights.ownedBeetleStacksWeight) +
+                        (movementPlacementAdvantageDiff * _weights.movementPlacementDiffWeight);
             }
         }
 
@@ -94,6 +122,7 @@ namespace HiveLib.ViewModels
         {
             BoardAnalysisData d = new BoardAnalysisData();
             d._weights = weights;
+            d.gameResult = board.gameResult;
             d.blackArticulationPoints = board.articulationPoints.Count(p => p.color == PieceColor.Black);
             d.whiteArticulationPoints = board.articulationPoints.Count(p => p.color == PieceColor.White);
 
@@ -116,6 +145,10 @@ namespace HiveLib.ViewModels
             d.blackCanMoveAnt = board.blackCanMoveAnt;
             d.whiteCanMoveQueen = board.whiteCanMoveQueen;
             d.blackCanMoveQueen = board.blackCanMoveQueen;
+            d.whiteMoveablePieces = board.whiteMoveablePieces;
+            d.blackMoveablePieces = board.blackMoveablePieces;
+            d.blackOwnedBeetleStacks = board.blackOwnedBeetleStacks;
+            d.whiteOwnedBeetleStacks = board.whiteOwnedBeetleStacks;
 
             return d;
         }
