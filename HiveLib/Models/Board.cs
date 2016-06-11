@@ -621,6 +621,12 @@ namespace HiveLib.Models
 
         public void OnDeserialization(object sender)
         {
+            _movesDirty = true;
+            _moves = new List<Move>();
+            _allMoves = new List<Move>();
+            _hivailableHexes = new Dictionary<Hex, Hivailability>();
+            _adjacencyGraph = new UndirectedGraph<Piece, UndirectedEdge<Piece>>();
+            _articulationPoints = new HashSet<Piece>();
             RefreshDependantBoardData();
         }
 

@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using System.IO;
 using HiveLib.Models;
 using HiveLib.Models.Pieces;
+using System.Runtime.Serialization.Formatters.Binary;
 
 
 namespace HiveDisplay
@@ -158,20 +159,51 @@ namespace HiveDisplay
                 string filename = files[0];
 
                 // HERE deserialize bin file of Game and display details on canvas
-                using(StreamReader stream = new StreamReader(filename))
+                switch(System.IO.Path.GetExtension(filename))
                 {
-                    string currentLine = stream.ReadLine();
-                    while (!stream.EndOfStream)
-                    {
-                        if (!TryAddMoveListItem(currentLine)) return;
-                        currentLine = stream.ReadLine();
-                    }
-                    if (!TryAddMoveListItem(currentLine)) return;
+                    case ".txt":
+                        TryLoadTextTranscript(filename);
+                        break;
+                    case ".bin":
+                        TryLoadGameBinary(filename);
+                        break;
+                    default:
+                        MovesListBox.Items.Add("Invalid file");
+                        return;
                 }
 
                 DrawBoard(_game.boards[0]);
                 _currentBoard = _game.boards[0];
             }
+        }
+
+        private bool TryLoadGameBinary(string filename)
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None))
+            {
+                _game = (Game)formatter.Deserialize(stream);
+            }
+            foreach (Move move in _game.movesMade)
+            {
+                MovesListBox.Items.Add(string.Format("{0}: {1}", MovesListBox.Items.Count, move.notation));
+            }
+            return true;
+        }
+
+        private bool TryLoadTextTranscript(string filename)
+        {
+            using (StreamReader stream = new StreamReader(filename))
+            {
+                string currentLine = stream.ReadLine();
+                while (!stream.EndOfStream)
+                {
+                    if (!TryAddMoveListItem(currentLine)) return false;
+                    currentLine = stream.ReadLine();
+                }
+                if (!TryAddMoveListItem(currentLine)) return false;
+            }
+            return true;
         }
 
         private bool TryAddMoveListItem(string currentLine)

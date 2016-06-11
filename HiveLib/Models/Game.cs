@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using HiveLib.ViewModels;
@@ -66,6 +67,5 @@ namespace HiveLib.Models
             _movesMade.ForEach(m => sb.Append(m.notation).Append("\n"));
             return sb.ToString();
         }
-
     }
 }
