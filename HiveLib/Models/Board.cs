@@ -28,6 +28,7 @@ namespace HiveLib.Models
         [NonSerialized]
         private Dictionary<Hex, Hivailability> _hivailableHexes = new Dictionary<Hex, Hivailability>();
         public IReadOnlyList<Hex> hivailableSpaces { get { return _hivailableHexes.Keys.ToList().AsReadOnly(); }}
+        public Dictionary<Hex, Hivailability> hivailableHexes { get { return new Dictionary<Hex, Hivailability>(_hivailableHexes); } }
 
         [NonSerialized]
         private List<Move> _moves = new List<Move>();
@@ -168,7 +169,7 @@ namespace HiveLib.Models
             }
         }
 
-        private void RefreshDependantBoardData(bool forceBlackCanPlace = false)
+        public void RefreshDependantBoardData(bool forceBlackCanPlace = false)
         {
             RefreshAllHivailability(forceBlackCanPlace);
             RefreshAdjacencyList();
@@ -627,7 +628,6 @@ namespace HiveLib.Models
             _hivailableHexes = new Dictionary<Hex, Hivailability>();
             _adjacencyGraph = new UndirectedGraph<Piece, UndirectedEdge<Piece>>();
             _articulationPoints = new HashSet<Piece>();
-            RefreshDependantBoardData();
         }
 
         #endregion

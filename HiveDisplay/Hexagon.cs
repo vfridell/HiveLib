@@ -20,9 +20,9 @@ namespace HiveDisplay
     public class FutureMoveDrawing : HexagonDrawing
     {
         protected FutureMoveDrawing() { }
-        public static FutureMoveDrawing GetFutureMoveDrawing(Hex hex, double size)
+        public static FutureMoveDrawing GetFutureMoveDrawing(Hex hex, double size, Point offsetPoint)
         {
-            HexagonDrawing hexDrawing = GetHexagonDrawing(hex, size);
+            HexagonDrawing hexDrawing = GetHexagonDrawing(hex, size, offsetPoint);
             FutureMoveDrawing drawing = new FutureMoveDrawing();
             drawing._center = hexDrawing.center;
             drawing._piece = hexDrawing.piece;
@@ -54,22 +54,18 @@ namespace HiveDisplay
 
         protected HexagonDrawing() { }
 
-        protected static double xOffset;
-        protected static double yOffset;
-
-        public static void SetCenterPoint(Point point, double size)
+        public static Point GetOffsetPointFromCenter(Point centerPoint, double size)
         {
-            HexagonDrawing calculatedCenter = GetHexagonDrawing(new Hex(24, 24), size);
-            xOffset = calculatedCenter._center.X - point.X;
-            yOffset = calculatedCenter._center.Y - point.Y;
+            HexagonDrawing calculatedCenter = GetHexagonDrawing(new Hex(24, 24), size, new Point(0,0));
+            return new Point(calculatedCenter._center.X - centerPoint.X, calculatedCenter._center.Y - centerPoint.Y);
         }
 
-        public static HexagonDrawing GetHexagonDrawing(Hex hex, double size)
+        public static HexagonDrawing GetHexagonDrawing(Hex hex, double size, Point offsetPoint)
         {
             HexagonDrawing drawing = new HexagonDrawing();
             drawing._polygon = new Polygon();
-            drawing._center = HexCoordToCenterPoint(hex, size);
-            for(int i = 1; i<=6; i++)
+            drawing._center = HexCoordToCenterPoint(hex, size, offsetPoint);
+            for (int i = 1; i <= 6; i++)
             {
                 drawing._polygon.Points.Add(HexCorner(drawing.center, size, i));
             }
@@ -80,9 +76,9 @@ namespace HiveDisplay
             return drawing;
         }
 
-        public static HexagonDrawing GetHexagonDrawing(Hex hex, double size, Piece piece)
+        public static HexagonDrawing GetHexagonDrawing(Hex hex, double size, Piece piece, Point offsetPoint)
         {
-            HexagonDrawing drawing = GetHexagonDrawing(hex, size);
+            HexagonDrawing drawing = GetHexagonDrawing(hex, size, offsetPoint);
             drawing._piece = piece;
             drawing._image = PieceToImage(piece);
             double imageXOffset = drawing._image.Source.Width / 2;
@@ -102,14 +98,14 @@ namespace HiveDisplay
             return new Point(center.X + size * Math.Cos(angle_rad), center.Y + size * Math.Sin(angle_rad));
         }
 
-        public static Point HexCoordToCenterPoint(Hex hex, double size)
+        public static Point HexCoordToCenterPoint(Hex hex, double size, Point offsetPoint)
         {
             double height = size * 2;
             double width = Math.Sqrt(3) / 2 * height;
             var basis = new Matrix(size * Math.Sqrt(3), size * Math.Sqrt(3) / 2, 0, size * 3 / 2, 0, 0);
             Matrix xy = Matrix.Multiply(basis, new Matrix(hex.column, 0, hex.row, 0, 0, 0));
 
-            return new Point(xy.M11 - xOffset, xy.M21 - yOffset);
+            return new Point(xy.M11 - offsetPoint.X, xy.M21 - offsetPoint.Y);
         }
 
         public static Image PieceToImage(Piece piece)

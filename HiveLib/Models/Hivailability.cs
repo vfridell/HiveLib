@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace HiveLib.Models
 {
-    class Hivailability
+    public class Hivailability
     {
         public enum NeighborStatus {Empty, Black, White};
         private bool _whiteCanPlace;

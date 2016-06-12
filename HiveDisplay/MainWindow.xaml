@@ -8,32 +8,45 @@
             <GradientStop Color="#FF9C9595" Offset="1"/>
         </LinearGradientBrush>
     </Window.Background>
-    <Grid Name="CanvasGrid" 
-              Width="{Binding ActualWidth, ElementName=WindowGrid}" Grid.Row="0">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Name="FirstColumn" Width="*" />
-            <ColumnDefinition Width="5" />
-            <ColumnDefinition Width="150" />
-        </Grid.ColumnDefinitions>
-        <Canvas Name="MainCanvas" ClipToBounds="True" 
-                    VerticalAlignment="Top" HorizontalAlignment="Left"
-                    Height="768"
-                    Width="889"
-                        Grid.Column="0" Background="Aqua" Margin="10,10,0,0">
-            <Canvas.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Open" Command="{Binding OpenCommand}"></MenuItem>
-                </ContextMenu>
-            </Canvas.ContextMenu>
-            <Canvas.RenderTransform>
-                <TransformGroup x:Name="transformGroup">
-                    <ScaleTransform x:Name="scaleTransform"/>
-                    <TranslateTransform x:Name="translateTransform"/>
-                </TransformGroup>
-            </Canvas.RenderTransform>
-        </Canvas>
-        <ListBox Name="MovesListBox" Grid.Column="2" AllowDrop="True" Drop="MovesTextBlock_Drop" Background="White" Height="768" VerticalAlignment="Top" Margin="0,10,10,0" FontFamily="Consolas" FontSize="16">
-            <ScrollViewer />
-        </ListBox>
+    <Grid Name="AppGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Name="DisplayRow" Height="*" />
+            <RowDefinition Height="5" />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
+        <Grid Name="CanvasGrid" 
+                  Width="{Binding ActualWidth, ElementName=WindowGrid}" Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Name="FirstColumn" Width="*" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="150" />
+            </Grid.ColumnDefinitions>
+            <Canvas Name="MainCanvas" ClipToBounds="True" 
+                        VerticalAlignment="Top" HorizontalAlignment="Left"
+                        Height="663"
+                        Width="879"
+                            Grid.Column="0" Background="Aqua" Margin="10,10,0,0">
+                <Canvas.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Open" Command="{Binding OpenCommand}"></MenuItem>
+                    </ContextMenu>
+                </Canvas.ContextMenu>
+                <Canvas.RenderTransform>
+                    <TransformGroup x:Name="transformGroup">
+                        <ScaleTransform x:Name="scaleTransform"/>
+                        <TranslateTransform x:Name="translateTransform"/>
+                    </TransformGroup>
+                </Canvas.RenderTransform>
+            </Canvas>
+            <ListBox Name="MovesListBox" Grid.Column="2" AllowDrop="True" Drop="MovesTextBlock_Drop" Background="White" Height="673" VerticalAlignment="Top" Margin="0,10,10,0" FontFamily="Consolas" FontSize="16">
+                <ScrollViewer />
+            </ListBox>
+        </Grid>
+        <Grid Name="UnplayedPiecesGrid"/>
+        <Canvas x:Name="UnplayedPiecesCanvas" ClipToBounds="True" 
+        	VerticalAlignment="Top" HorizontalAlignment="Left"
+        	Grid.Column="0" Background="BlanchedAlmond"  Margin="10,5,0,0" Height="85" Width="1034"
+        	Grid.Row="2"
+                    />
     </Grid>
 </Window>

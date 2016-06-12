@@ -31,14 +31,19 @@ namespace HiveDisplay
 
         double _drawSize = 30;
         Dictionary<Polygon, Piece> _imageToPieceMap = new Dictionary<Polygon, Piece>();
+        Dictionary<Image, Piece> _unplayedImageToPieceMap = new Dictionary<Image, Piece>();
         Dictionary<Piece, List<UIElement>> _tempUIElements = new Dictionary<Piece, List<UIElement>>();
         Board _currentBoard;
         Game _game;
+        Point _mainCanvasOffsetPoint;
+        Point _unplayedCanvasOffsetPoint;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Point canvasCenterPoint = new Point(MainCanvas.ActualWidth / 2, MainCanvas.ActualHeight / 2);
-            HexagonDrawing.SetCenterPoint(canvasCenterPoint, _drawSize);
+            _mainCanvasOffsetPoint = HexagonDrawing.GetOffsetPointFromCenter(canvasCenterPoint, _drawSize);
+            Point unplayedCanvasCenterPoint = new Point(UnplayedPiecesCanvas.ActualWidth / 2, UnplayedPiecesCanvas.ActualHeight / 2);
+            _unplayedCanvasOffsetPoint = HexagonDrawing.GetOffsetPointFromCenter(unplayedCanvasCenterPoint, _drawSize);
             MovesListBox.SelectionChanged += MovesListBox_SelectionChanged;
         }
 
@@ -65,19 +70,74 @@ namespace HiveDisplay
             try
             {
                 MainCanvas.Children.Clear();
+                _imageToPieceMap.Clear();
                 foreach (var kvp in board.playedPieces)
                 {
-                    HexagonDrawing hexWithImage = HexagonDrawing.GetHexagonDrawing(kvp.Value, _drawSize, kvp.Key);
+                    HexagonDrawing hexWithImage = HexagonDrawing.GetHexagonDrawing(kvp.Value, _drawSize, kvp.Key, _mainCanvasOffsetPoint);
                     MainCanvas.Children.Add(hexWithImage.image);
                     MainCanvas.Children.Add(hexWithImage.polygon);
                     _imageToPieceMap[hexWithImage.polygon] = kvp.Key;
                     hexWithImage.polygon.MouseLeftButtonDown += polygon_MouseLeftButtonDown;
+                }
+                UnplayedPiecesCanvas.Children.Clear();
+                _unplayedImageToPieceMap.Clear();
+                HashSet<Tuple<PieceColor, string>> shown = new HashSet<Tuple<PieceColor, string>>();
+                foreach (Piece unplayedPiece in board.unplayedPieces.OrderBy(p => p.number))
+                {
+                    var pieceTypeTuple = new Tuple<PieceColor, string>(unplayedPiece.color, unplayedPiece.GetPieceNotation());
+                    if (shown.Contains(pieceTypeTuple)) continue;
+                    AddUnplayedPieceToCanvas(unplayedPiece);
+                    shown.Add(pieceTypeTuple);
                 }
             }
             catch (Exception ex)
             {
                 throw;
             }
+        }
+
+        private void AddUnplayedPieceToCanvas(Piece piece)
+        {
+            Hex hex = GetHexForUnplayedPiece(piece);
+            HexagonDrawing hexWithImage = HexagonDrawing.GetHexagonDrawing(hex, _drawSize, piece, _unplayedCanvasOffsetPoint);
+            UnplayedPiecesCanvas.Children.Add(hexWithImage.image);
+            _unplayedImageToPieceMap[hexWithImage.image] = piece;
+            hexWithImage.image.MouseLeftButtonDown += unplayedPieceImage_MouseLeftButtonDown;
+        }
+
+        private Hex GetHexForUnplayedPiece(Piece piece)
+        {
+            int column = 14;
+            if (piece.color == PieceColor.Black) column = 24;
+            switch (piece.GetPieceNotation())
+            {
+                case "Q":
+                    column += 1;
+                    break;
+                case "A":
+                    column += 2;
+                    break;
+                case "B":
+                    column += 3;
+                    break;
+                case "G":
+                    column += 4;
+                    break;
+                case "S":
+                    column += 5;
+                    break;
+                default:
+                    column += 6;
+                    break;
+            }
+            return new Hex(column, 24);
+        }
+
+        void unplayedPieceImage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            RemoveAllFutureMoveDrawing();
+            Piece piece = _unplayedImageToPieceMap[((Image)e.Source)];
+            AddPlacementMoveDrawing(piece);
         }
 
         void polygon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -97,6 +157,25 @@ namespace HiveDisplay
         {
             Piece piece = _imageToPieceMap[((Polygon)e.Source)];
             AddFutureMoveDrawing(piece);
+        }
+
+        private void AddPlacementMoveDrawing(Piece piece)
+        {
+            List<Hex> hexes;
+            _currentBoard.RefreshDependantBoardData();
+            if(piece.color == PieceColor.White)
+                hexes = _currentBoard.hivailableHexes.Where(kvp => kvp.Value.WhiteCanPlace).Select(kvp => kvp.Key).ToList();
+            else
+                hexes = _currentBoard.hivailableHexes.Where(kvp => kvp.Value.BlackCanPlace).Select(kvp => kvp.Key).ToList();
+
+            List<UIElement> elementList = new List<UIElement>();
+            foreach (Hex hex in hexes)
+            {
+                FutureMoveDrawing hexWithImage = FutureMoveDrawing.GetFutureMoveDrawing(hex, _drawSize, _mainCanvasOffsetPoint);
+                MainCanvas.Children.Add(hexWithImage.polygon);
+                elementList.Add(hexWithImage.polygon);
+            }
+            _tempUIElements.Add(piece, elementList);
         }
 
         public void RemoveAllFutureMoveDrawing()
@@ -127,7 +206,7 @@ namespace HiveDisplay
             List<UIElement> elementList = new List<UIElement>();
             foreach (Move move in _currentBoard.GenerateAllMovementMoves().Where(m => m.pieceToMove == piece))
             {
-                FutureMoveDrawing hexWithImage = FutureMoveDrawing.GetFutureMoveDrawing(move.hex, _drawSize);
+                FutureMoveDrawing hexWithImage = FutureMoveDrawing.GetFutureMoveDrawing(move.hex, _drawSize, _mainCanvasOffsetPoint);
                 MainCanvas.Children.Add(hexWithImage.polygon);
                 elementList.Add(hexWithImage.polygon);
             }
@@ -153,15 +232,14 @@ namespace HiveDisplay
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 MovesListBox.Items.Clear();
-                _game = Game.GetNewGame("player1", "player2");
                 _currentBoard = null;
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 string filename = files[0];
 
-                // HERE deserialize bin file of Game and display details on canvas
                 switch(System.IO.Path.GetExtension(filename))
                 {
                     case ".txt":
+                        _game = Game.GetNewGame("player1", "player2");
                         TryLoadTextTranscript(filename);
                         break;
                     case ".bin":
