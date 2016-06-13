@@ -26,38 +26,6 @@ namespace HiveLib.AI
         }
 
         private BoardAnalysisWeights _weights;
-        public static BoardAnalysisWeights _blockingWeights = new BoardAnalysisWeights()
-        {
-            articulationPointDiffWeight = 1.5,
-            hivailableSpaceDiffWeight = 0.5,
-            possibleMovesDiffWeight = 1.0,
-            queenBreathingSpaceDiffWeight = 2.0,
-            unplayedPiecesDiffWeight = 1.0,
-            queenPlacementDiffWeight = 100.0,
-            movementPlacementDiffWeight = 0,
-        };
-
-        public static BoardAnalysisWeights _winningWeights = new BoardAnalysisWeights()
-        {
-            articulationPointDiffWeight = 0.1,
-            hivailableSpaceDiffWeight = 0.1,
-            possibleMovesDiffWeight = 0.1,
-            queenBreathingSpaceDiffWeight = 14.0,
-            unplayedPiecesDiffWeight = 1.0,
-            queenPlacementDiffWeight = 100.0,
-            movementPlacementDiffWeight = 0,
-        };
-
-        public static BoardAnalysisWeights _newWeights = new BoardAnalysisWeights()
-        {
-            articulationPointDiffWeight = 0,
-            hivailableSpaceDiffWeight = 0,
-            possibleMovesDiffWeight = 0,
-            queenBreathingSpaceDiffWeight = 0,
-            unplayedPiecesDiffWeight = 0,
-            queenPlacementDiffWeight = 100.0,
-            movementPlacementDiffWeight = 15.0,
-        };
 
         public bool playingWhite { get { return _playingWhite; } }
 

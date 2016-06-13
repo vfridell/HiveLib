@@ -15,6 +15,7 @@ using System.IO;
 using HiveLib.Models;
 using HiveLib.Models.Pieces;
 using System.Runtime.Serialization.Formatters.Binary;
+using HiveLib.ViewModels;
 
 
 namespace HiveDisplay
@@ -33,10 +34,12 @@ namespace HiveDisplay
         Dictionary<Polygon, Piece> _imageToPieceMap = new Dictionary<Polygon, Piece>();
         Dictionary<Image, Piece> _unplayedImageToPieceMap = new Dictionary<Image, Piece>();
         Dictionary<Piece, List<UIElement>> _tempUIElements = new Dictionary<Piece, List<UIElement>>();
+        Dictionary<UIElement, Hex> _moveToUIElementHexes = new Dictionary<UIElement, Hex>();
         Board _currentBoard;
         Game _game;
         Point _mainCanvasOffsetPoint;
         Point _unplayedCanvasOffsetPoint;
+        Piece _selectedPiece;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -45,6 +48,22 @@ namespace HiveDisplay
             Point unplayedCanvasCenterPoint = new Point(UnplayedPiecesCanvas.ActualWidth / 2, UnplayedPiecesCanvas.ActualHeight / 2);
             _unplayedCanvasOffsetPoint = HexagonDrawing.GetOffsetPointFromCenter(unplayedCanvasCenterPoint, _drawSize);
             MovesListBox.SelectionChanged += MovesListBox_SelectionChanged;
+            this.CommandBindings.Add(new CommandBinding(ApplicationCommands.New, NewGameExecute, NewGameCanExecute));
+        }
+
+        private void NewGameExecute(object sender, ExecutedRoutedEventArgs e)
+        {
+            //var newGameWindow = new NewGameWindow();
+            //newGameWindow.ShowDialog();
+            ClearDisplay();
+            _game = Game.GetNewGame("player1", "player2");
+            _currentBoard = _game.GetCurrentBoard();
+            DrawBoard(_currentBoard);
+        }
+
+        void NewGameCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
         }
 
         void MovesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -89,11 +108,30 @@ namespace HiveDisplay
                     AddUnplayedPieceToCanvas(unplayedPiece);
                     shown.Add(pieceTypeTuple);
                 }
+                DrawGameInfo(board);
             }
             catch (Exception ex)
             {
                 throw;
             }
+        }
+
+        private void DrawGameInfo(Board board)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("White: '{0}' vs. Black: '{1}'\n", _game.whitePlayerName, _game.blackPlayerName);
+            sb.AppendFormat("{0}\n", board.whiteToPlay ? "White Turn" : "Black Turn");
+            if(board.hivailableHexes.Count == 0) board.RefreshDependantBoardData();
+            var analysisData = BoardAnalysisData.GetBoardAnalysisData(board, BoardAnalysisWeights.winningWeights);
+            sb.AppendFormat("Advantage: {0}\n", analysisData.whiteAdvantage);
+            sb.Append(analysisData.ToString());
+
+            TextBlock textBlock = new TextBlock();
+            textBlock.Text = sb.ToString();
+            textBlock.Foreground = Brushes.Black;
+            Canvas.SetLeft(textBlock, 5);
+            Canvas.SetTop(textBlock, 5);
+            MainCanvas.Children.Add(textBlock);
         }
 
         private void AddUnplayedPieceToCanvas(Piece piece)
@@ -137,6 +175,7 @@ namespace HiveDisplay
         {
             RemoveAllFutureMoveDrawing();
             Piece piece = _unplayedImageToPieceMap[((Image)e.Source)];
+            _selectedPiece = piece;
             AddPlacementMoveDrawing(piece);
         }
 
@@ -144,38 +183,45 @@ namespace HiveDisplay
         {
             RemoveAllFutureMoveDrawing();
             Piece piece = _imageToPieceMap[((Polygon)e.Source)];
-            AddFutureMoveDrawing(piece);
-        }
-
-        void image_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Piece piece = _imageToPieceMap[((Polygon)e.Source)];
-            RemoveFutureMoveDrawing(piece);
-        }
-
-        void image_MouseEnter(object sender, MouseEventArgs e)
-        {
-            Piece piece = _imageToPieceMap[((Polygon)e.Source)];
+            _selectedPiece = piece;
             AddFutureMoveDrawing(piece);
         }
 
         private void AddPlacementMoveDrawing(Piece piece)
         {
             List<Hex> hexes;
-            _currentBoard.RefreshDependantBoardData();
+            if(_currentBoard.hivailableHexes.Count == 0) _currentBoard.RefreshDependantBoardData();
             if(piece.color == PieceColor.White)
                 hexes = _currentBoard.hivailableHexes.Where(kvp => kvp.Value.WhiteCanPlace).Select(kvp => kvp.Key).ToList();
             else
                 hexes = _currentBoard.hivailableHexes.Where(kvp => kvp.Value.BlackCanPlace).Select(kvp => kvp.Key).ToList();
 
             List<UIElement> elementList = new List<UIElement>();
+            _moveToUIElementHexes.Clear();
             foreach (Hex hex in hexes)
             {
                 FutureMoveDrawing hexWithImage = FutureMoveDrawing.GetFutureMoveDrawing(hex, _drawSize, _mainCanvasOffsetPoint);
                 MainCanvas.Children.Add(hexWithImage.polygon);
                 elementList.Add(hexWithImage.polygon);
+                hexWithImage.polygon.MouseLeftButtonDown += makeMovepolygon_MouseLeftButtonDown;
+                _moveToUIElementHexes[hexWithImage.polygon] = hex;
             }
             _tempUIElements.Add(piece, elementList);
+        }
+
+        void makeMovepolygon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Hex hex = _moveToUIElementHexes[((Polygon)e.Source)];
+            Move move = Move.GetMove(_selectedPiece, hex);
+            if (!_game.TryMakeMove(move))
+            {
+                MessageBox.Show("Invalid Move", "Error", MessageBoxButton.OK);
+            }
+            else
+            {
+                DrawBoard(_game.GetCurrentBoard());
+                _currentBoard = _game.GetCurrentBoard();
+            }
         }
 
         public void RemoveAllFutureMoveDrawing()
@@ -204,11 +250,14 @@ namespace HiveDisplay
         {
 
             List<UIElement> elementList = new List<UIElement>();
+            _moveToUIElementHexes.Clear();
             foreach (Move move in _currentBoard.GenerateAllMovementMoves().Where(m => m.pieceToMove == piece))
             {
                 FutureMoveDrawing hexWithImage = FutureMoveDrawing.GetFutureMoveDrawing(move.hex, _drawSize, _mainCanvasOffsetPoint);
                 MainCanvas.Children.Add(hexWithImage.polygon);
                 elementList.Add(hexWithImage.polygon);
+                hexWithImage.polygon.MouseLeftButtonDown += makeMovepolygon_MouseLeftButtonDown;
+                _moveToUIElementHexes[hexWithImage.polygon] = move.hex;
             }
             _tempUIElements.Add(piece, elementList);
         }
@@ -253,6 +302,17 @@ namespace HiveDisplay
                 DrawBoard(_game.boards[0]);
                 _currentBoard = _game.boards[0];
             }
+        }
+
+        private void ClearDisplay()
+        {
+            MovesListBox.Items.Clear();
+            _currentBoard = null;
+            _game = null;
+            MainCanvas.Children.Clear();
+            _imageToPieceMap.Clear();
+            _unplayedImageToPieceMap.Clear();
+            _tempUIElements.Clear();
         }
 
         private bool TryLoadGameBinary(string filename)

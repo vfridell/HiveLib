@@ -153,6 +153,19 @@ namespace HiveLib.ViewModels
             return d;
         }
 
+        public override string ToString()
+        {
+            return string.Format("articulationPointDiff: {0} * {1} = {2}\n", articulationPointDiff, _weights.articulationPointDiffWeight, articulationPointDiff * _weights.articulationPointDiffWeight) +
+                    string.Format("hivailableSpaceDiff: {0} * {1} = {2}\n", hivailableSpaceDiff, _weights.hivailableSpaceDiffWeight, hivailableSpaceDiff * _weights.hivailableSpaceDiffWeight) +
+                    string.Format("possibleMovesDiff: {0} * {1} = {2}\n", possibleMovesDiff, _weights.possibleMovesDiffWeight, possibleMovesDiff * _weights.possibleMovesDiffWeight) +
+                    string.Format("queenBreathingSpaceDiff: {0} * {1} = {2}\n", queenBreathingSpaceDiff, _weights.queenBreathingSpaceDiffWeight, queenBreathingSpaceDiff * _weights.queenBreathingSpaceDiffWeight) +
+                    string.Format("unplayedPiecesDiff: {0} * {1} = {2}\n", unplayedPiecesDiff, _weights.unplayedPiecesDiffWeight, unplayedPiecesDiff * _weights.unplayedPiecesDiffWeight) +
+                    string.Format("queenPlacementDiff: {0} * {1} = {2}\n", queenPlacementDiff, _weights.queenPlacementDiffWeight, queenPlacementDiff * _weights.queenPlacementDiffWeight) +
+                    string.Format("winningResultDiff: {0}\n", winningResultDiff) +
+                    string.Format("ownedBeetleStacksDiff: {0} * {1} = {2}\n", ownedBeetleStacksDiff, _weights.ownedBeetleStacksWeight, ownedBeetleStacksDiff * _weights.ownedBeetleStacksWeight) +
+                    string.Format("movementPlacementAdvantageDiff: {0} * {1} = {2}\n", movementPlacementAdvantageDiff, _weights.movementPlacementDiffWeight, movementPlacementAdvantageDiff * _weights.movementPlacementDiffWeight);
+        }
+
         public static BoardAnalysisDataDiff Diff(Board board1, Board board2, BoardAnalysisWeights weights)
         {
             BoardAnalysisData earlierBoardData;
