@@ -183,6 +183,7 @@ namespace HiveDisplay
         {
             RemoveAllFutureMoveDrawing();
             Piece piece = _imageToPieceMap[((Polygon)e.Source)];
+            if (piece is BeetleStack) piece = new Beetle(piece.color, piece.number);
             _selectedPiece = piece;
             AddFutureMoveDrawing(piece);
         }
@@ -213,7 +214,7 @@ namespace HiveDisplay
         {
             Hex hex = _moveToUIElementHexes[((Polygon)e.Source)];
             Move move = Move.GetMove(_selectedPiece, hex);
-            if (!_game.TryMakeMove(move))
+            if (!TryMakeMove(move))
             {
                 MessageBox.Show("Invalid Move", "Error", MessageBoxButton.OK);
             }
@@ -251,7 +252,7 @@ namespace HiveDisplay
 
             List<UIElement> elementList = new List<UIElement>();
             _moveToUIElementHexes.Clear();
-            foreach (Move move in _currentBoard.GenerateAllMovementMoves().Where(m => m.pieceToMove == piece))
+            foreach (Move move in _currentBoard.GenerateAllMovementMoves().Where(m => m.pieceToMove.Equals(piece)))
             {
                 FutureMoveDrawing hexWithImage = FutureMoveDrawing.GetFutureMoveDrawing(move.hex, _drawSize, _mainCanvasOffsetPoint);
                 MainCanvas.Children.Add(hexWithImage.polygon);
