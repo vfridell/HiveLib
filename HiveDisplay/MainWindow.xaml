@@ -1,4 +1,4 @@
-﻿<Window x:Class="HiveDisplay.MainWindow"
+﻿<Window x:Class="HiveDisplay.HiveGameWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Hive Display" Height="815.631" Width="1069.99" Loaded="Window_Loaded" Icon="images/bQ.png" ResizeMode="CanMinimize">

@@ -16,6 +16,7 @@ using HiveLib.Models;
 using HiveLib.Models.Pieces;
 using System.Runtime.Serialization.Formatters.Binary;
 using HiveLib.ViewModels;
+using HiveLib.AI;
 
 
 namespace HiveDisplay
@@ -23,9 +24,9 @@ namespace HiveDisplay
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class HiveGameWindow : Window
     {
-        public MainWindow()
+        public HiveGameWindow()
         {
             InitializeComponent();
         }
@@ -40,6 +41,10 @@ namespace HiveDisplay
         Point _mainCanvasOffsetPoint;
         Point _unplayedCanvasOffsetPoint;
         Piece _selectedPiece;
+
+        DisplayState _displayState;
+        IHiveAI _player1AI;
+        IHiveAI _player2AI;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -56,6 +61,9 @@ namespace HiveDisplay
             //var newGameWindow = new NewGameWindow();
             //newGameWindow.ShowDialog();
             ClearDisplay();
+            _player2AI = new JohnnyHive(BoardAnalysisWeights.winningWeights, "Johnny Hive Winning Weights");
+            _player2AI.BeginNewGame(false);
+            _displayState = new PlayGame();
             _game = Game.GetNewGame("player1", "player2");
             _currentBoard = _game.GetCurrentBoard();
             DrawBoard(_currentBoard);
@@ -222,6 +230,7 @@ namespace HiveDisplay
             {
                 DrawBoard(_game.GetCurrentBoard());
                 _currentBoard = _game.GetCurrentBoard();
+                _displayState.MoveMade(this);
             }
         }
 
@@ -281,8 +290,7 @@ namespace HiveDisplay
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                MovesListBox.Items.Clear();
-                _currentBoard = null;
+                ClearDisplay();
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
                 string filename = files[0];
 
@@ -299,7 +307,6 @@ namespace HiveDisplay
                         MovesListBox.Items.Add("Invalid file");
                         return;
                 }
-
                 DrawBoard(_game.boards[0]);
                 _currentBoard = _game.boards[0];
             }
@@ -314,6 +321,9 @@ namespace HiveDisplay
             _imageToPieceMap.Clear();
             _unplayedImageToPieceMap.Clear();
             _tempUIElements.Clear();
+            _player1AI = null;
+            _player2AI = null;
+            _displayState = new ViewOnly();
         }
 
         private bool TryLoadGameBinary(string filename)
@@ -359,5 +369,33 @@ namespace HiveDisplay
             }
         }
 
+        internal bool TryGetAIForTurn(out IHiveAI ai)
+        {
+            ai = null;
+            if(_currentBoard.whiteToPlay)
+            {
+                if (_player1AI != null && _player1AI.playingWhite) { ai = _player1AI; return true; }
+                else if (_player2AI != null && _player2AI.playingWhite) { ai = _player2AI; return true; }
+                else { return false; }
+            }
+            else
+            {
+                if (_player1AI != null && !_player1AI.playingWhite) { ai = _player1AI; return true; }
+                else if (_player2AI != null && !_player2AI.playingWhite) { ai = _player2AI; return true; }
+                else { return false; }
+            }
+        }
+
+        internal void MakeAIMove(IHiveAI ai)
+        {
+            if (_currentBoard.gameResult == GameResult.Incomplete)
+            {
+                Move bestMove = ai.PickBestMove(_currentBoard);
+                TryMakeMove(bestMove);
+                DrawBoard(_game.GetCurrentBoard());
+                _currentBoard = _game.GetCurrentBoard();
+                _displayState.MoveMade(this);
+            }
+        }
     }
 }
