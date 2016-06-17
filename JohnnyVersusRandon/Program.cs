@@ -23,7 +23,7 @@ namespace JohnnyVersusRandom
         {
             do
             {
-                IHiveAI AI = new JohnnyHive(BoardAnalysisWeights.newWeights, "JohnnyHive new Weights");
+                IHiveAI AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, "JohnnyDeep winningWeights");
                 //IHiveAI AI = new RandomAI();
                 //IHiveAI AI2 = new RandomAI();
                 IHiveAI AI2 = new JohnnyHive(BoardAnalysisWeights.winningWeights, "JohnnyHive winningWeights");
@@ -43,16 +43,19 @@ namespace JohnnyVersusRandom
                 {
                     Board currentBoard = game.GetCurrentBoard();
                     Move move;
+                    IHiveAI currentAI;
                     if (game.whiteToPlay == AI.playingWhite)
                     {
-                        move = AI.MakeBestMove(game);
-                        Console.WriteLine(string.Format("{0} Moved: {1}", AI.Name, Move.GetMoveWithNotation(move, currentBoard).notation));
+                        currentAI = AI;
                     }
                     else
                     {
-                        move = AI2.MakeBestMove(game);
-                        Console.WriteLine(string.Format("{0} Moved: {1}", AI2.Name, Move.GetMoveWithNotation(move, currentBoard).notation));
+                        currentAI = AI2;
                     }
+                    DateTime beginTimestamp = DateTime.Now;
+                    move = currentAI.MakeBestMove(game);
+                    TimeSpan timespan = DateTime.Now.Subtract(beginTimestamp);
+                    Console.WriteLine(string.Format("{0} seconds {1} Moved: {2}", timespan.TotalSeconds, currentAI.Name, Move.GetMoveWithNotation(move, currentBoard).notation));
                 } while (game.gameResult == GameResult.Incomplete);
 
                 Console.WriteLine(GetWinnerString(game));

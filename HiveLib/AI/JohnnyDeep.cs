@@ -47,23 +47,9 @@ namespace HiveLib.AI
 
         public Move PickBestMove(Board board)
         {
-            IDictionary<Move, BoardAnalysisData> movesData;
-            IDictionary<Move, BoardAnalysisDataDiff> dataDiffs;
-            AnalyzeNextMoves(board, out movesData, out dataDiffs);
-
-            List<Move> orderedMoves;
-            IOrderedEnumerable<KeyValuePair<Move, BoardAnalysisData>> orderedAnalysis;
-            if (_playingWhite)
-            {
-                orderedAnalysis = movesData.OrderByDescending(m => m.Value.whiteAdvantage);
-            }
-            else
-            {
-                orderedAnalysis = movesData.OrderBy(m => m.Value.whiteAdvantage);
-            }
-            orderedMoves = orderedAnalysis.Select<KeyValuePair<Move, BoardAnalysisData>, Move>(m => m.Key).ToList();
-
-            return orderedMoves[0];
+            Move bestMove;
+            double score = AnalyzeNextMoves(board, double.MinValue, double.MaxValue, 3, playingWhite ? 1 : -1, out bestMove);
+            return bestMove;
         }
 
         public void BeginNewGame(bool playingWhite)
@@ -71,32 +57,89 @@ namespace HiveLib.AI
             _playingWhite = playingWhite;
         }
 
-        private void AnalyzeNextMoves(Board board, out IDictionary<Move, BoardAnalysisData> movesData, out IDictionary<Move, BoardAnalysisDataDiff> dataDiffs)
+        private double AnalyzeNextMoves(Board board, double alpha, double beta, int depth, int color, out Move bestMove)
         {
-            var localMovesData = new ConcurrentDictionary<Move, BoardAnalysisData>();
-            var localDataDiffs = new ConcurrentDictionary<Move, BoardAnalysisDataDiff>();
-
-            var moves = new ConcurrentQueue<Move>();
-            foreach(Move move in board.GetMoves())
+            if (depth == 0 || board.GetMoves().Count == 0)
             {
-                moves.Enqueue(move);
+                bestMove = null;
+                return BoardAnalysisData.GetBoardAnalysisData(board, _weights).whiteAdvantage * color;
             }
 
-            Parallel.ForEach(moves, (nextMove) =>
+            var localMovesData = new ConcurrentDictionary<Move, Tuple<BoardAnalysisData,Board>>();
+            IOrderedEnumerable<KeyValuePair<Move, Tuple<BoardAnalysisData,Board>>> orderedAnalysis;
+
+            GetSortedMoves(board, out orderedAnalysis);
+            double bestScore = double.MinValue;
+            Move localBestMove = orderedAnalysis.First().Key;
+            object _lock = new object();
+            //Parallel.ForEach(orderedAnalysis, (kvp) =>
+            //{
+            //    Move subBestMove;
+            //    double score = -AnalyzeNextMoves(kvp.Value.Item2, -beta, -alpha, depth - 1, -color, out subBestMove);
+            //    lock (_lock)
+            //    {
+            //        double oldBestScore = bestScore;
+            //        bestScore = Math.Max(score, bestScore);
+            //        if (oldBestScore != bestScore) localBestMove = kvp.Key;
+            //        alpha = Math.Max(alpha, bestScore);
+            //        if (alpha >= beta)
+            //            return;
+            //    }
+            //});
+
+            foreach (var kvp in orderedAnalysis)
+            {
+                Move subBestMove;
+                double score = -AnalyzeNextMoves(kvp.Value.Item2, -beta, -alpha, depth - 1, -color, out subBestMove);
+                lock (_lock)
+                {
+                    double oldBestScore = bestScore;
+                    bestScore = Math.Max(score, bestScore);
+                    if (oldBestScore != bestScore) localBestMove = kvp.Key;
+                    alpha = Math.Max(alpha, bestScore);
+                    if (alpha >= beta)
+                        break;
+                }
+            };
+
+            bestMove = localBestMove;
+            return bestScore;
+        }
+
+        private void GetSortedMoves(Board board, out IOrderedEnumerable<KeyValuePair<Move, Tuple<BoardAnalysisData, Board>>> orderedAnalysis)
+        {
+            var localMovesData = new ConcurrentDictionary<Move, Tuple<BoardAnalysisData, Board>>();
+
+            Parallel.ForEach(board.GetMoves(), (nextMove) =>
             {
                 Board futureBoard = board.Clone();
                 if (!futureBoard.TryMakeMove(nextMove)) throw new Exception("Oh noe!  Bad move.");
-                localMovesData[nextMove] = BoardAnalysisData.GetBoardAnalysisData(futureBoard, _weights);
-                localDataDiffs[nextMove] = BoardAnalysisData.Diff(board, futureBoard, _weights);
+                localMovesData[nextMove] = new Tuple<BoardAnalysisData, Board>(BoardAnalysisData.GetBoardAnalysisData(futureBoard, _weights), futureBoard);
             });
-            movesData = localMovesData;
-            dataDiffs = localDataDiffs;
+
+            //foreach(Move nextMove in board.GetMoves())
+            //{
+            //    Board futureBoard = board.Clone();
+            //    if (!futureBoard.TryMakeMove(nextMove)) throw new Exception("Oh noe!  Bad move.");
+            //    localMovesData[nextMove] = new Tuple<BoardAnalysisData, Board>(BoardAnalysisData.GetBoardAnalysisData(futureBoard, _weights), futureBoard);
+            //};
+
+            //List<Move> orderedMoves;
+            if (board.whiteToPlay)
+            {
+                orderedAnalysis = localMovesData.OrderByDescending(m => m.Value.Item1.whiteAdvantage);
+            }
+            else
+            {
+                orderedAnalysis = localMovesData.OrderBy(m => m.Value.Item1.whiteAdvantage);
+            }
+            //orderedMoves = orderedAnalysis.Select<KeyValuePair<Move, BoardAnalysisData>, Move>(m => m.Key).ToList();
         }
 
         private string _name;
         public string Name
         {
-            get { return string.IsNullOrEmpty(_name) ? "JohnnyHive" : _name; }
+            get { return string.IsNullOrEmpty(_name) ? "JohnnyDeep" : _name; }
         }
 
     }
