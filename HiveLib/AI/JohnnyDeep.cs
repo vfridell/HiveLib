@@ -96,15 +96,12 @@ namespace HiveLib.AI
             {
                 Move subBestMove;
                 double score = -AnalyzeNextMoves(kvp.Value.Item2, -beta, -alpha, depth - 1, -color, out subBestMove);
-                lock (_lock)
-                {
-                    double oldBestScore = bestScore;
-                    bestScore = Math.Max(score, bestScore);
-                    if (oldBestScore != bestScore) localBestMove = kvp.Key;
-                    alpha = Math.Max(alpha, bestScore);
-                    if (alpha >= beta)
-                        break;
-                }
+                double oldBestScore = bestScore;
+                bestScore = Math.Max(score, bestScore);
+                if (oldBestScore != bestScore) localBestMove = kvp.Key;
+                alpha = Math.Max(alpha, bestScore);
+                if (alpha >= beta)
+                    break;
             };
 
             bestMove = localBestMove;
