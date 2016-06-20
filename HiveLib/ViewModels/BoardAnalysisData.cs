@@ -126,7 +126,8 @@ namespace HiveLib.ViewModels
             d.blackArticulationPoints = board.articulationPoints.Count(p => p.color == PieceColor.Black);
             d.whiteArticulationPoints = board.articulationPoints.Count(p => p.color == PieceColor.White);
 
-            IReadOnlyList<Move> moves = board.GenerateAllMovementMoves();
+            IReadOnlyList<Move> moves = board.GetMoves(false);
+            //IReadOnlyList<Move> moves = board.GenerateAllMovementMoves();
             d.blackPossibleMovementMoves = moves.Count(m => m.pieceToMove.color == PieceColor.Black);
             d.whitePossibleMovementMoves = moves.Count(m => m.pieceToMove.color == PieceColor.White);
             

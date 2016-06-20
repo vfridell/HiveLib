@@ -259,7 +259,7 @@ namespace HiveLib.Models
             }
         }
 
-        public IReadOnlyList<Move> GenerateAllMovementMoves()
+        private IReadOnlyList<Move> GenerateAllMovementMoves()
         {
             List<Move> moves = new List<Move>();
             if ((_whiteToPlay && whiteQueenPlaced) || (!_whiteToPlay && blackQueenPlaced))
@@ -275,7 +275,7 @@ namespace HiveLib.Models
             return moves.AsReadOnly();
         }
 
-        public IReadOnlyList<Move> GetMoves()
+        public IReadOnlyList<Move> GetMoves(bool currentPlayerOnly = true)
         {
             if (_gameResult != GameResult.Incomplete) return new List<Move>();
             if (_movesDirty)
@@ -286,7 +286,10 @@ namespace HiveLib.Models
                 GenerateMovementMoves();
                 _movesDirty = false;
             }
-            return _moves.AsReadOnly();
+            if (currentPlayerOnly)
+                return _moves.AsReadOnly();
+            else
+                return _allMoves.AsReadOnly();
         }
 
         /// <summary>
@@ -565,6 +568,11 @@ namespace HiveLib.Models
                 board._playedPieces.Add(kvp.Key, kvp.Value);
                 board._boardPieceArray[kvp.Value.column, kvp.Value.row] = kvp.Key;
             }
+            
+            board._movesDirty = this._movesDirty;
+            board._allMoves = new List<Move>(this._allMoves);
+            board._moves = new List<Move>(this._moves);
+
             return board;
         }
 

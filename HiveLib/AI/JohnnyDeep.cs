@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using HiveLib.Models;
+using HiveLib.Models.Pieces;
 using HiveLib.ViewModels;
 
 namespace HiveLib.AI
@@ -13,14 +14,16 @@ namespace HiveLib.AI
     {
         private Random _rand = new Random();
         private bool _playingWhite;
+        private int _depth;
 
-        public JohnnyDeep(BoardAnalysisWeights weights)
+        public JohnnyDeep(BoardAnalysisWeights weights, int depth)
         {
             _weights = weights;
+            _depth = depth;
         }
 
-        public JohnnyDeep(BoardAnalysisWeights weights, string name)
-            : this(weights)
+        public JohnnyDeep(BoardAnalysisWeights weights, int depth, string name)
+            : this(weights, depth)
         {
             _name = name;
         }
@@ -72,6 +75,8 @@ namespace HiveLib.AI
             double bestScore = double.MinValue;
             Move localBestMove = orderedAnalysis.First().Key;
             object _lock = new object();
+
+            // this is much slower
             //Parallel.ForEach(orderedAnalysis, (kvp) =>
             //{
             //    Move subBestMove;

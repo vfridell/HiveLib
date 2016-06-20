@@ -61,7 +61,7 @@ namespace HiveDisplay
             //var newGameWindow = new NewGameWindow();
             //newGameWindow.ShowDialog();
             ClearDisplay();
-            _player2AI = new JohnnyHive(BoardAnalysisWeights.winningWeights, "Johnny Hive Winning Weights");
+            _player2AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 2, "Johnny Deep");
             _player2AI.BeginNewGame(false);
             _displayState = new PlayGame();
             _game = Game.GetNewGame("player1", "player2");
@@ -261,7 +261,7 @@ namespace HiveDisplay
 
             List<UIElement> elementList = new List<UIElement>();
             _moveToUIElementHexes.Clear();
-            foreach (Move move in _currentBoard.GenerateAllMovementMoves().Where(m => m.pieceToMove.Equals(piece)))
+            foreach (Move move in _currentBoard.GetMoves(false).Where(m => m.pieceToMove.Equals(piece)))
             {
                 FutureMoveDrawing hexWithImage = FutureMoveDrawing.GetFutureMoveDrawing(move.hex, _drawSize, _mainCanvasOffsetPoint);
                 MainCanvas.Children.Add(hexWithImage.polygon);

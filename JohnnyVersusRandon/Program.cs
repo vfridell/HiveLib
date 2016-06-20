@@ -23,10 +23,10 @@ namespace JohnnyVersusRandom
         {
             do
             {
-                IHiveAI AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, "JohnnyDeep winningWeights");
+                IHiveAI AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 2, "JohnnyDeep");
                 //IHiveAI AI = new RandomAI();
                 //IHiveAI AI2 = new RandomAI();
-                IHiveAI AI2 = new JohnnyHive(BoardAnalysisWeights.winningWeights, "JohnnyHive winningWeights");
+                IHiveAI AI2 = new JohnnyHive(BoardAnalysisWeights.winningWeights, "JohnnyHive");
 
                 YesNo yn = PromptYesOrNo(string.Format("Is {0} playing white? ", AI.Name));
 

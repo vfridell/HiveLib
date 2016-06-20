@@ -26,6 +26,7 @@ namespace HiveLib.ViewModels
             unplayedPiecesDiffWeight = 1.0,
             queenPlacementDiffWeight = 100.0,
             movementPlacementDiffWeight = 0,
+            ownedBeetleStacksWeight = 0,
         };
 
         public static BoardAnalysisWeights winningWeights = new BoardAnalysisWeights()
@@ -40,13 +41,13 @@ namespace HiveLib.ViewModels
             ownedBeetleStacksWeight = 10,
         };
 
-        public static BoardAnalysisWeights newWeights = new BoardAnalysisWeights()
+        public static BoardAnalysisWeights deepWeights = new BoardAnalysisWeights()
         {
             articulationPointDiffWeight = 0,
             hivailableSpaceDiffWeight = 0,
             possibleMovesDiffWeight = 0,
-            queenBreathingSpaceDiffWeight = 0,
-            unplayedPiecesDiffWeight = 0,
+            queenBreathingSpaceDiffWeight = 14.0,
+            unplayedPiecesDiffWeight = 0.7,
             queenPlacementDiffWeight = 100.0,
             movementPlacementDiffWeight = 15.0,
             ownedBeetleStacksWeight = 10,
