@@ -20,7 +20,7 @@ namespace AIPlayerInterface
         {
             do
             {
-                IHiveAI AI = new JohnnyHive(BoardAnalysisWeights.winningWeights);
+                IHiveAI AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 4, "Johnny4Deep");
 
                 YesNo yn = PromptYesOrNo("Is this AI playing white? ");
                 string opponentName = PromptForString("Enter the other player's name: ");
@@ -39,17 +39,24 @@ namespace AIPlayerInterface
                     Move move;
                     if (game.whiteToPlay == AI.playingWhite)
                     {
+                        DateTime beginTimestamp = DateTime.Now;
                         move = AI.MakeBestMove(game);
-                        Console.WriteLine("Moved: " + Move.GetMoveWithNotation(move, currentBoard).notation);
+                        TimeSpan timespan = DateTime.Now.Subtract(beginTimestamp);
+                        Console.WriteLine(string.Format("{0} seconds {1} Moved: {2}", timespan.TotalSeconds, AI.Name, Move.GetMoveWithNotation(move, currentBoard).notation));
                     }
                     else
                     {
                         move = PromptForMove("Enter your move: ", game);
-                        Console.WriteLine("Moved: " + move.notation);
+                        Console.WriteLine(string.Format("{0} Moved: {1}", opponentName, Move.GetMoveWithNotation(move, currentBoard).notation));
                     }
                 } while (game.gameResult == GameResult.Incomplete);
 
                 Console.WriteLine(GetWinnerString(game));
+                if (PromptYesOrNo("Write out game transcript?") == YesNo.Yes)
+                {
+                    string filename = Game.WriteGameTranscript(game);
+                    Console.WriteLine("Written to " + filename);
+                }
             } while (PromptYesOrNo("Play again?") == YesNo.Yes);
         }
 

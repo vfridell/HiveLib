@@ -90,9 +90,11 @@ namespace HiveLib.ViewModels
                 switch (gameResult)
                 {
                     case GameResult.WhiteWin:
-                        return 9999;
+                        return int.MaxValue;
+                        //return 9999;
                     case GameResult.BlackWin:
-                        return -9999;
+                        return int.MinValue;
+                        //return -9999;
                     default:
                         return 0;
                 }

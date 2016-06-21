@@ -76,22 +76,6 @@ namespace HiveLib.AI
             Move localBestMove = orderedAnalysis.First().Key;
             object _lock = new object();
 
-            // this is much slower
-            //Parallel.ForEach(orderedAnalysis, (kvp) =>
-            //{
-            //    Move subBestMove;
-            //    double score = -AnalyzeNextMoves(kvp.Value.Item2, -beta, -alpha, depth - 1, -color, out subBestMove);
-            //    lock (_lock)
-            //    {
-            //        double oldBestScore = bestScore;
-            //        bestScore = Math.Max(score, bestScore);
-            //        if (oldBestScore != bestScore) localBestMove = kvp.Key;
-            //        alpha = Math.Max(alpha, bestScore);
-            //        if (alpha >= beta)
-            //            return;
-            //    }
-            //});
-
             foreach (var kvp in orderedAnalysis)
             {
                 Move subBestMove;
@@ -119,14 +103,6 @@ namespace HiveLib.AI
                 localMovesData[nextMove] = new Tuple<BoardAnalysisData, Board>(BoardAnalysisData.GetBoardAnalysisData(futureBoard, _weights), futureBoard);
             });
 
-            //foreach(Move nextMove in board.GetMoves())
-            //{
-            //    Board futureBoard = board.Clone();
-            //    if (!futureBoard.TryMakeMove(nextMove)) throw new Exception("Oh noe!  Bad move.");
-            //    localMovesData[nextMove] = new Tuple<BoardAnalysisData, Board>(BoardAnalysisData.GetBoardAnalysisData(futureBoard, _weights), futureBoard);
-            //};
-
-            //List<Move> orderedMoves;
             if (board.whiteToPlay)
             {
                 orderedAnalysis = localMovesData.OrderByDescending(m => m.Value.Item1.whiteAdvantage);
@@ -135,7 +111,6 @@ namespace HiveLib.AI
             {
                 orderedAnalysis = localMovesData.OrderBy(m => m.Value.Item1.whiteAdvantage);
             }
-            //orderedMoves = orderedAnalysis.Select<KeyValuePair<Move, BoardAnalysisData>, Move>(m => m.Key).ToList();
         }
 
         private string _name;

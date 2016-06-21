@@ -24,9 +24,6 @@ namespace JohnnyVersusRandom
             do
             {
                 IHiveAI AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 4, "Johnny4Deep");
-                //IHiveAI AI = new RandomAI();
-                //IHiveAI AI2 = new RandomAI();
-                //IHiveAI AI2 = new JohnnyHive(BoardAnalysisWeights.winningWeights, "JohnnyHive");
                 IHiveAI AI2 = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 2, "Johnny2Deep");
 
                 YesNo yn = PromptYesOrNo(string.Format("Is {0} playing white? ", AI.Name));
@@ -62,27 +59,11 @@ namespace JohnnyVersusRandom
                 Console.WriteLine(GetWinnerString(game));
                 if (PromptYesOrNo("Write out game transcript?") == YesNo.Yes)
                 {
-                    string filename = WriteGameTranscript(game);
+                    string filename = Game.WriteGameTranscript(game);
                     Console.WriteLine("Written to " + filename);
                 }
 
             } while (PromptYesOrNo("Play again?") == YesNo.Yes);
-        }
-
-        private static string WriteGameTranscript(Game game)
-        {
-            string filename = string.Format("transcript_{0}", DateTime.Now.ToString("yyyy.MM.dd.HHmmss"));
-            using (System.IO.StreamWriter writer = new System.IO.StreamWriter(filename + ".txt"))
-            {
-                writer.Write(game.GetMoveTranscript());
-            }
-
-            BinaryFormatter formatter = new BinaryFormatter();
-            using (Stream stream = new FileStream(filename + ".bin", FileMode.Create, FileAccess.Write, FileShare.None))
-            {
-                formatter.Serialize(stream, game);
-            }
-            return filename;
         }
 
         private static string GetWinnerString(Game game)

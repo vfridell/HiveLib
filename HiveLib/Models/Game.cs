@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using HiveLib.ViewModels;
@@ -66,6 +68,22 @@ namespace HiveLib.Models
             StringBuilder sb = new StringBuilder();
             _movesMade.ForEach(m => sb.Append(m.notation).Append("\n"));
             return sb.ToString();
+        }
+
+        public static string WriteGameTranscript(Game game)
+        {
+            string filename = string.Format("transcript_{0}", DateTime.Now.ToString("yyyy.MM.dd.HHmmss"));
+            using (System.IO.StreamWriter writer = new System.IO.StreamWriter(filename + ".txt"))
+            {
+                writer.Write(game.GetMoveTranscript());
+            }
+
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (Stream stream = new FileStream(filename + ".bin", FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                formatter.Serialize(stream, game);
+            }
+            return filename;
         }
     }
 }
