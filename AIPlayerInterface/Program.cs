@@ -20,7 +20,7 @@ namespace AIPlayerInterface
         {
             do
             {
-                IHiveAI AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 4, "Johnny4Deep");
+                IHiveAI AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 3, "Johnny3Deep");
 
                 YesNo yn = PromptYesOrNo("Is this AI playing white? ");
                 string opponentName = PromptForString("Enter the other player's name: ");

@@ -51,7 +51,7 @@ namespace HiveLib.AI
         public Move PickBestMove(Board board)
         {
             Move bestMove;
-            double score = AnalyzeNextMoves(board, double.MinValue, double.MaxValue, 3, playingWhite ? 1 : -1, out bestMove);
+            double score = AnalyzeNextMoves(board, double.MinValue, double.MaxValue, _depth, playingWhite ? 1 : -1, out bestMove);
             return bestMove;
         }
 
