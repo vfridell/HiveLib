@@ -57,7 +57,6 @@ namespace HiveLib.Models.Pieces
 
         protected void GetSlideMovesRecursive(Hex current, Board board, int stopAtDepth, int depth, IList<Hex> visited, Dictionary<int, HashSet<Hex>> results)
         {
-            List<Move> returnList = new List<Move>();
             Hivailability hivailableCenter = Hivailability.GetHivailability(board, current);
             IList<Hex> blockedNeighbors = hivailableCenter.BlockedNeighborHexes(current);
             IList<Hex> emptyNeighbors = hivailableCenter.EmptyNeighborHexes(current);

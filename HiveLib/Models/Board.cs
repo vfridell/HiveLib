@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using QuickGraph;
@@ -262,17 +263,22 @@ namespace HiveLib.Models
         private IReadOnlyList<Move> GenerateAllMovementMoves()
         {
             List<Move> moves = new List<Move>();
+            var moves2 = new ConcurrentBag<Move>();
             if ((_whiteToPlay && whiteQueenPlaced) || (!_whiteToPlay && blackQueenPlaced))
             {
-                foreach (var kvp in _playedPieces)
-                {
+                Parallel.ForEach(_playedPieces, (kvp) => {
                     if (!_articulationPoints.Contains(kvp.Key) || kvp.Key is BeetleStack)
                     {
-                        moves.AddRange(kvp.Key.GetMoves(kvp.Value, this));
+                        
+                        foreach(Move move in kvp.Key.GetMoves(kvp.Value, this))
+                        {
+                            moves2.Add(move);
+                        }
+                        //moves2.AddRange(kvp.Key.GetMoves(kvp.Value, this));
                     }
-                }
+                });
             }
-            return moves.AsReadOnly();
+            return moves2.ToList().AsReadOnly();
         }
 
         public IReadOnlyList<Move> GetMoves(bool currentPlayerOnly = true)

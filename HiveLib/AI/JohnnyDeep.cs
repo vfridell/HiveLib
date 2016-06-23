@@ -116,7 +116,7 @@ namespace HiveLib.AI
         private string _name;
         public string Name
         {
-            get { return string.IsNullOrEmpty(_name) ? "JohnnyDeep" : _name; }
+            get { return string.IsNullOrEmpty(_name) ? string.Format("Johnny{0}Deep", _depth) : _name; }
         }
 
     }
