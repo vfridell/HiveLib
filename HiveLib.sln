@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiveLib", "HiveLib\HiveLib.csproj", "{296B8570-BBD5-4F2C-915B-B6748C778204}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{C216B29D-77AB-41AA-BCBE-89E544CA87C7}"
@@ -12,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIJohnnyVersusRandom", "JohnnyVersusRandon\AIJohnnyVersusRandom.csproj", "{447ACEF2-24E7-4A81-AA0D-8CA07113EFFB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiveDisplay", "HiveDisplay\HiveDisplay.csproj", "{FA3A57F0-7944-4FA2-ABC3-84C207484297}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeightsFinder", "WeightsFinder\WeightsFinder.csproj", "{F658EFE1-A39C-49BF-AFB8-9B40E8CB41B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +39,10 @@ Global
 		{FA3A57F0-7944-4FA2-ABC3-84C207484297}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA3A57F0-7944-4FA2-ABC3-84C207484297}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA3A57F0-7944-4FA2-ABC3-84C207484297}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F658EFE1-A39C-49BF-AFB8-9B40E8CB41B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F658EFE1-A39C-49BF-AFB8-9B40E8CB41B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F658EFE1-A39C-49BF-AFB8-9B40E8CB41B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F658EFE1-A39C-49BF-AFB8-9B40E8CB41B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

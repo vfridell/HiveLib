@@ -51,6 +51,19 @@ namespace HiveLib.Models
             }
         }
 
+        public bool ThreeFoldRepetition()
+        {
+            int repetitions = 0;
+            // first board in _boards is same as _currentBoard (see TryMakeMove() above)
+            // second board is last turn, which cannot be the same
+            foreach(Board thisOldBoard in _boards.OrderByDescending(b => b.turnNumber).Skip(2))
+            {
+                if (Board.BoardPositionsEqual(_currentBoard, thisOldBoard)) repetitions++;
+                if (repetitions == 3) return true;
+            }
+            return false;
+        }
+
         public Board GetCurrentBoard()
         {
             return _currentBoard.Clone();

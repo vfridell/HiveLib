@@ -597,6 +597,7 @@ namespace HiveLib.Models
             if (x.playedPieces.Count != y.playedPieces.Count) return false;
             foreach (var kvp in x.playedPieces)
             {
+                if (null == y._boardPieceArray[kvp.Value.column, kvp.Value.row]) return false;
                 if (!y._boardPieceArray[kvp.Value.column, kvp.Value.row].Equals(kvp.Key)) return false;
             }
             return true;

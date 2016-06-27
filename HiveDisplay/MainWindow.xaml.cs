@@ -61,7 +61,7 @@ namespace HiveDisplay
             //var newGameWindow = new NewGameWindow();
             //newGameWindow.ShowDialog();
             ClearDisplay();
-            _player2AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 4, "Johnny4Deep");
+            _player2AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 3, "Johnny4Deep");
             _player2AI.BeginNewGame(false);
             _displayState = new PlayGame();
             _game = Game.GetNewGame("player1", "Johnny4Deep");

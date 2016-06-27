@@ -24,7 +24,7 @@ namespace JohnnyVersusRandom
             do
             {
                 IHiveAI AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 3);
-                IHiveAI AI2 = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 2);
+                IHiveAI AI2 = new JohnnyDeep(BoardAnalysisWeights.foundWeights1, 3, "foundWeights1");
 
                 YesNo yn = PromptYesOrNo(string.Format("Is {0} playing white? ", AI.Name));
 
@@ -54,7 +54,7 @@ namespace JohnnyVersusRandom
                     move = currentAI.MakeBestMove(game);
                     TimeSpan timespan = DateTime.Now.Subtract(beginTimestamp);
                     Console.WriteLine(string.Format("{0} seconds {1} Moved: {2}", timespan.TotalSeconds, currentAI.Name, Move.GetMoveWithNotation(move, currentBoard).notation));
-                } while (game.gameResult == GameResult.Incomplete);
+                } while (game.gameResult == GameResult.Incomplete && !game.ThreeFoldRepetition());
 
                 Console.WriteLine(GetWinnerString(game));
                 if (PromptYesOrNo("Write out game transcript?") == YesNo.Yes)
@@ -72,6 +72,8 @@ namespace JohnnyVersusRandom
             {
                 case GameResult.Draw:
                     return "Draw";
+                case GameResult.Incomplete:
+                    return "Draw (negotiated)";
                 case GameResult.WhiteWin:
                     return string.Format("{0} wins!", game.whitePlayerName);
                 case GameResult.BlackWin:

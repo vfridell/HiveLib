@@ -12,7 +12,6 @@ namespace HiveLib.AI
 {
     public class JohnnyDeep : IHiveAI
     {
-        private Random _rand = new Random();
         private bool _playingWhite;
         private int _depth;
 
@@ -96,6 +95,7 @@ namespace HiveLib.AI
         {
             var localMovesData = new ConcurrentDictionary<Move, Tuple<BoardAnalysisData, Board>>();
 
+            // I think this parallelism allows for randomness when picking multiple moves that all analyze to the same advantage number
             Parallel.ForEach(board.GetMoves(), (nextMove) =>
             {
                 Board futureBoard = board.Clone();
