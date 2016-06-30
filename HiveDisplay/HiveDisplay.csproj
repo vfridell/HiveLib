@@ -108,6 +108,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NewGameParameters.cs" />
     <Compile Include="NewGameWindow.xaml.cs">
       <DependentUpon>NewGameWindow.xaml</DependentUpon>
     </Compile>

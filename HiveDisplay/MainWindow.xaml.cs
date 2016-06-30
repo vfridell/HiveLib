@@ -58,15 +58,37 @@ namespace HiveDisplay
 
         private void NewGameExecute(object sender, ExecutedRoutedEventArgs e)
         {
-            //var newGameWindow = new NewGameWindow();
-            //newGameWindow.ShowDialog();
-            ClearDisplay();
-            _player2AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 3, "Johnny4Deep");
-            _player2AI.BeginNewGame(false);
-            _displayState = new PlayGame();
-            _game = Game.GetNewGame("player1", "Johnny4Deep");
-            _currentBoard = _game.GetCurrentBoard();
-            DrawBoard(_currentBoard);
+            var newGameWindow = new NewGameWindow();
+            newGameWindow.ShowDialog();
+            if (newGameWindow.DialogResult.HasValue && newGameWindow.DialogResult.Value)
+            {
+                ClearDisplay();
+                if (newGameWindow.Parameters.player1 != null)
+                {
+                    _player1AI = newGameWindow.Parameters.player1;
+                    _player1AI.BeginNewGame(true);
+                }
+                else
+                {
+                    _player1AI = null;
+                }
+
+                if (newGameWindow.Parameters.player2 != null)
+                {
+                    _player2AI = newGameWindow.Parameters.player2;
+                    _player2AI.BeginNewGame(false);
+                }
+                else
+                {
+                    _player2AI = null;
+                }
+
+                _displayState = new PlayGame();
+                _game = Game.GetNewGame(_player1AI == null ? newGameWindow.Parameters.player1Name : _player1AI.Name, 
+                                        _player2AI == null ? newGameWindow.Parameters.player2Name : _player2AI.Name );
+                _currentBoard = _game.GetCurrentBoard();
+                DrawBoard(_currentBoard);
+            }
         }
 
         void NewGameCanExecute(object sender, CanExecuteRoutedEventArgs e)
