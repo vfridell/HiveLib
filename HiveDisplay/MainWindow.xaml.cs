@@ -17,6 +17,7 @@ using HiveLib.Models.Pieces;
 using System.Runtime.Serialization.Formatters.Binary;
 using HiveLib.ViewModels;
 using HiveLib.AI;
+using System.Threading;
 
 
 namespace HiveDisplay
@@ -41,6 +42,7 @@ namespace HiveDisplay
         Point _mainCanvasOffsetPoint;
         Point _unplayedCanvasOffsetPoint;
         Piece _selectedPiece;
+        static readonly object _aiLoopLock = new object();
 
         DisplayState _displayState;
         IHiveAI _player1AI;
@@ -83,12 +85,57 @@ namespace HiveDisplay
                     _player2AI = null;
                 }
 
-                _displayState = new PlayGame();
                 _game = Game.GetNewGame(_player1AI == null ? newGameWindow.Parameters.player1Name : _player1AI.Name, 
                                         _player2AI == null ? newGameWindow.Parameters.player2Name : _player2AI.Name );
                 _currentBoard = _game.GetCurrentBoard();
                 DrawBoard(_currentBoard);
+
+                MakeAIMoveIfNecessary();
+
             }
+        }
+
+        private async void MakeAIMoveIfNecessary()
+        {
+            IHiveAI AI;
+            if (TryGetAIForTurn(out AI))
+            {
+                Monitor.Enter(_aiLoopLock);
+                try
+                {
+                    MainCanvas.IsEnabled = false;
+                    UnplayedPiecesCanvas.IsEnabled = false;
+
+                    Move move = await GetMove(AI, _game);
+                    if (null == move) return;
+                    if (!_game.TryMakeMove(move))
+                    {
+                        throw new Exception("Bad AI move!");
+                    }
+                    _currentBoard = _game.GetCurrentBoard();
+                    DrawBoard(_currentBoard);
+                }
+                catch(Exception ex)
+                {
+                    throw;
+                }
+                finally
+                {
+                    MainCanvas.IsEnabled = true;
+                    UnplayedPiecesCanvas.IsEnabled = true;
+                    Monitor.Exit(_aiLoopLock);
+                }
+
+            }
+        }
+
+        private Task<Move> GetMove(IHiveAI AI, Game game)
+        {
+            return Task<Move>.Run(() =>
+            {
+                Move move = AI.PickBestMove(game.GetCurrentBoard());
+                return move;
+            });
         }
 
         void NewGameCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -252,7 +299,7 @@ namespace HiveDisplay
             {
                 DrawBoard(_game.GetCurrentBoard());
                 _currentBoard = _game.GetCurrentBoard();
-                _displayState.MoveMade(this);
+                MakeAIMoveIfNecessary();
             }
         }
 
@@ -345,7 +392,6 @@ namespace HiveDisplay
             _tempUIElements.Clear();
             _player1AI = null;
             _player2AI = null;
-            _displayState = new ViewOnly();
         }
 
         private bool TryLoadGameBinary(string filename)
@@ -394,30 +440,37 @@ namespace HiveDisplay
         internal bool TryGetAIForTurn(out IHiveAI ai)
         {
             ai = null;
-            if(_currentBoard.whiteToPlay)
+            if (_game.GetCurrentBoard().gameResult == GameResult.Incomplete && !_game.ThreeFoldRepetition())
             {
-                if (_player1AI != null && _player1AI.playingWhite) { ai = _player1AI; return true; }
-                else if (_player2AI != null && _player2AI.playingWhite) { ai = _player2AI; return true; }
-                else { return false; }
+                if (_currentBoard.whiteToPlay)
+                {
+                    if (_player1AI != null && _player1AI.playingWhite) { ai = _player1AI; return true; }
+                    else if (_player2AI != null && _player2AI.playingWhite) { ai = _player2AI; return true; }
+                    else { return false; }
+                }
+                else
+                {
+                    if (_player1AI != null && !_player1AI.playingWhite) { ai = _player1AI; return true; }
+                    else if (_player2AI != null && !_player2AI.playingWhite) { ai = _player2AI; return true; }
+                    else { return false; }
+                }
             }
             else
             {
-                if (_player1AI != null && !_player1AI.playingWhite) { ai = _player1AI; return true; }
-                else if (_player2AI != null && !_player2AI.playingWhite) { ai = _player2AI; return true; }
-                else { return false; }
+                return false;
             }
         }
 
-        internal void MakeAIMove(IHiveAI ai)
-        {
-            if (_currentBoard.gameResult == GameResult.Incomplete)
-            {
-                Move bestMove = ai.PickBestMove(_currentBoard);
-                TryMakeMove(bestMove);
-                DrawBoard(_game.GetCurrentBoard());
-                _currentBoard = _game.GetCurrentBoard();
-                _displayState.MoveMade(this);
-            }
-        }
+        //internal void MakeAIMove(IHiveAI ai)
+        //{
+        //    if (_currentBoard.gameResult == GameResult.Incomplete)
+        //    {
+        //        Move bestMove = ai.PickBestMove(_currentBoard);
+        //        TryMakeMove(bestMove);
+        //        DrawBoard(_game.GetCurrentBoard());
+        //        _currentBoard = _game.GetCurrentBoard();
+        //        _displayState.MoveMade(this);
+        //    }
+        //}
     }
 }

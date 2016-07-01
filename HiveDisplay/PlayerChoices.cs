@@ -12,21 +12,21 @@ namespace HiveDisplay
     {
         public static List<PlayerChoice> Players = new List<PlayerChoice> 
         { 
-            new PlayerChoice() { IsHuman = true },
-            new PlayerChoice() { IsHuman = false, AI = new JohnnyDeep(BoardAnalysisWeights.winningWeights, 3) }
+            new PlayerChoice() { IsHuman = true, GetNewAI = () => {return null;} },
+            new PlayerChoice() { IsHuman = false, GetNewAI = () => { return new JohnnyDeep(BoardAnalysisWeights.winningWeights, 3);} }
         };
     }
 
     public class PlayerChoice
     {
         public bool IsHuman;
-        public IHiveAI AI;
+        public Func<IHiveAI> GetNewAI;
         public override string ToString()
         {
-            if (AI == null)
+            if (IsHuman)
                 return "Human";
             else
-                return AI.Name;
+                return GetNewAI().Name;
         }
     }
 }

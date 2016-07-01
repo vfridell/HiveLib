@@ -1,4 +1,5 @@
 ﻿using HiveLib.AI;
+using HiveLib.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,19 +10,26 @@ namespace HiveDisplay
 {
     public abstract class DisplayState
     {
-        public abstract void MoveMade(HiveGameWindow window);
-        public abstract void GameEnd(HiveGameWindow window);
+        public abstract void ReadyForMove(IHiveAI AI, Game game);
+        public abstract Task GameStart(IHiveAI AI, Game game);
+        public abstract void GameEnd(IHiveAI AI, Game game);
     }
 
     public class ViewOnly : DisplayState
     {
 
-        public override void MoveMade(HiveGameWindow window)
+        public override void ReadyForMove(IHiveAI AI, Game game)
         {
             // do nothing
         }
 
-        public override void GameEnd(HiveGameWindow window)
+        public override Task GameStart(IHiveAI AI, Game game)
+        {
+            // do nothing
+            return Task.FromResult<object>(null);
+        }
+
+        public override void GameEnd(IHiveAI AI, Game game)
         {
             // do nothing
         }
@@ -29,16 +37,22 @@ namespace HiveDisplay
 
     public class PlayGame : DisplayState
     {
-        public override void MoveMade(HiveGameWindow window)
+        public override void ReadyForMove(IHiveAI AI, Game game)
         {
-            IHiveAI ai;
-            if(window.TryGetAIForTurn(out ai))
-            {
-                window.MakeAIMove(ai);
-            }
+            //
+
         }
 
-        public override void GameEnd(HiveGameWindow window)
+        public override Task GameStart(IHiveAI AI, Game game)
+        {
+            return Task.Run(() =>
+            {
+                Move move = AI.PickBestMove(game.GetCurrentBoard());
+                game.TryMakeMove(move);
+            });
+        }
+
+        public override void GameEnd(IHiveAI AI, Game game)
         {
             throw new NotImplementedException();
         }

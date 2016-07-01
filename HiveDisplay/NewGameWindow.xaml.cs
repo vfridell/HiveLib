@@ -34,8 +34,8 @@ namespace HiveDisplay
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             _newGameParameters = new NewGameParameters();
-            _newGameParameters.player1 = ((PlayerChoice)player1ComboBox.SelectedValue).AI;
-            _newGameParameters.player2 = ((PlayerChoice)player2ComboBox.SelectedValue).AI;
+            _newGameParameters.player1 = ((PlayerChoice)player1ComboBox.SelectedValue).GetNewAI();
+            _newGameParameters.player2 = ((PlayerChoice)player2ComboBox.SelectedValue).GetNewAI();
             _newGameParameters.player1Name = player1Name.Text;
             _newGameParameters.player2Name = player2Name.Text;
             DialogResult = true;
