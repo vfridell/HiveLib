@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HiveLib.Models;
 using HiveLib.ViewModels;
+using System.Threading;
 
 namespace HiveLib.AI
 {
@@ -48,31 +49,41 @@ namespace HiveLib.AI
 
         public Move PickBestMove(Board board)
         {
-            IDictionary<Move, BoardAnalysisData> movesData;
-            IDictionary<Move, BoardAnalysisDataDiff> dataDiffs;
-            AnalyzeNextMoves(board, out movesData, out dataDiffs);
-
-            List<Move> orderedMoves;
-            IOrderedEnumerable<KeyValuePair<Move, BoardAnalysisData>> orderedAnalysis;
-            if (_playingWhite)
-            {
-                orderedAnalysis = movesData.OrderByDescending(m => m.Value.whiteAdvantage);
-            }
-            else
-            {
-                orderedAnalysis = movesData.OrderBy(m => m.Value.whiteAdvantage);
-            }
-            orderedMoves = orderedAnalysis.Select<KeyValuePair<Move, BoardAnalysisData>, Move>(m => m.Key).ToList();
-
-            return orderedMoves[0];
+            var cancelSource = new CancellationTokenSource();
+            return PickBestMoveAsync(board, cancelSource.Token).Result;
         }
+
+        public Task<Move> PickBestMoveAsync(Board board, CancellationToken aiCancelToken)
+        {
+            return Task.Run(() =>
+            {
+                IDictionary<Move, BoardAnalysisData> movesData;
+                IDictionary<Move, BoardAnalysisDataDiff> dataDiffs;
+                AnalyzeNextMoves(board, aiCancelToken, out movesData, out dataDiffs);
+
+                List<Move> orderedMoves;
+                IOrderedEnumerable<KeyValuePair<Move, BoardAnalysisData>> orderedAnalysis;
+                if (_playingWhite)
+                {
+                    orderedAnalysis = movesData.OrderByDescending(m => m.Value.whiteAdvantage);
+                }
+                else
+                {
+                    orderedAnalysis = movesData.OrderBy(m => m.Value.whiteAdvantage);
+                }
+                orderedMoves = orderedAnalysis.Select<KeyValuePair<Move, BoardAnalysisData>, Move>(m => m.Key).ToList();
+
+                return orderedMoves[0];
+            });
+        }
+
 
         public void BeginNewGame(bool playingWhite)
         {
             _playingWhite = playingWhite;
         }
 
-        private void AnalyzeNextMoves(Board board, out IDictionary<Move, BoardAnalysisData> movesData, out IDictionary<Move, BoardAnalysisDataDiff> dataDiffs)
+        private void AnalyzeNextMoves(Board board, CancellationToken aiCancelToken, out IDictionary<Move, BoardAnalysisData> movesData, out IDictionary<Move, BoardAnalysisDataDiff> dataDiffs)
         {
             var localMovesData = new ConcurrentDictionary<Move, BoardAnalysisData>();
             var localDataDiffs = new ConcurrentDictionary<Move, BoardAnalysisDataDiff>();
@@ -85,6 +96,7 @@ namespace HiveLib.AI
 
             Parallel.ForEach(moves, (nextMove) =>
             {
+                aiCancelToken.ThrowIfCancellationRequested();
                 Board futureBoard = board.Clone();
                 if (!futureBoard.TryMakeMove(nextMove)) throw new Exception("Oh noe!  Bad move.");
                 localMovesData[nextMove] = BoardAnalysisData.GetBoardAnalysisData(futureBoard, _weights);

@@ -42,6 +42,7 @@ namespace HiveDisplay
         Point _mainCanvasOffsetPoint;
         Point _unplayedCanvasOffsetPoint;
         Piece _selectedPiece;
+        CancellationTokenSource _cancelSource;
         static readonly object _aiLoopLock = new object();
 
         DisplayState _displayState;
@@ -56,6 +57,17 @@ namespace HiveDisplay
             _unplayedCanvasOffsetPoint = HexagonDrawing.GetOffsetPointFromCenter(unplayedCanvasCenterPoint, _drawSize);
             MovesListBox.SelectionChanged += MovesListBox_SelectionChanged;
             this.CommandBindings.Add(new CommandBinding(ApplicationCommands.New, NewGameExecute, NewGameCanExecute));
+            this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Stop, StopExecute, StopCanExecute));
+        }
+
+        private void StopCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void StopExecute(object sender, ExecutedRoutedEventArgs e)
+        {
+            CancelAIMove();
         }
 
         private void NewGameExecute(object sender, ExecutedRoutedEventArgs e)
@@ -90,8 +102,61 @@ namespace HiveDisplay
                 _currentBoard = _game.GetCurrentBoard();
                 DrawBoard(_currentBoard);
 
-                MakeAIMoveIfNecessary();
+                if (_player1AI != null && _player2AI != null)
+                {
+                    RunAIOnlyGame();
+                }
+                else
+                {
+                    MakeAIMoveIfNecessary();
+                }
+            }
+        }
 
+        private async void RunAIOnlyGame()
+        {
+            while (_game.gameResult == GameResult.Incomplete && !_game.ThreeFoldRepetition())
+            {
+                IHiveAI AI;
+                if (TryGetAIForTurn(out AI))
+                {
+                    try
+                    {
+                        using (_cancelSource = new CancellationTokenSource())
+                        {
+                            SetUIStatus(false);
+                            Move move = AI.PickBestMoveAsync(_game.GetCurrentBoard(), _cancelSource.Token).Result;
+                            if (null == move) return;
+                            if (!TryMakeMove(move))
+                            {
+                                throw new Exception("Bad AI move!");
+                            }
+                            _currentBoard = _game.GetCurrentBoard();
+                            DrawBoard(_currentBoard);
+                            await Task.Delay(1000);
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        MessageBox.Show("Move Cancelled");
+                    }
+                    catch (Exception ex)
+                    {
+                        throw;
+                    }
+                    finally
+                    {
+                        SetUIStatus(true);
+                    }
+                }
+            }
+        }
+
+        private void CancelAIMove()
+        {
+            if(_cancelSource != null)
+            {
+                _cancelSource.Cancel();
             }
         }
 
@@ -100,20 +165,25 @@ namespace HiveDisplay
             IHiveAI AI;
             if (TryGetAIForTurn(out AI))
             {
-                Monitor.Enter(_aiLoopLock);
                 try
                 {
-                    MainCanvas.IsEnabled = false;
-                    UnplayedPiecesCanvas.IsEnabled = false;
-
-                    Move move = await GetMove(AI, _game);
+                    SetUIStatus(false);
+                    Move move;
+                    using (_cancelSource = new CancellationTokenSource())
+                    {
+                        move = await AI.PickBestMoveAsync(_game.GetCurrentBoard(), _cancelSource.Token);
+                    }
                     if (null == move) return;
-                    if (!_game.TryMakeMove(move))
+                    if (!TryMakeMove(move))
                     {
                         throw new Exception("Bad AI move!");
                     }
                     _currentBoard = _game.GetCurrentBoard();
                     DrawBoard(_currentBoard);
+                }
+                catch(OperationCanceledException)
+                {
+                    MessageBox.Show("Move Cancelled");
                 }
                 catch(Exception ex)
                 {
@@ -121,21 +191,26 @@ namespace HiveDisplay
                 }
                 finally
                 {
-                    MainCanvas.IsEnabled = true;
-                    UnplayedPiecesCanvas.IsEnabled = true;
-                    Monitor.Exit(_aiLoopLock);
+                    SetUIStatus(true);
                 }
 
             }
         }
 
-        private Task<Move> GetMove(IHiveAI AI, Game game)
+        private void SetUIStatus(bool enabled)
         {
-            return Task<Move>.Run(() =>
+            MainCanvas.IsEnabled = enabled;
+            UnplayedPiecesCanvas.IsEnabled = enabled;
+            MovesListBox.IsEnabled = enabled;
+
+            if(!enabled)
             {
-                Move move = AI.PickBestMove(game.GetCurrentBoard());
-                return move;
-            });
+                //Mouse.OverrideCursor = Cursors.Wait;
+            }
+            else
+            {
+                //Mouse.OverrideCursor = Cursors.Arrow;
+            }
         }
 
         void NewGameCanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -461,16 +536,5 @@ namespace HiveDisplay
             }
         }
 
-        //internal void MakeAIMove(IHiveAI ai)
-        //{
-        //    if (_currentBoard.gameResult == GameResult.Incomplete)
-        //    {
-        //        Move bestMove = ai.PickBestMove(_currentBoard);
-        //        TryMakeMove(bestMove);
-        //        DrawBoard(_game.GetCurrentBoard());
-        //        _currentBoard = _game.GetCurrentBoard();
-        //        _displayState.MoveMade(this);
-        //    }
-        //}
     }
 }

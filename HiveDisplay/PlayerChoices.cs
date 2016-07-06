@@ -13,7 +13,11 @@ namespace HiveDisplay
         public static List<PlayerChoice> Players = new List<PlayerChoice> 
         { 
             new PlayerChoice() { IsHuman = true, GetNewAI = () => {return null;} },
-            new PlayerChoice() { IsHuman = false, GetNewAI = () => { return new JohnnyDeep(BoardAnalysisWeights.winningWeights, 3);} }
+            new PlayerChoice() { IsHuman = false, GetNewAI = () => { return new JohnnyDeep(BoardAnalysisWeights.winningWeights, 2);} },
+            new PlayerChoice() { IsHuman = false, GetNewAI = () => { return new JohnnyDeep(BoardAnalysisWeights.winningWeights, 3);} },
+            new PlayerChoice() { IsHuman = false, GetNewAI = () => { return new JohnnyDeep(BoardAnalysisWeights.winningWeights, 4);} },
+            new PlayerChoice() { IsHuman = false, GetNewAI = () => { return new RandomAI();} },
+            new PlayerChoice() { IsHuman = false, GetNewAI = () => { return new JohnnyHive(BoardAnalysisWeights.winningWeights);} },
         };
     }
 

@@ -12,6 +12,7 @@
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar>
                 <Button Content="New Game" Command="ApplicationCommands.New" />
+                <Button Content="Cancel Move" Command="ApplicationCommands.Stop" />
             </ToolBar>
         </ToolBarTray>
         <Grid Name="AppGrid">

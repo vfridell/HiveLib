@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HiveLib.Models;
 using HiveLib.ViewModels;
+using System.Threading;
 
 namespace HiveLib.AI
 {
@@ -49,6 +50,12 @@ namespace HiveLib.AI
         {
             IReadOnlyList<Move> moves = board.GetMoves();
             return GetRandomMove(moves);
+        }
+
+        public Task<Move> PickBestMoveAsync(Board board, CancellationToken aiCancelToken)
+        {
+            IReadOnlyList<Move> moves = board.GetMoves();
+            return Task.FromResult(GetRandomMove(moves));
         }
     }
 }
