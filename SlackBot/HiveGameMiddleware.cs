@@ -22,12 +22,6 @@ namespace SlackBot
             {
                 new HandlerMapping
                 {
-                    ValidHandles = new []{"initiate"},
-                    Description = "Send the start game message to another player",
-                    EvaluatorFunc = InitiateGameHandler
-                },
-                new HandlerMapping
-                {
                     ValidHandles = new []{"start"},
                     Description = "Start a new game of Hive",
                     EvaluatorFunc = StartGameHandler
@@ -78,25 +72,6 @@ namespace SlackBot
             }
         }
 
-        private IEnumerable<ResponseMessage> InitiateGameHandler(IncomingMessage message, string matchedHandle)
-        {
-            if (message.BotIsMentioned)
-            {
-                string parameters = message.TargetedText.Substring(matchedHandle.Length).Trim();
-                if (parameters.Split(' ').Length != 2)
-                {
-                    yield return message.ReplyToChannel($"you must give a user and a color:  initiate <username> <color>");
-                }
-                else
-                {
-                    string user = parameters.Split(' ')[0];
-                    string color = parameters.Split(' ')[1];
-                    _hiveGamePlugin.SaveUsername(user);
-                    yield return message.ReplyToChannel($"{user}: start {color}");
-                }
-            }
-        }
-
         private IEnumerable<ResponseMessage> QuitGameHandler(IncomingMessage message, string matchedHandle)
         {
             if (message.BotIsMentioned)
@@ -111,14 +86,22 @@ namespace SlackBot
             if (message.BotIsMentioned)
             {
                 string parameters = message.TargetedText.Substring(matchedHandle.Length).Trim();
-                if (parameters.Split(' ').Length != 2)
+                var paramArray = parameters.Split(' ');
+                string user;
+                string color;
+                if (paramArray.Length == 2 || paramArray.Length == 1)
                 {
-                    yield return message.ReplyToChannel($"you must give a user and a color:  start <username> <color>");
-                }
-                else
-                {
-                    string user = parameters.Split(' ')[0];
-                    string color = parameters.Split(' ')[1];
+                    if(paramArray.Length == 1)
+                    {
+                        user = message.Username;
+                        color = paramArray[0];
+                    }
+                    else
+                    {
+                        user = paramArray[0];
+                        color = paramArray[1];
+                    }
+
                     _hiveGamePlugin.SaveUsername(user);
                     if (!_hiveGamePlugin.GameStarted())
                     {
@@ -153,6 +136,10 @@ namespace SlackBot
                     {
                         yield return message.ReplyToChannel($"Game already started with {_hiveGamePlugin.GetUser()}");
                     }
+                }
+                else
+                {
+                    yield return message.ReplyToChannel($"you must give a user and a color:  start <username> <color>");
                 }
             }
         }
