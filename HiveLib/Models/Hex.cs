@@ -47,5 +47,7 @@ namespace HiveLib.Models
         {
             return new Hex(hex1.column + hex2.column, hex1.row + hex2.row);
         }
+
+        public static int Distance(Hex hex1, Hex hex2) => Math.Max(Math.Max(Math.Abs(hex1.x - hex2.x), Math.Abs(hex1.y - hex2.y)), Math.Abs(hex1.z - hex2.z));
     }
 }
