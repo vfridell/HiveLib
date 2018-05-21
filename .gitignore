@@ -29,4 +29,5 @@ _ReSharper*/
 *.psess
 *.vsp
 [Pp]ackages*/
+/SlackBot/Configuration/config.json
 .vs*/

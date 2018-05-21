@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiveDisplay", "HiveDisplay\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeightsFinder", "WeightsFinder\WeightsFinder.csproj", "{F658EFE1-A39C-49BF-AFB8-9B40E8CB41B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SlackBot", "SlackBot\SlackBot.csproj", "{32EFB1F1-43DE-4D53-8D31-3BEC3181759A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{F658EFE1-A39C-49BF-AFB8-9B40E8CB41B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F658EFE1-A39C-49BF-AFB8-9B40E8CB41B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F658EFE1-A39C-49BF-AFB8-9B40E8CB41B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32EFB1F1-43DE-4D53-8D31-3BEC3181759A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32EFB1F1-43DE-4D53-8D31-3BEC3181759A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32EFB1F1-43DE-4D53-8D31-3BEC3181759A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32EFB1F1-43DE-4D53-8D31-3BEC3181759A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
