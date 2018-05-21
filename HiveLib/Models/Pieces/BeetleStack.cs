@@ -66,6 +66,7 @@ namespace HiveLib.Models.Pieces
         public override PieceColor color { get { return top.color; } }
         public override int number { get { return top.number; } }
         public override int height { get { return _topLevel; } }
+        public IReadOnlyList<Piece> Pieces => _pieces.ToList().AsReadOnly();
 
         internal bool Contains(Piece piece)
         {
