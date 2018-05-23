@@ -58,6 +58,7 @@ namespace HiveLib.Models
 
         private bool _whiteToPlay = true;
         public bool whiteToPlay { get { return _whiteToPlay; } }
+        public PieceColor ColorToPlay => _whiteToPlay ? PieceColor.White : PieceColor.Black;
 
         private bool _whiteQueenPlaced = false;
         public bool whiteQueenPlaced { get { return _whiteQueenPlaced; } }
